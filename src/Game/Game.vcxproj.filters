@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="UnitTest.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MicroEngine.cpp">
+      <Filter>MicroEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="MicroOpenGLLoader.cpp">
+      <Filter>MicroEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="MicroRender.cpp">
+      <Filter>MicroEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="MicroGraphics.cpp">
+      <Filter>MicroEngine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AppConfig.h" />
+    <ClInclude Include="MicroMath.h">
+      <Filter>MicroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroEngine.h">
+      <Filter>MicroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroCollisions.h">
+      <Filter>MicroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroOpenGLLoader.h">
+      <Filter>MicroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroRender.h">
+      <Filter>MicroEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroGraphics.h">
+      <Filter>MicroEngine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="3rdparty">
+      <UniqueIdentifier>{df6fd6b1-03ed-4614-be39-f966c02ca7a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ref">
+      <UniqueIdentifier>{bd6a467c-0928-46e6-8e4e-0fa4c2c74f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine">
+      <UniqueIdentifier>{7cd59890-c8f1-46ea-8abd-1e57b7ac044f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
