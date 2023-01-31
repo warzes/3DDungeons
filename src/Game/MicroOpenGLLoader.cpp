@@ -1,9 +1,9 @@
 #include "MicroOpenGLLoader.h"
-
+//-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "OpenGL32.lib" )
 #endif
-
+//-----------------------------------------------------------------------------
 #if defined(_WIN32)
 extern "C"
 {
@@ -16,3 +16,9 @@ extern "C"
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 #endif // _WIN32
+//-----------------------------------------------------------------------------
+void OpenGLInit(OpenGLGetProcAddressFunc func)
+{
+
+}
+//-----------------------------------------------------------------------------
