@@ -474,11 +474,11 @@ float GetWindowAspectRatio()
 //-----------------------------------------------------------------------------
 void RenderSystemInit()
 {
-//	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-//	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-//	glEnable(GL_DEPTH_TEST);
-//	glClearDepth(1.0f);
-//	glDepthRange(0.0f, 1.0f);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glEnable(GL_DEPTH_TEST);
+	glClearDepth(1.0f);
+	glDepthRange(0.0f, 1.0f);
 }
 //-----------------------------------------------------------------------------
 void RenderSystemBeginFrame()
@@ -488,11 +488,11 @@ void RenderSystemBeginFrame()
 		render::FramebufferWidth = window::WindowClientWidth;
 		render::FramebufferHeight = window::WindowClientHeight;
 
-		//glViewport(0, 0, render::FramebufferWidth, render::FramebufferHeight);
-		//glScissor(0, 0, render::FramebufferWidth, render::FramebufferHeight);
+		glViewport(0, 0, render::FramebufferWidth, render::FramebufferHeight);
+		glScissor(0, 0, render::FramebufferWidth, render::FramebufferHeight);
 	}
 
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
