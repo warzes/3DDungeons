@@ -23,8 +23,6 @@
 #endif
 
 /* ----------------------------- GL_VERSION_1_1 ---------------------------- */
-#define GL_VERSION_1_0 1
-#define GL_VERSION_1_1 1
 
 typedef unsigned int GLenum;
 typedef unsigned int GLbitfield;
@@ -53,16 +51,36 @@ typedef uint64_t GLuint64;
 
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #define GL_DEPTH_BUFFER_BIT 0x00000100
+#define GL_DEPTH_COMPONENT 0x1902
 #define GL_DEPTH_TEST 0x0B71
 #define GL_FALSE 0
 #define GL_FLOAT 0x1406
+#define GL_GREEN 0x1904
+#define GL_LINEAR 0x2601
+#define GL_LINEAR_MIPMAP_LINEAR 0x2703
+#define GL_LINEAR_MIPMAP_NEAREST 0x2701
 #define GL_LINES 0x0001
+#define GL_NEAREST 0x2600
+#define GL_NEAREST_MIPMAP_LINEAR 0x2702
+#define GL_NEAREST_MIPMAP_NEAREST 0x2700
 #define GL_PACK_ALIGNMENT 0x0D05
 #define GL_POINTS 0x0000
+#define GL_RED 0x1903
+#define GL_REPEAT 0x2901
+#define GL_RGB 0x1907
+#define GL_RGB8 0x8051
+#define GL_RGBA 0x1908
+#define GL_RGBA8 0x8058
 #define GL_STENCIL_BUFFER_BIT 0x00000400
+#define GL_TEXTURE_2D 0x0DE1
+#define GL_TEXTURE_MAG_FILTER 0x2800
+#define GL_TEXTURE_MIN_FILTER 0x2801
+#define GL_TEXTURE_WRAP_S 0x2802
+#define GL_TEXTURE_WRAP_T 0x2803
 #define GL_TRIANGLES 0x0004
 #define GL_TRUE 1
 #define GL_UNPACK_ALIGNMENT 0x0CF5
+#define GL_UNSIGNED_BYTE 0x1401
 #define GL_UNSIGNED_INT 0x1405
 #define GL_UNSIGNED_SHORT 0x1403
 
@@ -70,32 +88,47 @@ typedef uint64_t GLuint64;
 #ifdef __cplusplus
 extern "C" {
 #endif
+	GLAPI void GLAPIENTRY glBindTexture(GLenum target, GLuint texture);
 	GLAPI void GLAPIENTRY glClear(GLbitfield mask);
 	GLAPI void GLAPIENTRY glClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 	GLAPI void GLAPIENTRY glClearDepth(GLclampd depth);
+	GLAPI void GLAPIENTRY glDeleteTextures(GLsizei n, const GLuint* textures);
 	GLAPI void GLAPIENTRY glDepthRange(GLclampd zNear, GLclampd zFar);
 	GLAPI void GLAPIENTRY glDisable(GLenum cap);
 	GLAPI void GLAPIENTRY glDrawArrays(GLenum mode, GLint first, GLsizei count);
 	GLAPI void GLAPIENTRY glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid* indices);
 	GLAPI void GLAPIENTRY glEnable(GLenum cap);
+	GLAPI void GLAPIENTRY glGenTextures(GLsizei n, GLuint* textures);
+	GLAPI void GLAPIENTRY glGetIntegerv(GLenum pname, GLint* params);
 	GLAPI void GLAPIENTRY glPixelStorei(GLenum pname, GLint param);
 	GLAPI void GLAPIENTRY glScissor(GLint x, GLint y, GLsizei width, GLsizei height);
+	GLAPI void GLAPIENTRY glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
+	GLAPI void GLAPIENTRY glTexParameteri(GLenum target, GLenum pname, GLint param);
+	GLAPI void GLAPIENTRY glTexParameteriv(GLenum target, GLenum pname, const GLint* params);
 	GLAPI void GLAPIENTRY glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 #ifdef __cplusplus
 }
 #endif
 
 /* ----------------------------- GL_VERSION_1_2 ---------------------------- */
-#define GL_VERSION_1_2 1
+
+#define GL_CLAMP_TO_EDGE 0x812F
 
 /* ----------------------------- GL_VERSION_1_3 ---------------------------- */
-#define GL_VERSION_1_3 1
+
+#define GL_CLAMP_TO_BORDER 0x812D
+#define GL_TEXTURE0 0x84C0
+
+typedef void (GLAPIENTRY* PFNGLACTIVETEXTUREPROC)(GLenum texture);
+extern PFNGLACTIVETEXTUREPROC glActiveTexture;
 
 /* ----------------------------- GL_VERSION_1_4 ---------------------------- */
-#define GL_VERSION_1_4 1
+
+#define GL_DEPTH_COMPONENT16 0x81A5
+#define GL_DEPTH_COMPONENT24 0x81A6
+#define GL_MIRRORED_REPEAT 0x8370
 
 /* ----------------------------- GL_VERSION_1_5 ---------------------------- */
-#define GL_VERSION_1_5 1
 
 #ifdef _WIN64
 typedef __int64          GLsizeiptr;
@@ -138,18 +171,17 @@ extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 
 /* ----------------------------- GL_VERSION_2_0 ---------------------------- */
-#define GL_VERSION_2_0 1
 
+#define GL_ACTIVE_ATTRIBUTES 0x8B89
+#define GL_ACTIVE_ATTRIBUTE_MAX_LENGTH 0x8B8A
 #define GL_COMPILE_STATUS 0x8B81
+#define GL_FLOAT_VEC2 0x8B50
+#define GL_FLOAT_VEC3 0x8B51
+#define GL_FLOAT_VEC4 0x8B52
 #define GL_FRAGMENT_SHADER 0x8B30
 #define GL_INFO_LOG_LENGTH 0x8B84
 #define GL_LINK_STATUS 0x8B82
 #define GL_VERTEX_SHADER 0x8B31
-#define GL_ACTIVE_ATTRIBUTES 0x8B89
-#define GL_ACTIVE_ATTRIBUTE_MAX_LENGTH 0x8B8A
-#define GL_FLOAT_VEC2 0x8B50
-#define GL_FLOAT_VEC3 0x8B51
-#define GL_FLOAT_VEC4 0x8B52
 
 // Shader Program
 typedef GLuint(GLAPIENTRY* PFNGLCREATEPROGRAMPROC)();
@@ -204,20 +236,33 @@ extern PFNGLGETSHADERIVPROC glGetShaderiv;
 extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 
 /* ----------------------------- GL_VERSION_2_1 ---------------------------- */
-#define GL_VERSION_2_1 1
 
 /* ----------------------------- GL_VERSION_3_0 ---------------------------- */
-#define GL_VERSION_3_0 1
 
 /* ----------------------------- GL_VERSION_3_1 ---------------------------- */
-#define GL_VERSION_3_1 1
+
 
 /* ----------------------------- GL_VERSION_3_2 ---------------------------- */
-#define GL_VERSION_3_2 1
 
 /* ----------------------------- GL_VERSION_3_3 ---------------------------- */
-#define GL_VERSION_3_3 1
 
+/* ----------------------- GL_ARB_framebuffer_object ----------------------- */
+
+#define GL_DEPTH_STENCIL 0x84F9
+#define GL_DEPTH24_STENCIL8 0x88F0
+
+typedef void (GLAPIENTRY* PFNGLGENERATEMIPMAPPROC)(GLenum target);
+extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+
+/* --------------------------- GL_ARB_texture_rg --------------------------- */
+
+#define GL_R8 0x8229
+#define GL_RG 0x8227
+#define GL_RG8 0x822B
+
+/* ------------------------- GL_ARB_texture_swizzle ------------------------ */
+
+#define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 
 //=============================================================================
 // OpenGL Func

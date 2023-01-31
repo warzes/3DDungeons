@@ -33,9 +33,6 @@
 #if defined(__EMSCRIPTEN__)
 #endif // __EMSCRIPTEN__
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-
 #if defined(_MSC_VER)
 #	pragma warning(pop)
 #endif // _MSC_VER

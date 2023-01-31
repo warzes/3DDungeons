@@ -17,6 +17,9 @@ extern "C"
 }
 #endif // _WIN32
 
+/* ----------------------------- GL_VERSION_1_3 ---------------------------- */
+PFNGLACTIVETEXTUREPROC glActiveTexture = nullptr;
+
 /* ----------------------------- GL_VERSION_1_5 ---------------------------- */
 
 // Buffer
@@ -64,9 +67,18 @@ PFNGLCOMPILESHADERPROC glCompileShader = nullptr;
 PFNGLGETSHADERIVPROC glGetShaderiv = nullptr;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = nullptr;
 
+/* ----------------------- GL_ARB_framebuffer_object ----------------------- */
+
+PFNGLGENERATEMIPMAPPROC glGenerateMipmap = nullptr;;
+
 //-----------------------------------------------------------------------------
 void OpenGLInit(OpenGLGetProcAddressFunc func)
 {
+	/* ----------------------------- GL_VERSION_1_3 ------------------------ */
+
+	glActiveTexture = (PFNGLACTIVETEXTUREPROC)func("glActiveTexture");
+
+
 	/* ----------------------------- GL_VERSION_1_5 ------------------------ */
 	
 	// Buffer
@@ -111,5 +123,9 @@ void OpenGLInit(OpenGLGetProcAddressFunc func)
 	glCompileShader = (PFNGLCOMPILESHADERPROC)func("glCompileShader");
 	glGetShaderiv = (PFNGLGETSHADERIVPROC)func("glGetShaderiv");
 	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)func("glGetShaderInfoLog");
+
+	/* ----------------------- GL_ARB_framebuffer_object ------------------- */
+	glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)func("glGenerateMipmap");
+
 }
 //-----------------------------------------------------------------------------

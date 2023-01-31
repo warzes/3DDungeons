@@ -22,6 +22,11 @@ class Vector3;
 class Matrix4;
 
 //=============================================================================
+// Render Config
+//=============================================================================
+constexpr int MaxBindingTextures = 16;
+
+//=============================================================================
 // Core
 //=============================================================================
 
@@ -158,4 +163,94 @@ private:
 	VertexBuffer* m_vbo = nullptr;
 	IndexBuffer* m_ibo = nullptr;
 	unsigned m_attribsCount = 0;
+};
+
+//=============================================================================
+// Texture 2D
+//=============================================================================
+
+enum class TextureMinFilter
+{
+	Nearest,
+	Linear,
+	NearestMipmapNearest,
+	NearestMipmapLinear,
+	LinearMipmapNearest,
+	LinearMipmapLinear,
+};
+
+enum class TextureMagFilter
+{
+	Nearest,
+	Linear,
+};
+
+enum class TextureWrapping
+{
+	Repeat,
+	MirroredRepeat,
+	ClampToEdge,
+	ClampToBorder,
+};
+
+enum class TexelsFormat
+{
+	None = 0,
+	R_U8,
+	RG_U8,
+	RGB_U8,
+	RGBA_U8,
+	Depth_U16,
+	DepthStencil_U16,
+	Depth_U24,
+	DepthStencil_U24,
+};
+
+struct Texture2DInfo
+{
+	RenderResourceUsage usage = RenderResourceUsage::Static;
+
+	TextureMinFilter minFilter = TextureMinFilter::NearestMipmapNearest;
+	TextureMagFilter magFilter = TextureMagFilter::Nearest;
+	TextureWrapping wrapS = TextureWrapping::Repeat;
+	TextureWrapping wrapT = TextureWrapping::Repeat;
+
+	bool mipmap = true;
+};
+
+struct Texture2DCreateInfo
+{
+	TexelsFormat format = TexelsFormat::RGBA_U8;
+	uint16_t width = 1;
+	uint16_t height = 1;
+	uint8_t* pixelData = nullptr;
+	unsigned mipMapCount = 1; // TODO: only compressed
+
+	bool isTransparent = false;
+};
+
+class Texture2D
+{
+public:
+	bool Create(const char* fileName, const Texture2DInfo& textureInfo = {});
+	bool Create(const Texture2DCreateInfo& createInfo, const Texture2DInfo& textureInfo = {});
+
+	void Destroy();
+
+	void Bind(unsigned slot = 0) const;
+
+	static void UnBind(unsigned slot = 0);
+	static void UnBindAll();
+
+	unsigned GetWidth() const { return m_width; }
+	unsigned GetHeight() const { return m_height; }
+
+	bool IsValid() const { return m_id > 0; }
+
+	bool isTransparent = false;
+
+private:
+	unsigned m_id = 0;
+	unsigned m_width = 0;
+	unsigned m_height = 0;
 };
