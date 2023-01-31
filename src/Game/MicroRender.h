@@ -37,6 +37,13 @@ enum class RenderResourceUsage
 // Shader Program
 //=============================================================================
 
+struct ShaderAttribInfo
+{
+	unsigned typeId;
+	std::string name;
+	int location;
+};
+
 class ShaderProgram
 {
 public:
@@ -54,6 +61,101 @@ public:
 
 	[[nodiscard]] bool IsValid() const { return m_id > 0; }
 
+	[[nodiscard]] std::vector<ShaderAttribInfo> GetAttribInfo() const;
+
 private:
 	unsigned m_id = 0;
+};
+
+//=============================================================================
+// Vertex Buffer
+//=============================================================================
+
+class VertexBuffer
+{
+public:
+	[[nodiscard]] bool Create(RenderResourceUsage usage, unsigned vertexCount, unsigned vertexSize, const void* data);
+	void Destroy();
+
+	void Update(unsigned offset, unsigned vertexCount, unsigned vertexSize, const void* data);
+
+	void Bind() const;
+
+	[[nodiscard]] unsigned GetVertexCount() const { return m_vertexCount; }
+
+	[[nodiscard]] bool IsValid() const { return m_id > 0; }
+
+private:
+	RenderResourceUsage m_usage = RenderResourceUsage::Static;
+	unsigned m_id = 0;
+	unsigned m_vertexCount = 0;
+	unsigned m_vertexSize = 0;
+};
+
+//=============================================================================
+// Index Buffer
+//=============================================================================
+
+class IndexBuffer
+{
+public:
+	[[nodiscard]] bool Create(RenderResourceUsage usage, unsigned indexCount, unsigned indexSize, const void* data);
+	void Destroy();
+
+	void Bind() const;
+
+	void Update(unsigned offset, unsigned indexCount, unsigned indexSize, const void* data);
+
+	[[nodiscard]] unsigned GetIndexCount() const { return m_indexCount; }
+	[[nodiscard]] unsigned GetIndexSize() const { return m_indexSize; }
+
+	[[nodiscard]] bool IsValid() const { return m_id > 0; }
+
+private:
+	RenderResourceUsage m_usage = RenderResourceUsage::Static;
+	unsigned m_id = 0;
+	unsigned m_indexCount = 0;
+	unsigned m_indexSize = 0;
+};
+
+//=============================================================================
+// Vertex Array Buffer
+//=============================================================================
+
+enum class PrimitiveDraw
+{
+	Lines,
+	Triangles,
+	Points,
+};
+
+struct VertexAttribute
+{
+	int location = -1;   // если -1, то берется индекс массива атрибутов
+	unsigned size;
+	bool normalized;
+	unsigned stride;     // sizeof Vertex
+	const void* pointer; // (void*)offsetof(Vertex, TexCoord)}
+};
+
+class VertexArrayBuffer
+{
+public:
+	[[nodiscard]] bool Create(VertexBuffer* vbo, IndexBuffer* ibo, const std::vector<VertexAttribute>& attribs);
+	[[nodiscard]] bool Create(VertexBuffer* vbo, IndexBuffer* ibo, ShaderProgram* shaders);
+	void Destroy();
+
+	static void UnBind();
+
+	void Draw(PrimitiveDraw primitive = PrimitiveDraw::Triangles);
+
+	[[nodiscard]] bool IsValid() const { return m_id > 0; }
+
+	[[nodiscard]] VertexBuffer* GetVertexBuffer() { return m_vbo; }
+	[[nodiscard]] IndexBuffer* GetIndexBuffer() { return m_ibo; }
+private:
+	unsigned m_id = 0;
+	VertexBuffer* m_vbo = nullptr;
+	IndexBuffer* m_ibo = nullptr;
+	unsigned m_attribsCount = 0;
 };

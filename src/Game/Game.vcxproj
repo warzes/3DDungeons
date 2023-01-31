@@ -185,7 +185,9 @@
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="01Triangle.h" />
     <ClInclude Include="AppConfig.h" />
+    <ClInclude Include="ExampleDemo.h" />
     <ClInclude Include="MicroCollisions.h" />
     <ClInclude Include="MicroEngine.h" />
     <ClInclude Include="MicroGraphics.h" />

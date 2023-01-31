@@ -1,5 +1,8 @@
 #include "AppConfig.h"
 #include "MicroEngine.h"
+#if START_EXAMPLE
+#include "ExampleDemo.h"
+#endif
 //-----------------------------------------------------------------------------
 int main(
 	[[maybe_unused]] int   argc,
@@ -10,6 +13,26 @@ int main(
 	RunTest();
 #endif // START_UNIT_TEST
 
+#if START_EXAMPLE
+	AppSystemCreateInfo createInfo;
+	if (AppSystemCreate(createInfo))
+	{
+		ExampleInit();
+		while (!IsAppExitRequested())
+		{
+			AppSystemBeginFrame();
+
+			if (IsKeyDown(27/*VK_ESCAPE*/))
+				AppExitRequest();
+
+			ExampleFrame();
+
+			AppSystemEndFrame();
+		}
+		ExampleClose();
+	}
+	AppSystemDestroy();
+#else
 	AppSystemCreateInfo createInfo;
 	if (AppSystemCreate(createInfo))
 	{
@@ -24,5 +47,6 @@ int main(
 		}
 	}
 	AppSystemDestroy();
+#endif
 }
 //-----------------------------------------------------------------------------

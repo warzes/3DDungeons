@@ -17,6 +17,23 @@ extern "C"
 }
 #endif // _WIN32
 
+/* ----------------------------- GL_VERSION_1_5 ---------------------------- */
+
+// Buffer
+PFNGLGENBUFFERSPROC glGenBuffers = nullptr;
+PFNGLDELETEBUFFERSPROC glDeleteBuffers = nullptr;
+PFNGLBINDBUFFERPROC glBindBuffer = nullptr;
+PFNGLBUFFERDATAPROC glBufferData = nullptr;
+PFNGLBUFFERSUBDATAPROC glBufferSubData = nullptr;
+
+// Vertex Arrays
+PFNGLGENVERTEXARRAYSPROC glGenVertexArrays = nullptr;
+PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays = nullptr;
+PFNGLBINDVERTEXARRAYPROC glBindVertexArray = nullptr;
+PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray = nullptr;
+PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer = nullptr;
+
+
 /* ----------------------------- GL_VERSION_2_0 ---------------------------- */
 
 // Shader Program
@@ -27,6 +44,10 @@ PFNGLATTACHSHADERPROC glAttachShader = nullptr;
 PFNGLLINKPROGRAMPROC glLinkProgram = nullptr;
 PFNGLGETPROGRAMIVPROC glGetProgramiv = nullptr;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = nullptr;
+
+// Shader Program Attrib
+PFNGLGETACTIVEATTRIBPROC glGetActiveAttrib = nullptr;
+PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation = nullptr;
 
 // Shader Program Uniform
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation = nullptr;
@@ -46,6 +67,23 @@ PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = nullptr;
 //-----------------------------------------------------------------------------
 void OpenGLInit(OpenGLGetProcAddressFunc func)
 {
+	/* ----------------------------- GL_VERSION_1_5 ------------------------ */
+	
+	// Buffer
+	glGenBuffers = (PFNGLGENBUFFERSPROC)func("glGenBuffers");
+	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)func("glDeleteBuffers");
+	glBindBuffer = (PFNGLBINDBUFFERPROC)func("glBindBuffer");
+	glBufferData = (PFNGLBUFFERDATAPROC)func("glBufferData");
+	glBufferSubData = (PFNGLBUFFERSUBDATAPROC)func("glBufferSubData");
+
+	// Vertex Arrays
+	glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)func("glGenVertexArrays");
+	glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)func("glDeleteVertexArrays");
+	glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)func("glBindVertexArray");
+	glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)func("glEnableVertexAttribArray");
+	glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)func("glVertexAttribPointer");
+
+	/* ----------------------------- GL_VERSION_2_0 ------------------------ */
 	// Shader Program
 	glCreateProgram = (PFNGLCREATEPROGRAMPROC)func("glCreateProgram");
 	glDeleteProgram = (PFNGLDELETEPROGRAMPROC)func("glDeleteProgram");
@@ -54,6 +92,10 @@ void OpenGLInit(OpenGLGetProcAddressFunc func)
 	glLinkProgram = (PFNGLLINKPROGRAMPROC)func("glLinkProgram");
 	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)func("glGetProgramiv");
 	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)func("glGetProgramInfoLog");
+
+	// Shader Program Attrib
+	glGetActiveAttrib = (PFNGLGETACTIVEATTRIBPROC)func("glGetActiveAttrib");
+	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)func("glGetAttribLocation");
 
 	// Shader Program Uniform
 	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)func("glGetUniformLocation");

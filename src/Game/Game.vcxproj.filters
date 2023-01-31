@@ -36,6 +36,12 @@
     <ClInclude Include="MicroGraphics.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
+    <ClInclude Include="01Triangle.h">
+      <Filter>ExampleDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="ExampleDemo.h">
+      <Filter>ExampleDemo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">
@@ -46,6 +52,9 @@
     </Filter>
     <Filter Include="MicroEngine">
       <UniqueIdentifier>{7cd59890-c8f1-46ea-8abd-1e57b7ac044f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExampleDemo">
+      <UniqueIdentifier>{a8b61894-ccce-4f6c-8eb7-40ea413e9b12}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
