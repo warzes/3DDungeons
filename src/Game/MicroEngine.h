@@ -16,12 +16,12 @@
 #include <string>
 #include <vector>
 
-#include "MicroOpenGLLoader.h"
-#include "MicroMath.h"
-
 #if defined(_MSC_VER)
 #	pragma warning(pop)
 #endif // _MSC_VER
+
+#include "MicroRender.h"
+#include "MicroMath.h"
 
 //=============================================================================
 // Logging System
@@ -32,6 +32,7 @@ void LogPrint(const std::string& msg);
 void LogWarning(const std::string& msg);
 void LogError(const std::string& msg);
 void Fatal(const std::string& msg);
+
 
 //=============================================================================
 // Input System
@@ -89,4 +90,3 @@ void AppSystemEndFrame();
 
 void AppExitRequest();
 [[nodiscard]] float GetDeltaTime();
-
