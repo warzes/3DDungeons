@@ -216,6 +216,12 @@ void ShaderProgram::SetUniform(int uniformId, const Vector3& v) const
 	glUniform3fv(uniformId, 1, &(v.x));
 }
 //-----------------------------------------------------------------------------
+void ShaderProgram::SetUniform(int uniformId, const Matrix3& m) const
+{
+	assert(state::CurrentShaderProgram == m_id);
+	glUniformMatrix3fv(uniformId, 1, GL_FALSE, m.m);
+}
+//-----------------------------------------------------------------------------
 void ShaderProgram::SetUniform(int uniformId, const Matrix4& m) const
 {
 	assert(state::CurrentShaderProgram == m_id);
@@ -703,7 +709,9 @@ bool TextureCube::Create(const char* fileNameRight, const char* fileNameLeft, co
 
 	for( int i = 0; i < 6; i++ )
 	{
-		const int desiredÑhannels = STBI_rgb_alpha; // Êîíâåðòèðîâàòü â RGBA
+		stbi_set_flip_vertically_on_load(1);
+
+		const int desiredÑhannels = STBI_rgb; // Êîíâåðòèðîâàòü â RGB
 		int width = 0;
 		int height = 0;
 		int nrChannels = 0;
@@ -742,7 +750,7 @@ bool TextureCube::Create(const char* fileNameRight, const char* fileNameLeft, co
 
 	for( int i = 0; i < 6; i++ )
 	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels[i].data());
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels[i].data());
 	}
 
 	if( textureInfo.mipmap )

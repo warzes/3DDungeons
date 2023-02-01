@@ -42,6 +42,9 @@
     <ClInclude Include="ExampleDemo.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
+    <ClInclude Include="X_CurrentTest.h">
+      <Filter>ExampleDemo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

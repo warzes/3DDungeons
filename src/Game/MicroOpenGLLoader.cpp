@@ -58,6 +58,7 @@ PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation = nullptr;
 PFNGLUNIFORM1FPROC glUniform1f = nullptr;
 PFNGLUNIFORM2FVPROC glUniform2fv = nullptr;
 PFNGLUNIFORM3FVPROC glUniform3fv = nullptr;
+PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv = nullptr;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv = nullptr;
 
 // Shader
@@ -116,6 +117,7 @@ void OpenGLInit(OpenGLGetProcAddressFunc func)
 	glUniform1f = (PFNGLUNIFORM1FPROC)func("glUniform1f");
 	glUniform2fv = (PFNGLUNIFORM2FVPROC)func("glUniform2fv");
 	glUniform3fv = (PFNGLUNIFORM3FVPROC)func("glUniform3fv");
+	glUniformMatrix3fv = (PFNGLUNIFORMMATRIX3FVPROC)func("glUniformMatrix3fv");
 	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)func("glUniformMatrix4fv");
 
 	// Shader

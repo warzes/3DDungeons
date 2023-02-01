@@ -194,6 +194,7 @@
     <ClInclude Include="MicroMath.h" />
     <ClInclude Include="MicroOpenGLLoader.h" />
     <ClInclude Include="MicroRender.h" />
+    <ClInclude Include="X_CurrentTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

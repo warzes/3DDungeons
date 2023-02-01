@@ -25,7 +25,7 @@ inline constexpr float Clamp(float x, float min, float max)
 	return x;
 }
 
-inline bool Ñompare(float f1, float f2) { return fabsf(f1 - f2) < EPSILON; }
+inline bool Compare(float f1, float f2) { return fabsf(f1 - f2) < EPSILON; }
 
 //=============================================================================
 // Point2
@@ -186,6 +186,7 @@ inline Vector3 Min(const Vector3& v1, const Vector3& v2);
 inline Vector3 Max(const Vector3& v1, const Vector3& v2);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
 inline Vector3 Mix(const Vector3& u, const Vector3& v, float a);
+inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v);
 
 //=============================================================================
 // Vector4
@@ -227,6 +228,8 @@ public:
 
 	float& operator[](size_t i) { return (&x)[i]; }
 	const float operator[](size_t i) const { return (&x)[i]; }
+
+	float* operator&() { return (float*)this; }
 
 	float x = 0.0f;
 	float y = 0.0f;
@@ -273,6 +276,8 @@ public:
 // Matrix3
 //=============================================================================
 
+class Matrix4;
+
 class Matrix3
 {
 public:
@@ -285,6 +290,7 @@ public:
 		float m0, float m1, float m2,
 		float m3, float m4, float m5,
 		float m6, float m7, float m8);
+	Matrix3(const Matrix4& m);
 
 	constexpr Matrix3& operator=(Matrix3&&) = default;
 	constexpr Matrix3& operator=(const Matrix3&) = default;
@@ -497,6 +503,11 @@ inline Vector3 Mix(const Vector3& u, const Vector3& v, float a)
 	return u * (1.0f - a) + v * a;
 }
 
+inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v)
+{
+	return *(Vector3*)&(Matrix4::GetRotate(v, angle) * Vector4(u.x, u.y, u.z, 1.0f));
+}
+
 //=============================================================================
 // Quat Impl
 //=============================================================================
@@ -604,6 +615,13 @@ inline constexpr Matrix3::Matrix3(
 	m[0] = m0; m[1] = m1; m[2] = m2;
 	m[3] = m3; m[4] = m4; m[5] = m5;
 	m[6] = m6; m[7] = m7; m[8] = m8;
+}
+
+inline Matrix3::Matrix3(const Matrix4& M)
+{
+	m[0] = M[0]; m[3] = M[4]; m[6] = M[8];
+	m[1] = M[1]; m[4] = M[5]; m[7] = M[9];
+	m[2] = M[2]; m[5] = M[6]; m[8] = M[10];
 }
 
 inline Matrix3 operator*(const Matrix3& m1, const Matrix3& m2)

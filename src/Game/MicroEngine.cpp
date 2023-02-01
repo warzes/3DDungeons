@@ -343,7 +343,6 @@ bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
 	pfd.cColorBits = 32;
 	pfd.cDepthBits = 32;
 	pfd.cStencilBits = 8;
-	pfd.iLayerType = PFD_MAIN_PLANE;
 
 	int pixelFormat = ChoosePixelFormat(window::Win32DCHandle, &pfd);
 	if (!pixelFormat)

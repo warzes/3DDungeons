@@ -37,4 +37,4 @@
 - Matrix3
 - Matrix4
 - Texture Cube
-- ICamera
+- летающая Camera
