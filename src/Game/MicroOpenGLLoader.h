@@ -50,6 +50,7 @@ typedef uint64_t GLuint64;
 #endif
 
 #define GL_COLOR_BUFFER_BIT 0x00004000
+#define GL_CULL_FACE 0x0B44
 #define GL_DEPTH_BUFFER_BIT 0x00000100
 #define GL_DEPTH_COMPONENT 0x1902
 #define GL_DEPTH_TEST 0x0B71

@@ -29,12 +29,10 @@ class ICamera
 public:
 	virtual ~ICamera() = default;
 
-	virtual bool CheckCollisions(Object* Objects, int ObjectsCount, Vector3& Movement, int Depth = 0) { return false; }
 	virtual void Look(const Vector3& Position, const Vector3& Reference);
 	virtual void Move(const Vector3& Movement);
 	virtual bool OnKeys(short Keys, float FrameTime, Vector3& Movement) = 0;
 	virtual void OnMouseMove(int dx, int dy) = 0;
-	virtual void OnMouseWheel(short zDelta) {}
 
 	const Matrix4& GetViewMatrix() const { return m_viewMatrix; }
 
@@ -43,13 +41,10 @@ public:
 	Vector3 z = Vector3::Forward;
 	Vector3 position = { 0.0f };
 
-
-
 protected:
 	virtual void calculateViewMatrix();
 
 	Matrix4 m_viewMatrix;
-	Matrix4 m_viewMatrixInverse;
 
 	float m_speed = 2.5f;
 	float m_sensitivity = 0.025f;
