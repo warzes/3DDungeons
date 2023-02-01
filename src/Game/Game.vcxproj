@@ -178,6 +178,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MicroAdvance.cpp" />
     <ClCompile Include="MicroEngine.cpp" />
     <ClCompile Include="MicroGraphics.cpp" />
     <ClCompile Include="MicroOpenGLLoader.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="01Triangle.h" />
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="ExampleDemo.h" />
+    <ClInclude Include="MicroAdvance.h" />
     <ClInclude Include="MicroCollisions.h" />
     <ClInclude Include="MicroEngine.h" />
     <ClInclude Include="MicroGraphics.h" />

@@ -6,6 +6,7 @@
 	https://github.com/polymonster/maths - там еще есть и коллизии
 
 Физика и коллизии
+	https://gdbooks.gitbooks.io/3dcollisions/content/Chapter1/point.html
 	https://github.com/Kazade/bounce - посмотреть
 	https://github.com/dtecta/solid3 - посмотреть
 	https://github.com/DarrenSweeney/3D-Physics-Engine минимальный физ движок - возможно на основе книги

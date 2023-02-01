@@ -22,8 +22,6 @@
 #define CAMERA_KEY_SHIFT 0x0400
 #define CAMERA_KEY_CONTROL 0x0800
 
-class Object;
-
 class ICamera
 {
 public:

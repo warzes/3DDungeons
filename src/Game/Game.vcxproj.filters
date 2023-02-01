@@ -15,6 +15,9 @@
     <ClCompile Include="MicroGraphics.cpp">
       <Filter>MicroEngine</Filter>
     </ClCompile>
+    <ClCompile Include="MicroAdvance.cpp">
+      <Filter>MicroEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
@@ -44,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="X_CurrentTest.h">
       <Filter>ExampleDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroAdvance.h">
+      <Filter>MicroEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
