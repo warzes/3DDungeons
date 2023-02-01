@@ -44,6 +44,7 @@ PFNGLCREATEPROGRAMPROC glCreateProgram = nullptr;
 PFNGLDELETEPROGRAMPROC glDeleteProgram = nullptr;
 PFNGLUSEPROGRAMPROC glUseProgram = nullptr;
 PFNGLATTACHSHADERPROC glAttachShader = nullptr;
+PFNGLDETACHSHADERPROC glDetachShader = nullptr;
 PFNGLLINKPROGRAMPROC glLinkProgram = nullptr;
 PFNGLGETPROGRAMIVPROC glGetProgramiv = nullptr;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = nullptr;
@@ -101,6 +102,7 @@ void OpenGLInit(OpenGLGetProcAddressFunc func)
 	glDeleteProgram = (PFNGLDELETEPROGRAMPROC)func("glDeleteProgram");
 	glUseProgram = (PFNGLUSEPROGRAMPROC)func("glUseProgram");
 	glAttachShader = (PFNGLATTACHSHADERPROC)func("glAttachShader");
+	glDetachShader = (PFNGLDETACHSHADERPROC)func("glDetachShader");
 	glLinkProgram = (PFNGLLINKPROGRAMPROC)func("glLinkProgram");
 	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)func("glGetProgramiv");
 	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)func("glGetProgramInfoLog");

@@ -30,3 +30,11 @@
 - двухмерная текстура
 - Vector2
 - Vector3
+
+## 01.02.2023
+- Vector4
+- Quat
+- Matrix3
+- Matrix4
+- Texture Cube
+- ICamera

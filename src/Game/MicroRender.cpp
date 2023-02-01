@@ -34,7 +34,8 @@ namespace state
 	unsigned CurrentVBO = 0;
 	unsigned CurrentIBO = 0;
 	unsigned CurrentVAO = 0;
-	unsigned CurrentTexture2D[MaxBindingTextures] = { 0 };	
+	unsigned CurrentTexture2D[MaxBindingTextures] = { 0 };
+	unsigned CurrentTextureCube = 0;
 }
 
 //=============================================================================
@@ -111,9 +112,9 @@ unsigned createShader(GLenum openGLshaderType, const std::string& source)
 	glShaderSource(shaderId, 1, &shaderText, &lenShaderText);
 	glCompileShader(shaderId);
 
-	GLint compiled = GL_FALSE;
-	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compiled);
-	if (compiled == GL_FALSE)
+	GLint compileStatus = GL_FALSE;
+	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compileStatus);
+	if ( compileStatus == GL_FALSE)
 	{
 		GLint infoLogSize;
 		glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &infoLogSize);
@@ -147,9 +148,9 @@ bool ShaderProgram::CreateFromMemories(const std::string& vertexShaderMemory, co
 		glAttachShader(m_id, glShaderFragment);
 		glLinkProgram(m_id);
 
-		GLint success = 0;
-		glGetProgramiv(m_id, GL_LINK_STATUS, &success);
-		if (success == GL_FALSE)
+		GLint linkStatus = 0;
+		glGetProgramiv(m_id, GL_LINK_STATUS, &linkStatus);
+		if ( linkStatus == GL_FALSE )
 		{
 			GLint errorMsgLen;
 			glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &errorMsgLen);
@@ -160,6 +161,8 @@ bool ShaderProgram::CreateFromMemories(const std::string& vertexShaderMemory, co
 			glDeleteProgram(m_id);
 			m_id = 0;
 		}
+		glDetachShader(m_id, glShaderVertex);
+		glDetachShader(m_id, glShaderFragment);
 	}
 	glDeleteShader(glShaderVertex);
 	glDeleteShader(glShaderFragment);
@@ -684,5 +687,98 @@ void Texture2D::UnBindAll()
 {
 	for (unsigned i = 0; i < MaxBindingTextures; i++)
 		UnBind(i);
+}
+//-----------------------------------------------------------------------------
+//=============================================================================
+// Texture Cube
+//=============================================================================
+//-----------------------------------------------------------------------------
+bool TextureCube::Create(const char* fileNameRight, const char* fileNameLeft, const char* fileNameBottom, const char* fileNameTop, const char* fileNameFront, const char* fileNameBack, const TextureCubeInfo& textureInfo)
+{
+	Destroy();
+
+	const std::vector<const char*> fileNames = { fileNameRight , fileNameLeft, fileNameBottom, fileNameTop, fileNameFront, fileNameBack };
+
+	std::vector<uint8_t> pixels[6];
+
+	for( int i = 0; i < 6; i++ )
+	{
+		const int desiredÑhannels = STBI_rgb_alpha; // Êîíâåðòèðîâàòü â RGBA
+		int width = 0;
+		int height = 0;
+		int nrChannels = 0;
+		stbi_uc* pixelData = stbi_load(fileNames[i], &width, &height, &nrChannels, desiredÑhannels);
+		if( !pixelData || width == 0 || height == 0 )
+		{
+			LogError("Image loading failed! Filename='" + std::string(fileNames[i]) + "'");
+			stbi_image_free((void*)pixelData);
+			return false;
+		}
+		const size_t imageDataSize = (size_t)width * height * nrChannels;
+
+		pixels[i].assign(pixelData, pixelData + imageDataSize);
+		m_width = Max(m_width, width);
+		m_height = Max(m_height, height);
+		stbi_image_free((void*)pixelData);
+	}
+
+	glGenTextures(1, &m_id);
+	//glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
+
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, translateToGL(textureInfo.wrapS));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, translateToGL(textureInfo.wrapT));
+
+	// set texture filtering parameters
+	TextureMinFilter minFilter = textureInfo.minFilter;
+	if( !textureInfo.mipmap )
+	{
+		if( textureInfo.minFilter == TextureMinFilter::NearestMipmapNearest ) minFilter = TextureMinFilter::Nearest;
+		else if( textureInfo.minFilter != TextureMinFilter::Nearest ) minFilter = TextureMinFilter::Linear;
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, translateToGL(minFilter));
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, translateToGL(textureInfo.magFilter));
+
+	for( int i = 0; i < 6; i++ )
+	{
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels[i].data());
+	}
+
+	if( textureInfo.mipmap )
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	// restore prev state
+	glBindTexture(GL_TEXTURE_CUBE_MAP, state::CurrentTextureCube);
+
+
+	return false;
+}
+//-----------------------------------------------------------------------------
+void TextureCube::Destroy()
+{
+	if( m_id > 0 )
+	{
+		if( state::CurrentTextureCube == m_id )
+			TextureCube::UnBind();
+
+		glDeleteTextures(1, &m_id);
+		m_id = 0;
+	}
+}
+//-----------------------------------------------------------------------------
+void TextureCube::Bind() const
+{
+	if( state::CurrentTextureCube == m_id ) return;
+	state::CurrentTextureCube = m_id;
+	//glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
+}
+//-----------------------------------------------------------------------------
+void TextureCube::UnBind()
+{
+	//glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	state::CurrentTextureCube = 0;
 }
 //-----------------------------------------------------------------------------

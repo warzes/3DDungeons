@@ -254,3 +254,47 @@ private:
 	unsigned m_width = 0;
 	unsigned m_height = 0;
 };
+
+//=============================================================================
+// Texture Cube
+//=============================================================================
+
+struct TextureCubeInfo
+{
+	RenderResourceUsage usage = RenderResourceUsage::Static;
+
+	TextureMinFilter minFilter = TextureMinFilter::NearestMipmapNearest;
+	TextureMagFilter magFilter = TextureMagFilter::Nearest;
+	TextureWrapping wrapS = TextureWrapping::Repeat;
+	TextureWrapping wrapT = TextureWrapping::Repeat;
+
+	bool mipmap = true;
+};
+
+class TextureCube
+{
+public:
+	bool Create(
+		const char* fileNameRight,
+		const char* fileNameLeft,
+		const char* fileNameBottom,
+		const char* fileNameTop,
+		const char* fileNameFront,
+		const char* fileNameBack,
+		const TextureCubeInfo& textureInfo = {});
+
+	void Destroy();
+
+	void Bind() const;
+	static void UnBind();
+
+	unsigned GetWidth() const { return m_width; }
+	unsigned GetHeight() const { return m_height; }
+
+	bool IsValid() const { return m_id > 0; }
+
+private:
+	unsigned m_id = 0;
+	unsigned m_width = 0;
+	unsigned m_height = 0;
+};

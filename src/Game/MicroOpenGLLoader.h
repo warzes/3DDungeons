@@ -118,6 +118,8 @@ extern "C" {
 
 #define GL_CLAMP_TO_BORDER 0x812D
 #define GL_TEXTURE0 0x84C0
+#define GL_TEXTURE_CUBE_MAP 0x8513
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X 0x8515
 
 typedef void (GLAPIENTRY* PFNGLACTIVETEXTUREPROC)(GLenum texture);
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
@@ -188,6 +190,7 @@ typedef GLuint(GLAPIENTRY* PFNGLCREATEPROGRAMPROC)();
 typedef void (GLAPIENTRY* PFNGLDELETEPROGRAMPROC)(GLuint program);
 typedef void (GLAPIENTRY* PFNGLUSEPROGRAMPROC)(GLuint program);
 typedef void (GLAPIENTRY* PFNGLATTACHSHADERPROC)(GLuint program, GLuint shader);
+typedef void (GLAPIENTRY *PFNGLDETACHSHADERPROC)(GLuint program, GLuint shader);
 typedef void (GLAPIENTRY* PFNGLLINKPROGRAMPROC)(GLuint program);
 typedef void (GLAPIENTRY* PFNGLGETPROGRAMIVPROC)(GLuint program, GLenum pname, GLint* params);
 typedef void (GLAPIENTRY* PFNGLGETPROGRAMINFOLOGPROC)(GLuint program, GLsizei bufSize, GLsizei* length, char* infoLog);
@@ -196,6 +199,7 @@ extern PFNGLCREATEPROGRAMPROC glCreateProgram;
 extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
 extern PFNGLUSEPROGRAMPROC glUseProgram;
 extern PFNGLATTACHSHADERPROC glAttachShader;
+extern PFNGLDETACHSHADERPROC glDetachShader;
 extern PFNGLLINKPROGRAMPROC glLinkProgram;
 extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
 extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;

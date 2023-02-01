@@ -22,6 +22,7 @@
 
 #include "MicroRender.h"
 #include "MicroMath.h"
+#include "MicroGraphics.h"
 
 //=============================================================================
 // Logging System
