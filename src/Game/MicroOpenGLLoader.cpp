@@ -17,119 +17,98 @@ extern "C"
 }
 #endif // _WIN32
 
-/* ----------------------------- GL_VERSION_1_3 ---------------------------- */
+
 PFNGLACTIVETEXTUREPROC glActiveTexture = nullptr;
-
-/* ----------------------------- GL_VERSION_1_5 ---------------------------- */
-
-// Buffer
-PFNGLGENBUFFERSPROC glGenBuffers = nullptr;
-PFNGLDELETEBUFFERSPROC glDeleteBuffers = nullptr;
+PFNGLATTACHSHADERPROC glAttachShader = nullptr;
 PFNGLBINDBUFFERPROC glBindBuffer = nullptr;
+PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer = nullptr;
+PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer = nullptr;
+PFNGLBINDVERTEXARRAYPROC glBindVertexArray = nullptr;
 PFNGLBUFFERDATAPROC glBufferData = nullptr;
 PFNGLBUFFERSUBDATAPROC glBufferSubData = nullptr;
-
-// Vertex Arrays
-PFNGLGENVERTEXARRAYSPROC glGenVertexArrays = nullptr;
-PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays = nullptr;
-PFNGLBINDVERTEXARRAYPROC glBindVertexArray = nullptr;
-PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray = nullptr;
-PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer = nullptr;
-
-
-/* ----------------------------- GL_VERSION_2_0 ---------------------------- */
-
-// Shader Program
+PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus = nullptr;
+PFNGLCOMPILESHADERPROC glCompileShader = nullptr;
 PFNGLCREATEPROGRAMPROC glCreateProgram = nullptr;
+PFNGLCREATESHADERPROC glCreateShader = nullptr;
+PFNGLDELETEBUFFERSPROC glDeleteBuffers = nullptr;
+PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers = nullptr;
 PFNGLDELETEPROGRAMPROC glDeleteProgram = nullptr;
-PFNGLUSEPROGRAMPROC glUseProgram = nullptr;
-PFNGLATTACHSHADERPROC glAttachShader = nullptr;
+PFNGLDELETERENDERBUFFERSPROC glDeleteRenderbuffers = nullptr;
+PFNGLDELETESHADERPROC glDeleteShader = nullptr;
+PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays = nullptr;
 PFNGLDETACHSHADERPROC glDetachShader = nullptr;
-PFNGLLINKPROGRAMPROC glLinkProgram = nullptr;
-PFNGLGETPROGRAMIVPROC glGetProgramiv = nullptr;
-PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = nullptr;
-
-// Shader Program Attrib
+PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray = nullptr;
+PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer = nullptr;
+PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D = nullptr;
+PFNGLGENBUFFERSPROC glGenBuffers = nullptr;
+PFNGLGENERATEMIPMAPPROC glGenerateMipmap = nullptr;
+PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers = nullptr;
+PFNGLGENRENDERBUFFERSPROC glGenRenderbuffers = nullptr;
+PFNGLGENVERTEXARRAYSPROC glGenVertexArrays = nullptr;
 PFNGLGETACTIVEATTRIBPROC glGetActiveAttrib = nullptr;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation = nullptr;
-
-// Shader Program Uniform
+PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = nullptr;
+PFNGLGETPROGRAMIVPROC glGetProgramiv = nullptr;
+PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = nullptr;
+PFNGLGETSHADERIVPROC glGetShaderiv = nullptr;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation = nullptr;
+PFNGLLINKPROGRAMPROC glLinkProgram = nullptr;
+PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage = nullptr;
+PFNGLSHADERSOURCEPROC glShaderSource = nullptr;
 PFNGLUNIFORM1FPROC glUniform1f = nullptr;
 PFNGLUNIFORM2FVPROC glUniform2fv = nullptr;
 PFNGLUNIFORM3FVPROC glUniform3fv = nullptr;
 PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv = nullptr;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv = nullptr;
-
-// Shader
-PFNGLCREATESHADERPROC glCreateShader = nullptr;
-PFNGLDELETESHADERPROC glDeleteShader = nullptr;
-PFNGLSHADERSOURCEPROC glShaderSource = nullptr;
-PFNGLCOMPILESHADERPROC glCompileShader = nullptr;
-PFNGLGETSHADERIVPROC glGetShaderiv = nullptr;
-PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = nullptr;
-
-/* ----------------------- GL_ARB_framebuffer_object ----------------------- */
-
-PFNGLGENERATEMIPMAPPROC glGenerateMipmap = nullptr;;
+PFNGLUSEPROGRAMPROC glUseProgram = nullptr;
+PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer = nullptr;
 
 //-----------------------------------------------------------------------------
 void OpenGLInit(OpenGLGetProcAddressFunc func)
 {
-	/* ----------------------------- GL_VERSION_1_3 ------------------------ */
-
 	glActiveTexture = (PFNGLACTIVETEXTUREPROC)func("glActiveTexture");
-
-
-	/* ----------------------------- GL_VERSION_1_5 ------------------------ */
-	
-	// Buffer
-	glGenBuffers = (PFNGLGENBUFFERSPROC)func("glGenBuffers");
-	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)func("glDeleteBuffers");
+	glAttachShader = (PFNGLATTACHSHADERPROC)func("glAttachShader");
 	glBindBuffer = (PFNGLBINDBUFFERPROC)func("glBindBuffer");
+	glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)func("glBindFramebuffer");
+	glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)func("glBindRenderbuffer");
+	glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)func("glBindVertexArray");
 	glBufferData = (PFNGLBUFFERDATAPROC)func("glBufferData");
 	glBufferSubData = (PFNGLBUFFERSUBDATAPROC)func("glBufferSubData");
-
-	// Vertex Arrays
-	glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)func("glGenVertexArrays");
-	glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)func("glDeleteVertexArrays");
-	glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)func("glBindVertexArray");
-	glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)func("glEnableVertexAttribArray");
-	glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)func("glVertexAttribPointer");
-
-	/* ----------------------------- GL_VERSION_2_0 ------------------------ */
-	// Shader Program
+	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)func("glCheckFramebufferStatus");
+	glCompileShader = (PFNGLCOMPILESHADERPROC)func("glCompileShader");
 	glCreateProgram = (PFNGLCREATEPROGRAMPROC)func("glCreateProgram");
+	glCreateShader = (PFNGLCREATESHADERPROC)func("glCreateShader");
+	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)func("glDeleteBuffers");
+	glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)func("glDeleteFramebuffers");
 	glDeleteProgram = (PFNGLDELETEPROGRAMPROC)func("glDeleteProgram");
-	glUseProgram = (PFNGLUSEPROGRAMPROC)func("glUseProgram");
-	glAttachShader = (PFNGLATTACHSHADERPROC)func("glAttachShader");
+	glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)func("glDeleteRenderbuffers");
+	glDeleteShader = (PFNGLDELETESHADERPROC)func("glDeleteShader");
+	glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)func("glDeleteVertexArrays");
 	glDetachShader = (PFNGLDETACHSHADERPROC)func("glDetachShader");
-	glLinkProgram = (PFNGLLINKPROGRAMPROC)func("glLinkProgram");
-	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)func("glGetProgramiv");
-	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)func("glGetProgramInfoLog");
-
-	// Shader Program Attrib
+	glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)func("glEnableVertexAttribArray");
+	glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)func("glFramebufferRenderbuffer");
+	glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)func("glFramebufferTexture2D");
+	glGenBuffers = (PFNGLGENBUFFERSPROC)func("glGenBuffers");
+	glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)func("glGenerateMipmap");
+	glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)func("glGenFramebuffers");
+	glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)func("glGenRenderbuffers");
+	glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)func("glGenVertexArrays");
 	glGetActiveAttrib = (PFNGLGETACTIVEATTRIBPROC)func("glGetActiveAttrib");
 	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)func("glGetAttribLocation");
-
-	// Shader Program Uniform
+	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)func("glGetProgramInfoLog");
+	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)func("glGetProgramiv");
+	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)func("glGetShaderInfoLog");
+	glGetShaderiv = (PFNGLGETSHADERIVPROC)func("glGetShaderiv");
 	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)func("glGetUniformLocation");
+	glLinkProgram = (PFNGLLINKPROGRAMPROC)func("glLinkProgram");
+	glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)func("glRenderbufferStorage");
+	glShaderSource = (PFNGLSHADERSOURCEPROC)func("glShaderSource");
 	glUniform1f = (PFNGLUNIFORM1FPROC)func("glUniform1f");
 	glUniform2fv = (PFNGLUNIFORM2FVPROC)func("glUniform2fv");
 	glUniform3fv = (PFNGLUNIFORM3FVPROC)func("glUniform3fv");
 	glUniformMatrix3fv = (PFNGLUNIFORMMATRIX3FVPROC)func("glUniformMatrix3fv");
 	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)func("glUniformMatrix4fv");
-
-	// Shader
-	glCreateShader = (PFNGLCREATESHADERPROC)func("glCreateShader");
-	glDeleteShader = (PFNGLDELETESHADERPROC)func("glDeleteShader");
-	glShaderSource = (PFNGLSHADERSOURCEPROC)func("glShaderSource");
-	glCompileShader = (PFNGLCOMPILESHADERPROC)func("glCompileShader");
-	glGetShaderiv = (PFNGLGETSHADERIVPROC)func("glGetShaderiv");
-	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)func("glGetShaderInfoLog");
-
-	/* ----------------------- GL_ARB_framebuffer_object ------------------- */
-	glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)func("glGenerateMipmap");
-
+	glUseProgram = (PFNGLUSEPROGRAMPROC)func("glUseProgram");
+	glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)func("glVertexAttribPointer");
 }
 //-----------------------------------------------------------------------------

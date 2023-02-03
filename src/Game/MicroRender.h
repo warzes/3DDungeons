@@ -38,6 +38,11 @@ enum class RenderResourceUsage
 	Stream,
 };
 
+//=============================================================================
+// Render States
+//=============================================================================
+
+
 
 //=============================================================================
 // Shader Program
@@ -249,6 +254,8 @@ public:
 
 	bool IsValid() const { return m_id > 0; }
 
+	bool operator==(const Texture2D&) const = default;
+
 	bool isTransparent = false;
 
 private:
@@ -267,8 +274,9 @@ struct TextureCubeInfo
 
 	TextureMinFilter minFilter = TextureMinFilter::NearestMipmapNearest;
 	TextureMagFilter magFilter = TextureMagFilter::Nearest;
-	TextureWrapping wrapS = TextureWrapping::Repeat;
-	TextureWrapping wrapT = TextureWrapping::Repeat;
+	TextureWrapping wrapS = TextureWrapping::ClampToEdge;
+	TextureWrapping wrapT = TextureWrapping::ClampToEdge;
+	TextureWrapping wrapR = TextureWrapping::ClampToEdge;
 
 	bool mipmap = true;
 };
@@ -299,4 +307,32 @@ private:
 	unsigned m_id = 0;
 	unsigned m_width = 0;
 	unsigned m_height = 0;
+};
+
+//=============================================================================
+// FrameBuffer
+//=============================================================================
+
+class FrameBuffer
+{
+public:
+	bool Create(int width, int height);
+	void Destroy();
+
+	void Bind(const Vector3& color);
+
+	void BindTextureBuffer();
+
+	static void MainFrameBufferBind();
+
+	bool IsValid() const { return m_id > 0 && m_texColorBuffer > 0 && m_rbo > 0; }
+
+private:
+	bool checkFramebuffer();
+
+	unsigned m_id = 0;
+	unsigned m_texColorBuffer = 0;
+	unsigned m_rbo = 0;
+	int m_width = 0;
+	int m_height = 0;
 };

@@ -590,8 +590,8 @@ void ExampleInit()
 	// init tori --------------------------------------------------------------------------------------------------------------
 
 	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4());
-	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4::GetRotate(Vector3(0.0f, 1.0f, 0.0f), 90.0f));
-	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4::GetRotate(Vector3(1.0f, 0.0f, 0.0f), 90.0f));
+	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4::Rotate(Vector3(0.0f, 1.0f, 0.0f), 90.0f));
+	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4::Rotate(Vector3(1.0f, 0.0f, 0.0f), 90.0f));
 
 	Objects[2].InitVBO(20, 32);
 
@@ -645,7 +645,7 @@ void ExampleFrame()
 		}
 	}
 
-	ProjectionMatrix = Matrix4::GetPerspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	ProjectionMatrix = Matrix4::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
 	ViewProjectionMatrix = ProjectionMatrix * cam->GetViewMatrix();
 
 	// render skybox - depth test must be disabled 
@@ -671,10 +671,10 @@ void ExampleFrame()
 
 	static float Angle = 0.0f;
 	Angle += 22.5f * 0.001f;
-	Objects[2].SetModelMatrix(Matrix4::GetTranslate({ 0.0f, 1.75f, 5.0f }) * Matrix4::GetRotate(Vector3(0.0f, 1.0f, 0.0f), Angle * DEG2RAD));
+	Objects[2].SetModelMatrix(Matrix4::Translate({ 0.0f, 1.75f, 5.0f }) * Matrix4::Rotate(Vector3(0.0f, 1.0f, 0.0f), Angle * DEG2RAD));
 
 
-	Objects[0].SetModelMatrix(Matrix4::GetRotate(Vector3(0.0f, 1.0f, 0.1f), 47*DEG2RAD));
+	Objects[0].SetModelMatrix(Matrix4::Rotate(Vector3(0.0f, 1.0f, 0.1f), 47*DEG2RAD));
 
 	for (int i = 0; i < ObjectsCount; i++)
 	{

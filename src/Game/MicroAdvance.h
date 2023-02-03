@@ -18,8 +18,9 @@
 namespace ResourceCacheSystem
 {
 	ShaderProgram* LoadShaderProgram(const char* fileName);
-	Texture2D* LoadTexture2D(const char* fileName);
-	TextureCube* LoadTextureCube(const char* fileName);
+	Texture2D* LoadTexture2D(const char* fileName, const Texture2DInfo& textureInfo);
+	
+	bool IsLoad(const Texture2D& texture);
 
 	void Clear();
 } // ResourceCacheSystem

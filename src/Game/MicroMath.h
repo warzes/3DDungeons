@@ -8,11 +8,11 @@
 //=============================================================================
 // Core
 //=============================================================================
-constexpr float EPSILON = 1e-6f;
-constexpr float PI = 3.14159265358979323846f;
-constexpr float HALF_PI = PI * 0.5f;
-constexpr float DEG2RAD = PI / 180.0f;
-constexpr float RAD2DEG = 180.0f / PI;
+constexpr const float EPSILON = 1e-6f;
+constexpr const float PI = 3.14159265358979323846f;
+constexpr const float HALF_PI = PI * 0.5f;
+constexpr const float DEG2RAD = PI / 180.0f;
+constexpr const float RAD2DEG = 180.0f / PI;
 
 inline constexpr int   Min(int a, int b) { return a < b ? a : b; }
 inline constexpr float Min(float a, float b) { return a < b ? a : b; }
@@ -25,7 +25,12 @@ inline constexpr float Clamp(float x, float min, float max)
 	return x;
 }
 
-inline bool Compare(float f1, float f2) { return fabsf(f1 - f2) < EPSILON; }
+inline constexpr float Lerp(float lower, float upper, float gradient) noexcept
+{
+	return lower + (upper - lower) * Max(0.0f, Min(gradient, 1.0f));
+}
+
+inline bool Compare(float a, float b, float eps = EPSILON) { return fabsf(a - b) < eps; }
 
 //=============================================================================
 // Point2
@@ -55,10 +60,19 @@ public:
 	constexpr Color() = default;
 	constexpr Color(Color&&) = default;
 	constexpr Color(const Color&) = default;
+	constexpr Color(unsigned uintRGBA) 
+	{
+		a = (unsigned char)(uintRGBA >> 24);
+		r = (unsigned char)(uintRGBA >> 16);
+		g = (unsigned char)(uintRGBA >> 8);
+		b = (unsigned char)(uintRGBA >> 0);
+	}
 	constexpr Color(unsigned char nr, unsigned char ng, unsigned char nb, unsigned char na = 255) : r(nr), g(ng), b(nb), a(na) {}
 
 	constexpr Color& operator=(Color&&) = default;
 	constexpr Color& operator=(const Color&) = default;
+
+	unsigned ToUInt() const { return (unsigned)a << 24 | r << 16 | g << 8 | b; }
 
 	unsigned char r = 0;
 	unsigned char g = 0;
@@ -185,7 +199,7 @@ inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2);
 inline Vector3 Min(const Vector3& v1, const Vector3& v2);
 inline Vector3 Max(const Vector3& v1, const Vector3& v2);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
-inline Vector3 Mix(const Vector3& u, const Vector3& v, float a);
+inline Vector3 Mix(const Vector3& u, const Vector3& v, float t);
 inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v);
 
 //=============================================================================
@@ -357,15 +371,17 @@ public:
 	[[nodiscard]] Matrix4 Inverse() const;
 	[[nodiscard]] Matrix4 Transpose() const;
 
-	[[nodiscard]] static Matrix4 GetRotate(const Vector3& axis, float angle);
-	[[nodiscard]] static Matrix4 GetRotateX(float angle);
-	[[nodiscard]] static Matrix4 GetRotateY(float angle);
-	[[nodiscard]] static Matrix4 GetRotateZ(float angle);
-	[[nodiscard]] static Matrix4 GetScale(const Vector3& v);
-	[[nodiscard]] static Matrix4 GetTranslate(const Vector3& v);
+	void Decompose(Vector3& outScale, Quat& outRotation, Vector3& outTranslation) const;
 
-	[[nodiscard]] static Matrix4 GetOrtho(float left, float right, float bottom, float top, float n, float f);
-	[[nodiscard]] static Matrix4 GetPerspective(float fieldOfView, float aspectRatio, float znear, float zfar);
+	[[nodiscard]] static Matrix4 Rotate(const Vector3& axis, float angle);
+	[[nodiscard]] static Matrix4 RotateX(float angle);
+	[[nodiscard]] static Matrix4 RotateY(float angle);
+	[[nodiscard]] static Matrix4 RotateZ(float angle);
+	[[nodiscard]] static Matrix4 Scale(const Vector3& v);
+	[[nodiscard]] static Matrix4 Translate(const Vector3& v);
+
+	[[nodiscard]] static Matrix4 Ortho(float left, float right, float bottom, float top, float n, float f);
+	[[nodiscard]] static Matrix4 Perspective(float fieldOfView, float aspectRatio, float znear, float zfar);
 	[[nodiscard]] static Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up);
 
 	float m[16] = { 1.0f, 0.0f, 0.0f, 0.0f,
@@ -498,14 +514,14 @@ inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x)
 	return a + (b - a) * x;
 }
 
-inline Vector3 Mix(const Vector3& u, const Vector3& v, float a)
+inline Vector3 Mix(const Vector3& u, const Vector3& v, float t)
 {
-	return u * (1.0f - a) + v * a;
+	return u * (1.0f - t) + v * t;
 }
 
 inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v)
 {
-	return *(Vector3*)&(Matrix4::GetRotate(v, angle) * Vector4(u.x, u.y, u.z, 1.0f));
+	return *(Vector3*)&(Matrix4::Rotate(v, angle) * Vector4(u.x, u.y, u.z, 1.0f));
 }
 
 //=============================================================================
@@ -870,7 +886,7 @@ inline Matrix4 Matrix4::Transpose() const
 	return Transpose;
 }
 
-inline Matrix4 Matrix4::GetRotate(const Vector3& axis, float angle)
+inline Matrix4 Matrix4::Rotate(const Vector3& axis, float angle)
 {
 	const float s = sinf(angle);
 	const float c = 1.0f - cosf(angle);
@@ -892,7 +908,7 @@ inline Matrix4 Matrix4::GetRotate(const Vector3& axis, float angle)
 	return mat;
 }
 
-inline Matrix4 Matrix4::GetRotateX(float angle)
+inline Matrix4 Matrix4::RotateX(float angle)
 {
 	const float s = sinf(angle);
 	const float c = cosf(angle);
@@ -905,7 +921,7 @@ inline Matrix4 Matrix4::GetRotateX(float angle)
 	return mat;
 }
 
-inline Matrix4 Matrix4::GetRotateY(float angle)
+inline Matrix4 Matrix4::RotateY(float angle)
 {
 	const float s = sinf(angle);
 	const float c = cosf(angle);
@@ -918,7 +934,7 @@ inline Matrix4 Matrix4::GetRotateY(float angle)
 	return mat;
 }
 
-inline Matrix4 Matrix4::GetRotateZ(float angle)
+inline Matrix4 Matrix4::RotateZ(float angle)
 {
 	const float s = sinf(angle);
 	const float c = cosf(angle);
@@ -931,7 +947,7 @@ inline Matrix4 Matrix4::GetRotateZ(float angle)
 	return mat;
 }
 
-inline Matrix4 Matrix4::GetScale(const Vector3& v)
+inline Matrix4 Matrix4::Scale(const Vector3& v)
 {
 	Matrix4 mat;
 	mat[0] = v.x;  mat[4] = 0.0f; mat[ 8] = 0.0f; mat[12] = 0.0f;
@@ -941,7 +957,7 @@ inline Matrix4 Matrix4::GetScale(const Vector3& v)
 	return mat;
 }
 
-inline Matrix4 Matrix4::GetTranslate(const Vector3& v)
+inline Matrix4 Matrix4::Translate(const Vector3& v)
 {
 	Matrix4 mat;
 	mat[0] = 1.0f; mat[4] = 0.0f; mat[ 8] = 0.0f; mat[12] = v.x;
@@ -951,7 +967,7 @@ inline Matrix4 Matrix4::GetTranslate(const Vector3& v)
 	return mat;
 }
 
-inline Matrix4 Matrix4::GetOrtho(float left, float right, float bottom, float top, float n, float f)
+inline Matrix4 Matrix4::Ortho(float left, float right, float bottom, float top, float n, float f)
 {
 	Matrix4 mat;
 	mat[0] = 2.0f / (right - left); mat[4] = 0.0f;                  mat[ 8] = 0.0f;            mat[12] = -(right + left) / (right - left);
@@ -961,7 +977,7 @@ inline Matrix4 Matrix4::GetOrtho(float left, float right, float bottom, float to
 	return mat;
 }
 
-inline Matrix4 Matrix4::GetPerspective(float fieldOfView, float aspectRatio, float znear, float zfar)
+inline Matrix4 Matrix4::Perspective(float fieldOfView, float aspectRatio, float znear, float zfar)
 {
 	const float y = tanf(fieldOfView * 0.5f);
 	const float x = y * aspectRatio;

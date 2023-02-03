@@ -4,6 +4,7 @@
 
 Матемтаика
 	https://github.com/polymonster/maths - там еще есть и коллизии
+	https://opensource.apple.com/source/WebCore/WebCore-514/platform/graphics/transforms/TransformationMatrix.cpp   - matrix decompose
 
 Физика и коллизии
 	https://gdbooks.gitbooks.io/3dcollisions/content/Chapter1/point.html

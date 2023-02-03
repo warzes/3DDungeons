@@ -6,9 +6,6 @@
     <ClCompile Include="MicroEngine.cpp">
       <Filter>MicroEngine</Filter>
     </ClCompile>
-    <ClCompile Include="MicroOpenGLLoader.cpp">
-      <Filter>MicroEngine</Filter>
-    </ClCompile>
     <ClCompile Include="MicroRender.cpp">
       <Filter>MicroEngine</Filter>
     </ClCompile>
@@ -17,6 +14,9 @@
     </ClCompile>
     <ClCompile Include="MicroAdvance.cpp">
       <Filter>MicroEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="MicroOpenGLLoader.cpp">
+      <Filter>MicroEngine\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -28,9 +28,6 @@
       <Filter>MicroEngine</Filter>
     </ClInclude>
     <ClInclude Include="MicroCollisions.h">
-      <Filter>MicroEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="MicroOpenGLLoader.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
     <ClInclude Include="MicroRender.h">
@@ -51,6 +48,9 @@
     <ClInclude Include="MicroAdvance.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
+    <ClInclude Include="MicroOpenGLLoader.h">
+      <Filter>MicroEngine\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">
@@ -64,6 +64,9 @@
     </Filter>
     <Filter Include="ExampleDemo">
       <UniqueIdentifier>{a8b61894-ccce-4f6c-8eb7-40ea413e9b12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\utils">
+      <UniqueIdentifier>{f9feb1f4-25b5-4689-a3c4-c9342d8d26e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
