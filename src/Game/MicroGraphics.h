@@ -4,7 +4,77 @@
 // Header
 //=============================================================================
 
+#include <vector>
+
 #include "MicroMath.h"
+#include "MicroRender.h"
+
+class Texture2D;
+
+//=============================================================================
+// Material
+//=============================================================================
+class Material
+{
+public:
+	Texture2D* diffuseTexture = nullptr;
+
+	Vector3 ambientColor = { 1.0f };
+	Vector3 diffuseColor = { 1.0f };
+	Vector3 specularColor = { 1.0f };
+	float shininess = 1.0f;
+};
+
+//=============================================================================
+// Mesh
+//=============================================================================
+struct VertexMesh
+{
+	bool operator==(const VertexMesh& v) const { return position == v.position && normal == v.normal && color == v.color && texCoord == v.texCoord; }
+
+	Vector3 position;
+	Vector3 normal;
+	Vector3 color;
+	Vector2 texCoord;
+};
+
+class Mesh
+{
+public:
+	std::vector<VertexMesh> vertices;
+	std::vector<uint32_t> indices;
+	Material material;
+
+	VertexBuffer vertexBuffer;
+	IndexBuffer indexBuffer;
+	VertexArrayBuffer vao;
+};
+
+//=============================================================================
+// Model
+//=============================================================================
+class Model
+{
+public:
+	bool Create(const char* fileName, const char* pathMaterialFiles = "./");
+	bool Create(std::vector<Mesh>&& meshes);
+	void Destroy();
+
+	void SetMaterial(const Material& material);
+
+	void Draw();
+
+	bool IsValid() const
+	{
+		if (m_subMeshes.size() > 0)
+			return m_subMeshes[0].vertexBuffer.IsValid() && m_subMeshes[0].indexBuffer.IsValid() && m_subMeshes[0].vao.IsValid();
+		return false;
+	}
+
+private:
+	bool createBuffer();
+	std::vector<Mesh> m_subMeshes;
+};
 
 //=============================================================================
 // Camera

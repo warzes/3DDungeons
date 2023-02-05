@@ -39,9 +39,6 @@
     <ClInclude Include="01_Triangle.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
-    <ClInclude Include="ExampleDemo.h">
-      <Filter>ExampleDemo</Filter>
-    </ClInclude>
     <ClInclude Include="X_CurrentTest.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
@@ -54,6 +51,10 @@
     <ClInclude Include="02_QuadTexture.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
+    <ClInclude Include="03_ObjModel.h">
+      <Filter>ExampleDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="ExampleDemo.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

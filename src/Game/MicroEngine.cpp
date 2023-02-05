@@ -338,7 +338,7 @@ bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
 	pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.cColorBits = 32;
-	pfd.cDepthBits = 32;
+	pfd.cDepthBits = 24;
 	pfd.cStencilBits = 8;
 
 	int pixelFormat = ChoosePixelFormat(window::Win32DCHandle, &pfd);
@@ -529,9 +529,8 @@ void RenderSystemInit()
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0f);
 	glDepthRange(0.0f, 1.0f);
-
-	glEnable(GL_TEXTURE_2D); // нужно?
-	glEnable(GL_TEXTURE_CUBE_MAP); // нужно?
+	glClearColor(0.2f, 0.4f, 0.9f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 //-----------------------------------------------------------------------------
 void RenderSystemBeginFrame()
@@ -559,7 +558,7 @@ bool AppSystemCreate(const AppSystemCreateInfo& createInfo)
 	if (!WindowSystemCreate(createInfo.window))
 		return false;
 
-	void RenderSystemInit();
+	RenderSystemInit();
 
 	return !IsAppExitRequested();
 }

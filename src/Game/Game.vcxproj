@@ -188,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="01_Triangle.h" />
     <ClInclude Include="02_QuadTexture.h" />
+    <ClInclude Include="03_ObjModel.h" />
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="ExampleDemo.h" />
     <ClInclude Include="MicroAdvance.h" />

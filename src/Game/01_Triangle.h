@@ -1,6 +1,6 @@
 #pragma once
 
-std::string vertexShaderText = R"(
+constexpr const char* vertexShaderText = R"(
 #version 330 core
 
 layout(location = 0) in vec3 position;
@@ -17,7 +17,7 @@ void main()
 }
 )";
 
-std::string fragmentShaderText = R"(
+constexpr const char* fragmentShaderText = R"(
 #version 330 core
 
 in vec3 fragmentColor;
@@ -35,11 +35,11 @@ struct testVertex
 	Vector3 color;
 };
 
-testVertex vert[3] =
+testVertex vert[] =
 {
 	{{-1.0f, -1.0f, -4.0f}, {1.0f, 0.0f, 0.0f}},
-	{{ 1.0f, -1.0f, -4.0f}, {0.0f, 1.0f, 0.0f}},
-	{{ 0.0f,  1.0f, -4.0f}, {0.0f, 0.0f, 1.0f}}
+	{{ 0.0f,  1.0f, -4.0f}, {0.0f, 1.0f, 0.0f}},
+	{{ 1.0f, -1.0f, -4.0f}, {0.0f, 0.0f, 1.0f}}
 };
 
 ShaderProgram shader;

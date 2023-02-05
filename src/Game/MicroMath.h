@@ -136,6 +136,8 @@ public:
 	constexpr Vector2& operator=(Vector2&&) = default;
 	constexpr Vector2& operator=(const Vector2&) = default;
 
+	bool operator==(const Vector2& v) const { return Compare(x, v.x) && Compare(y, v.y); }
+
 	Vector2 operator-() const { return { -x, -y }; }
 
 	friend Vector2 operator-(const Vector2& u, float num) { return { u.x - num, u.y - num }; }
@@ -198,6 +200,8 @@ public:
 
 	constexpr Vector3& operator=(Vector3&&) = default;
 	constexpr Vector3& operator=(const Vector3&) = default;
+
+	bool operator==(const Vector3& v) const { return Compare(x, v.x) && Compare(y, v.y) && Compare(z, v.z); }
 
 	Vector3 operator-() const { return { -x, -y, -z }; }
 	friend Vector3 operator-(const Vector3& u, float num) { return { u.x - num, u.y - num, u.z - num }; }

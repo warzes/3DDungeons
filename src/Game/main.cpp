@@ -3,7 +3,6 @@
 #if START_EXAMPLE
 #include "ExampleDemo.h"
 #endif
-#include <time.h>
 
 //повторить вот это 
 //https://gpvoid.itch.io/rogue3d - механика боя
@@ -34,7 +33,6 @@ int main(
 		ExampleInit();
 		while (!IsAppExitRequested())
 		{
-			double d1 = double(clock()) / CLOCKS_PER_SEC;
 			AppSystemBeginFrame();
 
 			if (IsKeyDown(27/*VK_ESCAPE*/))
@@ -43,11 +41,6 @@ int main(
 			ExampleFrame();
 
 			AppSystemEndFrame();
-			double d2 = double(clock()) / CLOCKS_PER_SEC;
-
-			double dt = d2 - d1;
-			puts(std::to_string(dt).c_str());
-
 		}
 		ExampleClose();
 	}
