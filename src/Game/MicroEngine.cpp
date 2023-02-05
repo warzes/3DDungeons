@@ -532,9 +532,6 @@ void RenderSystemInit()
 
 	glEnable(GL_TEXTURE_2D); // нужно?
 	glEnable(GL_TEXTURE_CUBE_MAP); // нужно?
-	glEnable(GL_TEXTURE_GEN_S); // нужно?
-	glEnable(GL_TEXTURE_GEN_T); // нужно?
-	glEnable(GL_TEXTURE_GEN_R); // нужно?
 }
 //-----------------------------------------------------------------------------
 void RenderSystemBeginFrame()

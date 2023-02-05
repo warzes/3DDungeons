@@ -1,12 +1,20 @@
-﻿Уроки
+﻿Механики
+	анимация взмаха меча и щита - https://genaralskar.itch.io/dungeon-crawler - стоит посмотреть
+
+
+Уроки
 	https://sites.google.com/site/john87connor/scene-light-material
 	https://www.dhpoware.com/demos/index.html
 
 Матемтаика
 	https://github.com/polymonster/maths - там еще есть и коллизии
 	https://opensource.apple.com/source/WebCore/WebCore-514/platform/graphics/transforms/TransformationMatrix.cpp   - matrix decompose
+	https://github.com/xoorath/xo-math - оптим математика
 
 Физика и коллизии
+	софт-пиксель-эндж - организация менеджера коллайдеров
+	https://github.com/frabbani/polysoup - https://www.youtube.com/watch?v=6R4RItlo--U
+	https://github.com/SirJonthe/retro3d - физика
 	https://gdbooks.gitbooks.io/3dcollisions/content/Chapter1/point.html
 	https://github.com/Kazade/bounce - посмотреть
 	https://github.com/dtecta/solid3 - посмотреть
@@ -29,11 +37,17 @@
 		https://gist.github.com/mlfarrell/76fe8d1a0e01322093f8ff828e360b50
 
 Варианты стиля
+	вот такой кубический опенмир неплох - https://mudgate.itch.io/mudgate
+
+	https://reveu-games.itch.io/dungeon-game
+	https://orbissan.itch.io/pixel-roguelike
 	https://cornflowerblue.itch.io/the-orchids-edge - анимешный
 	https://fi.itch.io/bright-light
 	https://www.youtube.com/watch?v=0Id0LQj7pIs - покемоны в 3д
 	https://www.youtube.com/watch?v=xTyhXulFzX0 - мягкая стилизация
-
+	https://zaffresheep.itch.io/oneiro
+	https://ithiro.itch.io/dungeons-of-rhamdon-ii
+	https://ithiro.itch.io/devil-spire
 	дьябло 3д
 		https://3dwarehouse.sketchup.com/model/e8a097d7e7c91ddbbdd42daa9ca7d146/Fan-Art-Diablo-1-Tristram-3D?hl=tr
 		https://blenderartists.org/t/tristram-diablo/545836/7

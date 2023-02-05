@@ -7,7 +7,6 @@
 #endif
 #define __gl_h_ 1
 
-
 #ifndef GLAPIENTRY
 #	ifdef APIENTRY
 #		define GLAPIENTRY APIENTRY
@@ -119,9 +118,6 @@ typedef int GLintptr;
 #define GL_TEXTURE_2D 0x0DE1
 #define GL_TEXTURE_CUBE_MAP 0x8513
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_X 0x8515
-#define GL_TEXTURE_GEN_R 0x0C62
-#define GL_TEXTURE_GEN_S 0x0C60
-#define GL_TEXTURE_GEN_T 0x0C61
 #define GL_TEXTURE_MAG_FILTER 0x2800
 #define GL_TEXTURE_MIN_FILTER 0x2801
 #define GL_TEXTURE_SWIZZLE_RGBA 0x8E46

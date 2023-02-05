@@ -36,7 +36,7 @@
     <ClInclude Include="MicroGraphics.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
-    <ClInclude Include="01Triangle.h">
+    <ClInclude Include="01_Triangle.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
     <ClInclude Include="ExampleDemo.h">
@@ -50,6 +50,9 @@
     </ClInclude>
     <ClInclude Include="MicroOpenGLLoader.h">
       <Filter>MicroEngine\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="02_QuadTexture.h">
+      <Filter>ExampleDemo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

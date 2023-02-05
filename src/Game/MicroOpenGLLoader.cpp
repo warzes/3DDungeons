@@ -16,8 +16,7 @@ extern "C"
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 #endif // _WIN32
-
-
+//-----------------------------------------------------------------------------
 PFNGLACTIVETEXTUREPROC glActiveTexture = nullptr;
 PFNGLATTACHSHADERPROC glAttachShader = nullptr;
 PFNGLBINDBUFFERPROC glBindBuffer = nullptr;

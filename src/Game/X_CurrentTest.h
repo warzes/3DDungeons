@@ -379,8 +379,10 @@ out vec4 frag_Color;
 void main()
 {
 	frag_Color = texture(Texture, TexCoord);
-	float NdotLD = max(dot(normalize(Normal), Light.Direction), 0.0);
+	float NdotLD = max(dot(Light.Direction, normalize(Normal)), 0.0); // ламберт
 	frag_Color.rgb *= Light.Ambient + Light.Diffuse * NdotLD;
+	//float attenuation = saturate(1.0 - DistanceToLight / LightRadius);
+	//frag_Color.rgb *= Light.Ambient + Light.Diffuse * NdotLD * attenuation;
 }
 )";
 
@@ -636,6 +638,7 @@ void ExampleFrame()
 
 	Vector3 Movement;
 	bool MoveCamera = cam->OnKeys(Keys, 0.01f, Movement);
+	//Movement.y -= 0.01f;
 	if (MoveCamera)
 	{
 		bool CollisionsDetected = CheckCollisions(cam, Objects, ObjectsCount, Movement, 0);

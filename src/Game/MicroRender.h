@@ -42,7 +42,101 @@ enum class RenderResourceUsage
 // Render States
 //=============================================================================
 
+enum ColorWriteMask
+{
+	ColorWriteA = 1,
+	ColorWriteB = 2,
+	ColorWriteG = 4,
+	ColorWriteR = 8,
+	ColorWriteAll = (ColorWriteR | ColorWriteG | ColorWriteB | ColorWriteA)
+};
 
+enum class StencilOp
+{
+	Keep,
+	Zero,
+	Replace,
+	IncrSat,
+	DecrSat,
+	Invert,
+	IncrWrap,
+	DecrWrap
+};
+
+enum class BlendOp
+{
+	Add,
+	Sub,
+	RevSub,
+	Min,
+	Max,
+	LogicalClear,
+	LogicalSet,
+	LogicalCopy,
+	LogicalCopyInverted,
+	LogicalNoop,
+	LogicalInvert,
+	LogicalAnd,
+	LogicalNand,
+	LogicalOr,
+	LogicalNor,
+	LogicalXor,
+	LogicalEquiv,
+	LogicalAndReverse,
+	LogicalAndInverted,
+	LogicalOrReverse,
+	LogicalOrInverted,
+};
+
+enum class BlendMode
+{
+	Zero,
+	One,
+	DstColor,
+	SrcColor,
+	OneMinusDstColor,
+	SrcAlpha,
+	OneMinusSrcColor,
+	DstAlpha,
+	OneMinusDstAlpha,
+	SrcAlphaSaturate,
+	OneMinusSrcAlpha
+};
+
+enum class CompareFunction
+{
+	Disabled,
+	Never,
+	Less,
+	Equal,
+	LEqual,
+	Greater,
+	NotEqual,
+	GEqual,
+	Always,
+};
+
+enum class CullMode
+{
+	Full,
+	Front,
+	Back,
+};
+
+struct BlendState
+{
+	BlendMode       srcBlend = BlendMode::One;
+	BlendMode       dstBlend = BlendMode::Zero;
+	BlendMode       srcBlendAlpha = BlendMode::One;
+	BlendMode       dstBlendAlpha = BlendMode::Zero;
+	BlendOp         blendOp = BlendOp::Add;
+	BlendOp         blendOpAlpha = BlendOp::Add;
+	uint32_t        renderTargetWriteMask = ColorWriteAll;
+	CompareFunction alphaTest = CompareFunction::Disabled;
+	bool            alphaToMask = false;
+};
+
+void SetBlendState(const BlendState& state, float alphaRef);
 
 //=============================================================================
 // Shader Program
