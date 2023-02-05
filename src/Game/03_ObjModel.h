@@ -139,4 +139,11 @@ void ExampleFrame()
 
 	shader.SetUniform(uniformWorldMatrix, world2);
 	customModel.Draw();
+
+
+
+
+	DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, { -10.0f, 2.0f, 5.0f }, RED);
+
+	DebugDraw::Flush(perpective * view);
 }

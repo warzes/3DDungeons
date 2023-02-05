@@ -72,6 +72,7 @@ public:
 	}
 
 private:
+	bool loadObjFile(const char* fileName, const char* pathMaterialFiles = "./");
 	bool createBuffer();
 	std::vector<Mesh> m_subMeshes;
 };

@@ -79,7 +79,57 @@ namespace std
 bool Model::Create(const char* fileName, const char* pathMaterialFiles)
 {
 	Destroy();
+	if (std::string(fileName).find(".obj") != std::string::npos)
+		return loadObjFile(fileName, pathMaterialFiles);
 
+	return false;
+}
+//-----------------------------------------------------------------------------
+bool Model::Create(std::vector<Mesh>&& meshes)
+{
+	Destroy();
+	m_subMeshes = std::move(meshes);
+	return createBuffer();
+}
+//-----------------------------------------------------------------------------
+void Model::Destroy()
+{
+	for (int i = 0; i < m_subMeshes.size(); i++)
+	{
+		m_subMeshes[i].vertices.clear();
+		m_subMeshes[i].indices.clear();
+
+		m_subMeshes[i].vertexBuffer.Destroy();
+		m_subMeshes[i].indexBuffer.Destroy();
+		m_subMeshes[i].vao.Destroy();
+	}
+	m_subMeshes.clear();
+}
+//-----------------------------------------------------------------------------
+void Model::SetMaterial(const Material& material)
+{
+	for (int i = 0; i < m_subMeshes.size(); i++)
+	{
+		m_subMeshes[i].material = material;
+	}
+}
+//-----------------------------------------------------------------------------
+void Model::Draw()
+{
+	for (int i = 0; i < m_subMeshes.size(); i++)
+	{
+		if (m_subMeshes[i].vao.IsValid())
+		{
+			const Texture2D* diffuseTexture = m_subMeshes[i].material.diffuseTexture;
+			if (diffuseTexture && diffuseTexture->IsValid())
+				diffuseTexture->Bind(0);
+			m_subMeshes[i].vao.Draw(PrimitiveDraw::Triangles);
+		}
+	}
+}
+//-----------------------------------------------------------------------------
+bool Model::loadObjFile(const char* fileName, const char* pathMaterialFiles)
+{
 	tinyobj::ObjReaderConfig readerConfig;
 	readerConfig.mtl_search_path = pathMaterialFiles; // Path to material files
 
@@ -213,49 +263,6 @@ bool Model::Create(const char* fileName, const char* pathMaterialFiles)
 		m_subMeshes = std::move(tempMesh);
 
 	return createBuffer();
-}
-//-----------------------------------------------------------------------------
-bool Model::Create(std::vector<Mesh>&& meshes)
-{
-	Destroy();
-	m_subMeshes = std::move(meshes);
-	return createBuffer();
-}
-//-----------------------------------------------------------------------------
-void Model::Destroy()
-{
-	for (int i = 0; i < m_subMeshes.size(); i++)
-	{
-		m_subMeshes[i].vertices.clear();
-		m_subMeshes[i].indices.clear();
-
-		m_subMeshes[i].vertexBuffer.Destroy();
-		m_subMeshes[i].indexBuffer.Destroy();
-		m_subMeshes[i].vao.Destroy();
-	}
-	m_subMeshes.clear();
-}
-//-----------------------------------------------------------------------------
-void Model::SetMaterial(const Material& material)
-{
-	for (int i = 0; i < m_subMeshes.size(); i++)
-	{
-		m_subMeshes[i].material = material;
-	}
-}
-//-----------------------------------------------------------------------------
-void Model::Draw()
-{
-	for (int i = 0; i < m_subMeshes.size(); i++)
-	{
-		if (m_subMeshes[i].vao.IsValid())
-		{
-			const Texture2D* diffuseTexture = m_subMeshes[i].material.diffuseTexture;
-			if (diffuseTexture && diffuseTexture->IsValid())
-				diffuseTexture->Bind(0);
-			m_subMeshes[i].vao.Draw(PrimitiveDraw::Triangles);
-		}
-	}
 }
 //-----------------------------------------------------------------------------
 bool Model::createBuffer()

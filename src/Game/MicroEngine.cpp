@@ -44,6 +44,12 @@
 namespace core
 {
 	FILE* LogFile = nullptr;
+#if defined(_WIN32)
+	LARGE_INTEGER Frequency = {};
+	LARGE_INTEGER CurrentTime = {};
+	LARGE_INTEGER PrevTime = {};
+#endif
+	float DeltaTime = 0.0f;
 }
 //-----------------------------------------------------------------------------
 namespace window
@@ -553,6 +559,12 @@ void RenderSystemBeginFrame()
 //-----------------------------------------------------------------------------
 bool AppSystemCreate(const AppSystemCreateInfo& createInfo)
 {
+#if defined(_WIN32)
+	if (!QueryPerformanceFrequency(&core::Frequency)) return false;
+	if (!QueryPerformanceCounter(&core::CurrentTime)) return false;
+	core::PrevTime = core::CurrentTime;
+#endif
+
 	LogCreate("../log.txt");
 
 	if (!WindowSystemCreate(createInfo.window))
@@ -560,14 +572,16 @@ bool AppSystemCreate(const AppSystemCreateInfo& createInfo)
 
 	RenderSystemInit();
 
+	if (!DebugDraw::Init())
+		return false;
+
 	return !IsAppExitRequested();
 }
 //-----------------------------------------------------------------------------
 void AppSystemDestroy()
 {
-#if USE_RESOURCE_CACHE_SYSTEM
+	DebugDraw::Close();
 	ResourceCacheSystem::Clear();
-#endif // USE_RESOURCE_CACHE_SYSTEM
 	WindowSystemDestroy();
 	LogDestroy();
 }
@@ -585,10 +599,22 @@ void AppSystemBeginFrame()
 void AppSystemEndFrame()
 {
 	WindowSystemUpdate();
+#if defined(_WIN32)
+	QueryPerformanceCounter(&core::CurrentTime);
+	double delta = (double)(core::CurrentTime.QuadPart - core::PrevTime.QuadPart);
+	delta /= core::Frequency.QuadPart;
+	core::DeltaTime = (float)delta;
+	core::PrevTime = core::CurrentTime;
+#endif
 }
 //-----------------------------------------------------------------------------
 void AppExitRequest()
 {
 	app::IsExitRequested = true;
+}
+//-----------------------------------------------------------------------------
+float GetDeltaTime()
+{
+	return core::DeltaTime;
 }
 //-----------------------------------------------------------------------------

@@ -25,6 +25,13 @@
 // ==> MicroEngine
 extern void LogError(const std::string& msg);
 
+// ==> MicroAdvance
+namespace ResourceCacheSystem
+{
+	bool IsLoad(const ShaderProgram& shader);
+	bool IsLoad(const Texture2D& texture);
+}
+
 //=============================================================================
 // Global vars
 //=============================================================================
@@ -190,7 +197,8 @@ void ShaderProgram::Destroy()
 	if (m_id > 0)
 	{
 		if (state::CurrentShaderProgram == m_id) UnBind();
-		glDeleteProgram(m_id);
+		if (!ResourceCacheSystem::IsLoad(*this))
+			glDeleteProgram(m_id);
 		m_id = 0;
 	}
 }
@@ -684,8 +692,8 @@ void Texture2D::Destroy()
 			if (state::CurrentTexture2D[i] == m_id)
 				Texture2D::UnBind(i);
 		}
-
-		glDeleteTextures(1, &m_id);
+		if (!ResourceCacheSystem::IsLoad(*this))
+			glDeleteTextures(1, &m_id);
 		m_id = 0;
 	}
 }
