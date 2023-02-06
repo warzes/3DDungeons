@@ -130,7 +130,7 @@ void drawGround(float scale)
 void DrawConeLowres(const Vector3& center, const Vector3& top, float radius, unsigned rgb)
 {
 	Vector3 diff3 = top - center;
-	DebugDraw::DrawPrism(center, radius ? radius : 1, diff3.GetLength(), diff3.Normalize(), 3, rgb);
+	DebugDraw::DrawPrism(center, radius ? radius : 1, diff3.GetLength(), diff3.GetNormalize(), 3, rgb);
 }
 //-----------------------------------------------------------------------------
 void DrawCircleWithOrientation(const Vector3& center, Vector3 dir, float radius, unsigned rgb)
@@ -211,7 +211,7 @@ void DebugDraw::DrawLine(const Vector3& from, const Vector3& to, unsigned rgb)
 void DebugDraw::DrawLineDashed(Vector3 from, Vector3 to, unsigned rgb)
 {
 	Vector3 dist = (to - from);
-	Vector3 unit = dist.Normalize();
+	Vector3 unit = dist.GetNormalize();
 	for (float len = 0, mag = dist.GetLength() / 2; len < mag; ++len)
 	{
 		to = (from + unit);
@@ -267,7 +267,7 @@ void DebugDraw::DrawArrow(const Vector3& begin, const Vector3& end, unsigned rgb
 	float len = diff.GetLength(), stick_len = len * 2 / 3;
 
 	DrawLine(begin, end, rgb);
-	DrawConeLowres((begin + (diff.Normalize() * stick_len)), end, len / 6, rgb);
+	DrawConeLowres((begin + (diff.GetNormalize() * stick_len)), end, len / 6, rgb);
 }
 //-----------------------------------------------------------------------------
 void DebugDraw::DrawBounds(const Vector3 points[8], unsigned rgb)
@@ -385,7 +385,7 @@ void DebugDraw::DrawCapsule(const Vector3& from, const Vector3& to, float r, uns
 	/* calculate axis */
 	Vector3 up, right, forward;
 	forward = (to - from);
-	forward = forward.Normalize();
+	forward = forward.GetNormalize();
 	orthoVec(&right, &up, forward);
 
 	/* calculate first two cone verts (buttom + top) */
@@ -465,7 +465,7 @@ void DebugDraw::DrawDiamond(const Vector3& from, const Vector3& to, float size, 
 		static poly Pyramid(const Vector3& from, const Vector3& to, float size)
 		{
 			/* calculate axis */
-			Vector3 up, right, forward = (to - from).Normalize();
+			Vector3 up, right, forward = (to - from).GetNormalize();
 			orthoVec(&right, &up, forward);
 
 			/* calculate extend */
@@ -591,7 +591,7 @@ void DebugDraw::DrawHexagon(const Vector3& pos, float radius, unsigned rgb)
 void DebugDraw::DrawCone(const Vector3& center, const Vector3& top, float radius, unsigned rgb)
 {
 	Vector3 diff3 = (top - center);
-	DrawPrism(center, radius ? radius : 1, diff3.GetLength(), diff3.Normalize(), 24, rgb);
+	DrawPrism(center, radius ? radius : 1, diff3.GetLength(), diff3.GetNormalize(), 24, rgb);
 }
 //-----------------------------------------------------------------------------
 void DebugDraw::DrawCircle(const Vector3& pos, const Vector3& n, float radius, unsigned rgb)
@@ -627,7 +627,7 @@ void DebugDraw::DrawPositionDir(const Vector3& position, const Vector3& directio
 	DrawPoint(position, clr);
 	(position.y < 0 ? DrawLineDashed(ground, position, clr) : DrawLine(ground, position, clr));
 
-	Vector3 n = direction.Normalize(), up = Vector3(0, 1, 0);
+	Vector3 n = direction.GetNormalize(), up = Vector3(0, 1, 0);
 	for (int i = 0; i < 10 && i <= fabs(position.y); ++i)
 	{
 		if (i < 2 && direction.GetLength())
@@ -640,7 +640,7 @@ void DebugDraw::DrawPositionDir(const Vector3& position, const Vector3& directio
 
 void DebugDraw::DrawNormal(const Vector3& pos, const Vector3& n)
 {
-	DrawLine(pos, (pos + n.Normalize()), YELLOW);
+	DrawLine(pos, (pos + n.GetNormalize()), YELLOW);
 }
 //-----------------------------------------------------------------------------
 void DebugDraw::DrawBone(const Vector3& center, const Vector3& end, unsigned rgb)
@@ -656,7 +656,7 @@ void DebugDraw::DrawBone(const Vector3& center, const Vector3& end, unsigned rgb
 //-----------------------------------------------------------------------------
 void DebugDraw::DrawBoid(const Vector3& position, Vector3 dir)
 {
-	dir = dir.Normalize();
+	dir = dir.GetNormalize();
 
 	// if n is too similar to up vector, use right. else use up vector
 	Vector3 v1 = CrossProduct(dir, DotProduct(dir, Vector3(0, 1, 0)) > 0.8f ? Vector3(1, 0, 0) : Vector3(0, 1, 0));

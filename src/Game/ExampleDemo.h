@@ -17,3 +17,7 @@
 #if EXAMPLE_X_TEMP
 #	include "X_CurrentTest.h"
 #endif
+
+#if EXAMPLE_X_DEBUG
+#	include "X_Debug.h"
+#endif

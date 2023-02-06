@@ -170,7 +170,7 @@ void CObject::PrepareTriangles()
 			Triangle->Vertex[v].z = ModelMatrix[2] * Vertex->x + ModelMatrix[6] * Vertex->y + ModelMatrix[10] * Vertex->z + ModelMatrix[14];
 		}
 
-		Triangle->Normal[0] = CrossProduct(Triangle->Vertex[1] - Triangle->Vertex[0], Triangle->Vertex[2] - Triangle->Vertex[0]).Normalize();
+		Triangle->Normal[0] = CrossProduct(Triangle->Vertex[1] - Triangle->Vertex[0], Triangle->Vertex[2] - Triangle->Vertex[0]).GetNormalize();
 		Triangle->D[0] = -DotProduct(Triangle->Normal[0], Triangle->Vertex[0]);
 
 		for (int e = 0; e < 3; e++)
@@ -820,7 +820,7 @@ int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubD
 				int Index = Indices[i];
 
 				Buffer.AddData(&TexCoords[Index], 8);
-				Vector3 Normal = (NormalMatrix * Normals[Index]).Normalize();
+				Vector3 Normal = (NormalMatrix * Normals[Index]).GetNormalize();
 				Buffer.AddData(&Normal, 12);
 				Vector4 Vertex = ModelMatrix * Vector4(Vertices[Index].x, Vertices[Index].y, Vertices[Index].z, 1.0f);
 				Buffer.AddData(&Vertex, 12);

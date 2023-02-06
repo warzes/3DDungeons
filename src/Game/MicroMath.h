@@ -39,8 +39,6 @@ CrossProduct - векторное произведение векторов.
 
 */
 
-
-
 //=============================================================================
 // Header
 //=============================================================================
@@ -49,11 +47,17 @@ CrossProduct - векторное произведение векторов.
 //=============================================================================
 // Core
 //=============================================================================
-constexpr const float EPSILON = 1e-6f;
+constexpr const float EPSILON = 1.0e-6f;
 constexpr const float PI = 3.14159265358979323846f;
 constexpr const float HALF_PI = PI * 0.5f;
 constexpr const float DEG2RAD = PI / 180.0f;
+constexpr const float DEG2RAD_2 = PI / 360.0f; // DEG2RAD / 2.f
 constexpr const float RAD2DEG = 180.0f / PI;
+constexpr const int MIN_INT = 0x80000000;
+constexpr const int MAX_INT = 0x7fffffff;
+constexpr const unsigned MIN_UNSIGNED = 0x00000000;
+constexpr const unsigned MAX_UNSIGNED = 0xffffffff;
+constexpr const float MAX_FLOAT = 3.402823466e+38f;
 
 inline constexpr int   Min(int a, int b) { return a < b ? a : b; }
 inline constexpr float Min(float a, float b) { return a < b ? a : b; }
@@ -66,12 +70,16 @@ inline constexpr float Clamp(float x, float min, float max)
 	return x;
 }
 
-inline constexpr float Lerp(float lower, float upper, float gradient) noexcept
+// Linear interpolation between two float values.
+inline constexpr float Lerp(float lhs, float rhs, float t) noexcept
 {
-	return lower + (upper - lower) * Max(0.0f, Min(gradient, 1.0f));
+	return lhs * (1.0f - t) + rhs * t;
 }
 
-inline bool Compare(float a, float b, float eps = EPSILON) { return fabsf(a - b) < eps; }
+inline bool Equals(float a, float b, float eps = EPSILON) { return fabsf(a - b) < eps; }
+
+/// Check whether a floating point value is NaN.
+inline bool IsNaN(float value) { return value != value; }
 
 //=============================================================================
 // Point2
@@ -88,8 +96,12 @@ public:
 	constexpr Point2& operator=(Point2&&) = default;
 	constexpr Point2& operator=(const Point2&) = default;
 
-	friend Point2 operator-(const Point2& u, const Point2& v) { return { u.x - v.x, u.y - v.y }; }
+	bool operator==(const Point2& rhs) const { return x == rhs.x && y == rhs.y; }
 
+	friend Point2 operator-(const Point2& u, const Point2& v) { return { u.x - v.x, u.y - v.y }; }
+	friend Point2 operator+(const Point2& u, const Point2& v) { return { u.x + v.x, u.y + v.y }; }
+
+	Point2& operator-=(const Point2& u) { x -= u.x; y -= u.y; return *this; }
 	Point2& operator+=(const Point2& u) { x += u.x; y += u.y; return *this; }
 
 	int x = 0;
@@ -140,7 +152,7 @@ public:
 	constexpr Vector2& operator=(Vector2&&) = default;
 	constexpr Vector2& operator=(const Vector2&) = default;
 
-	bool operator==(const Vector2& v) const { return Compare(x, v.x) && Compare(y, v.y); }
+	bool operator==(const Vector2& v) const { return Equals(x, v.x) && Equals(y, v.y); }
 
 	Vector2 operator-() const { return { -x, -y }; }
 
@@ -171,7 +183,7 @@ public:
 
 	float GetLength() const;
 	float GetLengthSquared() const;
-	Vector2 Normalize() const;
+	Vector2 GetNormalize() const;
 
 	float x = 0.0f;
 	float y = 0.0f;
@@ -192,9 +204,12 @@ class Vector3
 public:
 	static const Vector3 Zero;
 	static const Vector3 One;
+	static const Vector3 Left;
 	static const Vector3 Right;
 	static const Vector3 Up;
+	static const Vector3 Down;
 	static const Vector3 Forward;
+	static const Vector3 Back;
 
 	constexpr Vector3() = default;
 	constexpr Vector3(Vector3&&) = default;
@@ -205,7 +220,7 @@ public:
 	constexpr Vector3& operator=(Vector3&&) = default;
 	constexpr Vector3& operator=(const Vector3&) = default;
 
-	bool operator==(const Vector3& v) const { return Compare(x, v.x) && Compare(y, v.y) && Compare(z, v.z); }
+	bool operator==(const Vector3& v) const { return Equals(x, v.x) && Equals(y, v.y) && Equals(z, v.z); }
 
 	Vector3 operator-() const { return { -x, -y, -z }; }
 	friend Vector3 operator-(const Vector3& u, float num) { return { u.x - num, u.y - num, u.z - num }; }
@@ -235,7 +250,7 @@ public:
 
 	float GetLength() const;
 	float GetLengthSquared() const;
-	Vector3 Normalize() const;
+	Vector3 GetNormalize() const;
 
 	float x = 0.0f;
 	float y = 0.0f;
@@ -250,6 +265,8 @@ inline Vector3 Max(const Vector3& v1, const Vector3& v2);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
 inline Vector3 Mix(const Vector3& u, const Vector3& v, float t);
 inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v);
+// Return the angle between this vector and another vector in degrees.
+inline float Angle(const Vector3& v1, const Vector3& v2);
 
 //=============================================================================
 // Vector4
@@ -262,9 +279,12 @@ public:
 	constexpr Vector4(const Vector4&) = default;
 	constexpr Vector4(float n) : x(n), y(n), z(n), w(n) {}
 	constexpr Vector4(float nx, float ny, float nz, float nw) : x(nx), y(ny), z(nz), w(nw) {}
+	constexpr Vector4(const Vector4& v, float nw) : x(v.x), y(v.y), z(v.z), w(nw) {}
 
 	constexpr Vector4& operator=(Vector4&&) = default;
 	constexpr Vector4& operator=(const Vector4&) = default;
+
+	bool operator==(const Vector4& v) const { return Equals(x, v.x) && Equals(y, v.y) && Equals(z, v.z) && Equals(w, v.w); }
 
 	Vector4 operator-() const { return { -x, -y, -z, -w }; }
 	friend Vector4 operator-(const Vector4& u, float num) { return { u.x - num, u.y - num, u.z - num, u.w - num }; }
@@ -294,46 +314,97 @@ public:
 
 	float* operator&() { return (float*)this; }
 
+	Vector4 GetNormalize() const;
+
 	float x = 0.0f;
 	float y = 0.0f;
 	float z = 0.0f;
 	float w = 0.0f;
 };
 
-//=============================================================================
-// Quat
-//=============================================================================
+inline float DotProduct(const Vector4& v1, const Vector4& v2);
 
-class Quat
+//=============================================================================
+// Quaternion
+//=============================================================================
+class Matrix3;
+
+class Quaternion
 {
 public:
-	constexpr Quat() = default;
-	constexpr Quat(Quat&&) = default;
-	constexpr Quat(const Quat&) = default;
-	constexpr Quat(float nx, float ny, float nz, float nw = 1.0f) : x(nx), y(ny), z(nz), w(nw) {}
-	Quat(const Vector3& axis, float angle);
+	static const Quaternion Identity;
 
-	constexpr Quat& operator=(Quat&&) = default;
-	constexpr Quat& operator=(const Quat&) = default;
+	constexpr Quaternion() = default;
+	constexpr Quaternion(Quaternion&&) = default;
+	constexpr Quaternion(const Quaternion&) = default;
+	constexpr Quaternion(float nx, float ny, float nz, float nw) : x(nx), y(ny), z(nz), w(nw) {}
+	Quaternion(const Vector3& axis, float angle);         // Construct from an angle (in degrees) and axis.
+	Quaternion(float ax, float ay, float az);             // Construct from Euler angles (in degrees.)
+	Quaternion(const Vector3& start, const Vector3& end); // Construct from the rotation difference between two direction vectors.
+	Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis); // Construct from orthonormal axes.
+	Quaternion(const Matrix3& matrix);                    // Construct from a rotation matrix.
 
-	constexpr Quat operator*(const Quat& q) const;
-	constexpr Quat operator-() const { return { x, y, z, -w }; }
-	constexpr Quat operator+(const Quat& q) const { return { x + q.x, y + q.y, z + q.z, w + q.w }; }
-	constexpr Quat operator*(float m) const { return { x * m, y * m, z * m, w * m }; }
-	Vector3 operator*(const Vector3& q) const { return Rotate(q); }
+	constexpr Quaternion& operator=(Quaternion&&) = default;
+	constexpr Quaternion& operator=(const Quaternion&) = default;
+
+	bool operator==(const Quaternion& v) const { return Equals(x, v.x) && Equals(y, v.y) && Equals(z, v.z) && Equals(w, v.w); }
+
+	Quaternion operator-() const { return { -x, -y, -z, -w }; }
+	friend Quaternion operator-(const Quaternion& u, const Quaternion& v) { return { u.x - v.x, u.y - v.y, u.z - v.z, u.w - v.w }; }
+	friend Quaternion operator+(const Quaternion& u, const Quaternion& v) { return { u.x + v.x, u.y + v.y, u.z + v.z, u.w + v.w }; }
+	friend Quaternion operator*(const Quaternion& u, float num) { return { u.x * num, u.y * num, u.z * num, u.w * num }; }
+	friend Quaternion operator*(float num, const Quaternion& u) { return { num * u.x, num * u.y, num * u.z, num * u.w }; }
+	friend Quaternion operator*(const Quaternion& u, const Quaternion& v);
+	Vector3 operator*(const Vector3& q) const;
+
+	Quaternion& operator*=(float num) { x *= num; y *= num; z *= num; w *= num; return *this; }
+	Quaternion& operator+=(const Quaternion& u) { x += u.x; y += u.y; z += u.z; w += u.w; return *this; }
 
 	constexpr void Set(float nx, float ny, float nz, float nw) { x = nx; y = ny; z = nz; w = nw; }
+	
+	// Define from an angle (in degrees) and axis.
+	void FromAngleAxis(float angle, const Vector3& axis);
+	// Define from Euler angles (in degrees.)
+	void FromEulerAngles(float x, float y, float z);
+	// Define from the rotation difference between two direction vectors.
+	void FromRotationTo(const Vector3& start, const Vector3& end);
+	// Define from orthonormal axes.
+	void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
+	// Define from a rotation matrix.
+	void FromRotationMatrix(const Matrix3& matrix);
+	// Define from a direction to look in and an up direction. Return true on success, or false if would result in a NaN, in which case the current value remains.
+	bool FromLookRotation(const Vector3& direction, const Vector3& up = Vector3::Up);
+		
+	/// Return whether is NaN.
+	bool IsNaN() const { return ::IsNaN(w) || ::IsNaN(x) || ::IsNaN(y) || ::IsNaN(z); }
 
-	void FromEuler(const Vector3& euler);
-	[[nodiscard]] Vector3 ToEuler() const;
+	float GetLengthSquared() const;
+	Quaternion GetNormalize() const;
+	Quaternion Inverse() const;
+	Quaternion Conjugate() const { return Quaternion(-x, -y, -z, w); }
 
-	[[nodiscard]] Vector3 Rotate(const Vector3& v) const;
+	// Return Euler angles in degrees.
+	Vector3 EulerAngles() const;
+	// Return yaw angle in degrees.
+	float YawAngle() const;
+	// Return pitch angle in degrees.
+	float PitchAngle() const;
+	// Return roll angle in degrees.
+	float RollAngle() const;
+	// Return the rotation matrix that corresponds to this quaternion.
+	Matrix3 RotationMatrix() const;
+	// Spherical interpolation with another quaternion.
+	Quaternion Slerp(Quaternion rhs, float t) const;
+	// Normalized linear interpolation with another quaternion.
+	Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath = false) const;
 
 	float x = 0.0f;
 	float y = 0.0f;
 	float z = 0.0f;
 	float w = 1.0f;
 };
+
+inline float DotProduct(const Quaternion& v1, const Quaternion& v2);
 
 //=============================================================================
 // Matrix3
@@ -361,8 +432,11 @@ public:
 	constexpr float& operator[](size_t i) { return m[i]; }
 	constexpr const float operator[](size_t i) const { return m[i]; }
 
-	friend Matrix3 operator*(const Matrix3 &m1, const Matrix3 &m2);
+	friend Matrix3 operator+(const Matrix3 &m1, const Matrix3 &m2);
+	friend Matrix3 operator-(const Matrix3 &m1, const Matrix3 &m2);
+	friend Matrix3 operator*(const Matrix3 &m, float f);
 	friend Vector3 operator*(const Matrix3 &m, const Vector3 &u);
+	friend Matrix3 operator*(const Matrix3 &m1, const Matrix3 &m2);
 
 	constexpr void Set(const float* f);
 	constexpr void Set(
@@ -371,6 +445,13 @@ public:
 		float m6, float m7, float m8);
 	constexpr void Set(const Matrix3& M);
 
+	void SetScale(const Vector3& scale);
+	void SetScale(float scale);
+
+	// Return the scaling part.
+	Vector3 GetScale() const;
+	Matrix3 Scaled(const Vector3& scale) const;
+
 	[[nodiscard]] Matrix3 Inverse() const;
 	[[nodiscard]] Matrix3 Transpose() const;
 
@@ -378,6 +459,65 @@ public:
 		1.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 1.0f
+	};
+};
+
+//=============================================================================
+// Matrix3x4
+//=============================================================================
+class Matrix3x4
+{
+public:
+	constexpr Matrix3x4() = default;
+	constexpr Matrix3x4(Matrix3x4&&) = default;
+	constexpr Matrix3x4(const Matrix3x4&) = default;
+	constexpr Matrix3x4(const float* f);
+	Matrix3x4(const Matrix3& matrix);
+	Matrix3x4(const Matrix4& matrix);
+	Matrix3x4(float v00, float v01, float v02, float v03,
+		float v10, float v11, float v12, float v13,
+		float v20, float v21, float v22, float v23);
+	Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale);
+	Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
+
+	constexpr Matrix3x4& operator=(Matrix3x4&&) = default;
+	constexpr Matrix3x4& operator=(const Matrix3x4&) = default;
+	Matrix3x4& operator=(const Matrix3& rhs);
+	Matrix3x4& operator=(const Matrix4& rhs);
+
+	friend Matrix3x4 operator+(const Matrix3x4 &m1, const Matrix3x4 &m2);
+	friend Matrix3x4 operator-(const Matrix3x4 &m1, const Matrix3x4 &m2);
+	friend Matrix3x4 operator*(float f, const Matrix3x4 &m);
+	friend Matrix3x4 operator*(const Matrix3x4 &m, float f);
+	friend Vector3 operator*(const Matrix3x4 &m, const Vector3 &u);
+	friend Vector3 operator*(const Matrix3x4 &m, const Vector4 &u);
+	friend Matrix3x4 operator*(const Matrix3x4 &m1, const Matrix3x4 &m2);
+	friend Matrix4 operator*(const Matrix3x4 &m1, const Matrix4 &m2);
+	friend Matrix4 operator*(const Matrix4 &m1, const Matrix3x4 &m2);
+
+	constexpr float& operator[](size_t i) { return m[i]; }
+	constexpr const float operator[](size_t i) const { return m[i]; }
+
+	void SetTranslation(const Vector3& translation);
+	void SetRotation(const Matrix3& rotation);
+	void SetScale(const Vector3& scale);
+	void SetScale(float scale);
+
+	Matrix3 ToMatrix3() const;
+	Matrix4 ToMatrix4() const;
+
+	Matrix3 RotationMatrix() const;
+	Vector3 Translation() const;
+	Quaternion Rotation() const { return Quaternion(RotationMatrix()); }
+	Vector3 Scale() const;
+
+	void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+	Matrix3x4 Inverse() const;
+
+	float m[12] = {
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f
 	};
 };
 
@@ -420,7 +560,7 @@ public:
 	[[nodiscard]] Matrix4 Inverse() const;
 	[[nodiscard]] Matrix4 Transpose() const;
 
-	void Decompose(Vector3& outScale, Quat& outRotation, Vector3& outTranslation) const;
+	void Decompose(Vector3& outScale, Quaternion& outRotation, Vector3& outTranslation) const;
 
 	[[nodiscard]] static Matrix4 Rotate(const Vector3& axis, float angle);
 	[[nodiscard]] static Matrix4 RotateX(float angle);
@@ -453,7 +593,7 @@ inline float Vector2::GetLengthSquared() const
 	return x * x + y * y;
 }
 
-inline Vector2 Vector2::Normalize() const
+inline Vector2 Vector2::GetNormalize() const
 {
 	const float invLen = 1.0f / sqrtf(x * x + y * y);
 	return { x * invLen, y * invLen };
@@ -499,11 +639,14 @@ inline Vector2 Mix(const Vector2& u, const Vector2& v, float a)
 // Vector3 Impl
 //=============================================================================
 
-inline const Vector3 Vector3::Zero = { 0.0f };
-inline const Vector3 Vector3::One = { 1.0f };
-inline const Vector3 Vector3::Right = { 1.0f, 0.0f, 0.0f };
-inline const Vector3 Vector3::Up = { 0.0f, 1.0f, 0.0f };
+inline const Vector3 Vector3::Zero    = { 0.0f };
+inline const Vector3 Vector3::One     = { 1.0f };
+inline const Vector3 Vector3::Left    = {-1.0f, 0.0f, 0.0f };
+inline const Vector3 Vector3::Right   = { 1.0f, 0.0f, 0.0f };
+inline const Vector3 Vector3::Up      = { 0.0f, 1.0f, 0.0f };
+inline const Vector3 Vector3::Down    = { 0.0f,-1.0f, 0.0f };
 inline const Vector3 Vector3::Forward = { 0.0f, 0.0f, 1.0f };
+inline const Vector3 Vector3::Back    = { 0.0f, 0.0f, -1.0f };
 
 inline float Vector3::GetLength() const
 {
@@ -515,7 +658,7 @@ inline float Vector3::GetLengthSquared() const
 	return x * x + y * y + z * z;
 }
 
-inline Vector3 Vector3::Normalize() const
+inline Vector3 Vector3::GetNormalize() const
 {
 	const float invLen = 1.0f / sqrtf(x * x + y * y + z * z);
 	return { x * invLen, y * invLen, z * invLen };
@@ -573,85 +716,344 @@ inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v)
 	return *(Vector3*)&(Matrix4::Rotate(v, angle) * Vector4(u.x, u.y, u.z, 1.0f));
 }
 
+inline float Angle(const Vector3& v1, const Vector3& v2)
+{
+	float value = DotProduct(v1, v2) / (v1.GetLength() * v2.GetLength());
+	return RAD2DEG * acosf(Clamp(value, -1.0f, 1.0f));
+}
+
 //=============================================================================
-// Quat Impl
+// Vector4 Impl
 //=============================================================================
 
-inline Quat::Quat(const Vector3& axis, float angle)
+inline Vector4 Vector4::GetNormalize() const
 {
-	const float half_angle = angle * 0.5f;
-	const float s = sinf(half_angle);
-	w = cosf(half_angle);
-	x = axis.x * s;
-	y = axis.y * s;
-	z = axis.z * s;
+	const float invLen = 1.0f / sqrtf(x * x + y * y + z * z + w * w);
+	return { x * invLen, y * invLen, z * invLen, w * invLen };
 }
 
-inline constexpr Quat Quat::operator*(const Quat& rhs) const
+inline float DotProduct(const Vector4& v1, const Vector4& v2)
 {
-	return {
-		w * rhs.x + rhs.w * x + y * rhs.z - rhs.y * z,
-		w * rhs.y + rhs.w * y + z * rhs.x - rhs.z * x,
-		w * rhs.z + rhs.w * z + x * rhs.y - rhs.x * y,
-		w * rhs.w - rhs.x * x - y * rhs.y - rhs.z * z };
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 }
 
-inline void Quat::FromEuler(const Vector3& euler)
-{
-	const float ex = euler.x * 0.5f;
-	const float ey = euler.y * 0.5f;
-	const float ez = euler.z * 0.5f;
-	const float sinX = sinf(ex);
-	const float cosX = cosf(ex);
-	const float sinY = sinf(ey);
-	const float cosY = cosf(ey);
-	const float sinZ = sinf(ez);
-	const float cosZ = cosf(ez);
+//=============================================================================
+// Quaternion Impl
+//=============================================================================
 
-	w = cosY * cosX * cosZ + sinY * sinX * sinZ;
-	x = cosY * sinX * cosZ + sinY * cosX * sinZ;
-	y = sinY * cosX * cosZ - cosY * sinX * sinZ;
-	z = cosY * cosX * sinZ - sinY * sinX * cosZ;
+const Quaternion Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+inline Quaternion::Quaternion(const Vector3& axis, float angle)
+{
+	FromAngleAxis(angle, axis);
 }
 
-inline Vector3 Quat::ToEuler() const
+inline Quaternion::Quaternion(float ax, float ay, float az)
 {
-	const float check = 2.0f * (w * x - y * z);
-
-	if( check < -0.999999f )
-	{
-		return {
-			-HALF_PI,
-			0.0f,
-			-atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z))
-		};
-	}
-
-	if( check > 0.999999f )
-	{
-		return {
-			HALF_PI,
-			0.0f,
-			atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z))
-		};
-	}
-
-	return {
-		(float)asin(check),
-		atan2f(2.0f * (x * z + w * y), 1.0f - 2.0f * (x * x + y * y)),
-		atan2f(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z))
-	};
+	FromEulerAngles(x, y, z);
 }
 
-inline Vector3 Quat::Rotate(const Vector3& v) const
+inline Quaternion::Quaternion(const Vector3& start, const Vector3& end)
+{
+	FromRotationTo(start, end);
+}
+
+inline Quaternion::Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
+{
+	FromAxes(xAxis, yAxis, zAxis);
+}
+
+inline Quaternion::Quaternion(const Matrix3& matrix)
+{
+	FromRotationMatrix(matrix);
+}
+
+inline Quaternion operator*(const Quaternion& u, const Quaternion& v)
+{
+	return Quaternion(
+		u.w * v.x + u.x * v.w + u.y * v.z - u.z * v.y,
+		u.w * v.y + u.y * v.w + u.z * v.x - u.x * v.z,
+		u.w * v.z + u.z * v.w + u.x * v.y - u.y * v.x,
+		u.w * v.w - u.x * v.x - u.y * v.y - u.z * v.z
+	);
+}
+
+inline Vector3 Quaternion::operator*(const Vector3& v) const
 {
 	const Vector3 qvec(x, y, z);
 	Vector3 uv = CrossProduct(qvec, v);
 	Vector3 uuv = CrossProduct(qvec, uv);
-	uv *= (2.0f * w);
-	uuv *= 2.0f;
+	return v + 2.0f * (uv * w + uuv);
+}
 
-	return v + uv + uuv;
+inline void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
+{
+	Vector3 normAxis = axis.GetNormalize();
+	angle *= DEG2RAD_2;
+	const float sinAngle = sinf(angle);
+	const float cosAngle = cosf(angle);
+
+	x = normAxis.x * sinAngle;
+	y = normAxis.y * sinAngle;
+	z = normAxis.z * sinAngle;
+	w = cosAngle;
+}
+
+inline void Quaternion::FromEulerAngles(float x_, float y_, float z_)
+{
+	// Order of rotations: Z first, then X, then Y (mimics typical FPS camera with gimbal lock at top/bottom)
+	x_ *= DEG2RAD_2;
+	y_ *= DEG2RAD_2;
+	z_ *= DEG2RAD_2;
+	const float sinX = sinf(x_);
+	const float cosX = cosf(x_);
+	const float sinY = sinf(y_);
+	const float cosY = cosf(y_);
+	const float sinZ = sinf(z_);
+	const float cosZ = cosf(z_);
+
+	x = cosY * sinX * cosZ + sinY * cosX * sinZ;
+	y = sinY * cosX * cosZ - cosY * sinX * sinZ;
+	z = cosY * cosX * sinZ - sinY * sinX * cosZ;
+	w = cosY * cosX * cosZ + sinY * sinX * sinZ;
+}
+
+inline void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
+{
+	Vector3 normStart = start.GetNormalize();
+	Vector3 normEnd = end.GetNormalize();
+	float d = DotProduct(normStart, normEnd);
+
+	if( d > -1.0f + EPSILON )
+	{
+		Vector3 c = CrossProduct(normStart, normEnd);
+		float s = sqrtf((1.0f + d) * 2.0f);
+		float invS = 1.0f / s;
+
+		x = c.x * invS;
+		y = c.y * invS;
+		z = c.z * invS;
+		w = 0.5f * s;
+	}
+	else
+	{
+		Vector3 axis = CrossProduct(Vector3::Right, normStart);
+		if( axis.GetLength() < EPSILON )
+			axis = CrossProduct(Vector3::Up, normStart);
+
+		FromAngleAxis(180.f, axis);
+	}
+}
+
+inline void Quaternion::FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
+{
+	Matrix3 matrix(
+		xAxis.x, yAxis.x, zAxis.x,
+		xAxis.y, yAxis.y, zAxis.y,
+		xAxis.z, yAxis.z, zAxis.z
+	);
+
+	FromRotationMatrix(matrix);
+}
+
+inline void Quaternion::FromRotationMatrix(const Matrix3& matrix)
+{
+	float t = matrix[0] + matrix[4] + matrix[8];
+
+	if( t > 0.0f )
+	{
+		float invS = 0.5f / sqrtf(1.0f + t);
+
+		x = (matrix[7] - matrix[5]) * invS;
+		y = (matrix[2] - matrix[6]) * invS;
+		z = (matrix[3] - matrix[1]) * invS;
+		w = 0.25f / invS;
+	}
+	else
+	{
+		if( matrix[0] > matrix[4] && matrix[0] > matrix[8] )
+		{
+			float invS = 0.5f / sqrtf(1.0f + matrix[0] - matrix[4] - matrix[8]);
+
+			x = 0.25f / invS;
+			y = (matrix[1] + matrix[3]) * invS;
+			z = (matrix[6] + matrix[2]) * invS;
+			w = (matrix[7] - matrix[5]) * invS;
+		}
+		else if( matrix[4] > matrix[8] )
+		{
+			float invS = 0.5f / sqrtf(1.0f + matrix[4] - matrix[0] - matrix[8]);
+
+			x = (matrix[1] + matrix[3]) * invS;
+			y = 0.25f / invS;
+			z = (matrix[5] + matrix[7]) * invS;
+			w = (matrix[2] - matrix[6]) * invS;
+		}
+		else
+		{
+			float invS = 0.5f / sqrtf(1.0f + matrix[8] - matrix[0] - matrix[4]);
+
+			x = (matrix[2] + matrix[6]) * invS;
+			y = (matrix[5] + matrix[7]) * invS;
+			z = 0.25f / invS;
+			w = (matrix[3] - matrix[1]) * invS;
+		}
+	}
+}
+
+inline bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDirection)
+{
+	Quaternion ret;
+	Vector3 forward = direction.GetNormalize();
+
+	Vector3 v = CrossProduct(forward, upDirection);
+	// If direction & upDirection are parallel and crossproduct becomes zero, use FromRotationTo() fallback
+	if( v.GetLengthSquared() >= EPSILON )
+	{
+		v = v.GetNormalize();
+		Vector3 up = CrossProduct(v, forward);
+		Vector3 right = CrossProduct(up, forward);
+		ret.FromAxes(right, up, forward);
+	}
+	else
+		ret.FromRotationTo(Vector3::Forward, forward);
+
+	if( !ret.IsNaN() )
+	{
+		(*this) = ret;
+		return true;
+	}
+	else
+		return false;
+}
+
+inline float Quaternion::GetLengthSquared() const
+{
+	return x * x + y * y + z * z + w * w;
+}
+
+inline Quaternion Quaternion::GetNormalize() const
+{
+	const float invLen = 1.0f / sqrtf(x * x + y * y + z * z + w * w);
+	return { x * invLen, y * invLen, z * invLen, w * invLen };
+}
+
+inline Quaternion Quaternion::Inverse() const
+{
+	float lenSquared = GetLengthSquared();
+	if( lenSquared == 1.0f )
+		return Conjugate();
+	else if( lenSquared >= EPSILON )
+		return Conjugate() * (1.0f / lenSquared);
+	else
+		return Identity;
+}
+
+inline Vector3 Quaternion::EulerAngles() const
+{
+	// Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	// Order of rotations: Z first, then X, then Y
+	float check = 2.0f * (w * x - y * z);
+
+	if( check < -0.995f )
+	{
+		return Vector3(
+			-90.0f,
+			0.0f,
+			-atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z)) * RAD2DEG
+		);
+	}
+	else if( check > 0.995f )
+	{
+		return Vector3(
+			90.0f,
+			0.0f,
+			atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z)) * RAD2DEG
+		);
+	}
+	else
+	{
+		return Vector3(
+			asinf(check) * RAD2DEG,
+			atan2f(2.0f * (x * z + w * y), 1.0f - 2.0f * (x * x + y * y)) * RAD2DEG,
+			atan2f(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z)) * RAD2DEG
+		);
+	}
+}
+
+inline float Quaternion::YawAngle() const
+{
+	return EulerAngles().y;
+}
+
+inline float Quaternion::PitchAngle() const
+{
+	return EulerAngles().x;
+}
+
+inline float Quaternion::RollAngle() const
+{
+	return EulerAngles().z;
+}
+
+inline Matrix3 Quaternion::RotationMatrix() const
+{
+	return {
+		1.0f - 2.0f * y * y - 2.0f * z * z,
+		2.0f * x * y - 2.0f * w * z,
+		2.0f * x * z + 2.0f * w * y,
+		2.0f * x * y + 2.0f * w * z,
+		1.0f - 2.0f * x * x - 2.0f * z * z,
+		2.0f * y * z - 2.0f * w * x,
+		2.0f * x * z - 2.0f * w * y,
+		2.0f * y * z + 2.0f * w * x,
+		1.0f - 2.0f * x * x - 2.0f * y * y
+	};
+}
+
+inline Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
+{
+	float cosAngle = DotProduct(*this, rhs);
+	// Enable shortest path rotation
+	if( cosAngle < 0.0f )
+	{
+		cosAngle = -cosAngle;
+		rhs = -rhs;
+	}
+
+	float angle = acosf(cosAngle);
+	float sinAngle = sinf(angle);
+	float t1, t2;
+
+	if( sinAngle > 0.001f )
+	{
+		float invSinAngle = 1.0f / sinAngle;
+		t1 = sinf((1.0f - t) * angle) * invSinAngle;
+		t2 = sinf(t * angle) * invSinAngle;
+	}
+	else
+	{
+		t1 = 1.0f - t;
+		t2 = t;
+	}
+
+	return *this * t1 + rhs * t2;
+}
+
+inline Quaternion Quaternion::Nlerp(Quaternion rhs, float t, bool shortestPath) const
+{
+	Quaternion result;
+	float fCos = DotProduct(*this, rhs);
+	if( fCos < 0.0f && shortestPath )
+		result = (*this) + (((-rhs) - (*this)) * t);
+	else
+		result = (*this) + ((rhs - (*this)) * t);
+	return result.GetNormalize();
+}
+
+inline float DotProduct(const Quaternion& v1, const Quaternion& v2)
+{
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 }
 
 //=============================================================================
@@ -665,7 +1067,7 @@ inline constexpr Matrix3::Matrix3(const float* f)
 	m[6] = f[6]; m[7] = f[7]; m[8] = f[8];
 }
 
-inline constexpr Matrix3::Matrix3(const Vector3 & col1, const Vector3 & col2, const Vector3 & col3)
+inline constexpr Matrix3::Matrix3(const Vector3& col1, const Vector3& col2, const Vector3& col3)
 {
 	m[0] = col1.x; m[3] = col2.x; m[6] = col3.x;
 	m[1] = col1.y; m[4] = col2.y; m[7] = col3.y;
@@ -689,27 +1091,55 @@ inline Matrix3::Matrix3(const Matrix4& M)
 	m[2] = M[2]; m[5] = M[6]; m[8] = M[10];
 }
 
-inline Matrix3 operator*(const Matrix3& m1, const Matrix3& m2)
+inline Matrix3 operator+(const Matrix3& m1, const Matrix3& m2)
 {
 	return {
-		m1[0] * m2[0] + m1[3] * m2[1] + m1[6] * m2[2],
-		m1[1] * m2[0] + m1[4] * m2[1] + m1[7] * m2[2],
-		m1[2] * m2[0] + m1[5] * m2[1] + m1[8] * m2[2],
-		m1[0] * m2[3] + m1[3] * m2[4] + m1[6] * m2[5],
-		m1[1] * m2[3] + m1[4] * m2[4] + m1[7] * m2[5],
-		m1[2] * m2[3] + m1[5] * m2[4] + m1[8] * m2[5],
-		m1[0] * m2[6] + m1[3] * m2[7] + m1[6] * m2[8],
-		m1[1] * m2[6] + m1[4] * m2[7] + m1[7] * m2[8],
-		m1[2] * m2[6] + m1[5] * m2[7] + m1[8] * m2[8],
+		m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2],
+		m1[3] + m2[3], m1[4] + m2[4], m1[5] + m2[5],
+		m1[6] + m2[6], m1[7] + m2[7], m1[8] + m2[8]
 	};
 }
 
-inline Vector3 operator*(const Matrix3 &m, const Vector3 &u)
+inline Matrix3 operator-(const Matrix3& m1, const Matrix3& m2)
 {
 	return {
-		m[0] * u.x + m[3] * u.y + m[6] * u.z,
-		m[1] * u.x + m[4] * u.y + m[7] * u.z,
-		m[2] * u.x + m[5] * u.y + m[8] * u.z
+		m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2],
+		m1[3] - m2[3], m1[4] - m2[4], m1[5] - m2[5],
+		m1[6] - m2[6], m1[7] - m2[7], m1[8] - m2[8]
+	};
+}
+
+inline Matrix3 operator*(const Matrix3& m, float f)
+{
+	return {
+		m[0] * f, m[1] * f, m[2] * f,
+		m[3] * f, m[4] * f, m[5] * f,
+		m[6] * f, m[7] * f, m[8] * f
+	};
+}
+
+inline Vector3 operator*(const Matrix3& m, const Vector3& u)
+{
+	return {
+		m[0] * u.x + m[1] * u.y + m[2] * u.z,
+		m[3] * u.x + m[4] * u.y + m[5] * u.z,
+		m[6] * u.x + m[7] * u.y + m[8] * u.z
+	};
+}
+
+
+inline Matrix3 operator*(const Matrix3& m1, const Matrix3& m2)
+{
+	return {
+		m1[0] * m2[0] + m1[1] * m2[3] + m1[2] * m2[6],
+		m1[0] * m2[1] + m1[1] * m2[4] + m1[2] * m2[7],
+		m1[0] * m2[2] + m1[1] * m2[5] + m1[2] * m2[8],
+		m1[3] * m2[0] + m1[4] * m2[3] + m1[5] * m2[6],
+		m1[3] * m2[1] + m1[4] * m2[4] + m1[5] * m2[7],
+		m1[3] * m2[2] + m1[4] * m2[5] + m1[5] * m2[8],
+		m1[6] * m2[0] + m1[7] * m2[3] + m1[8] * m2[6],
+		m1[6] * m2[1] + m1[7] * m2[4] + m1[8] * m2[7],
+		m1[6] * m2[2] + m1[7] * m2[5] + m1[8] * m2[8]
 	};
 }
 
@@ -729,6 +1159,7 @@ inline constexpr void Matrix3::Set(
 	m[3] = m3; m[4] = m4; m[5] = m5;
 	m[6] = m6; m[7] = m7; m[8] = m8;
 }
+
 inline constexpr void Matrix3::Set(const Matrix3& M)
 {
 	m[0] = M[0]; m[1] = M[1]; m[2] = M[2];
@@ -736,44 +1167,364 @@ inline constexpr void Matrix3::Set(const Matrix3& M)
 	m[6] = M[6]; m[7] = M[7]; m[8] = M[8];
 }
 
-inline float det2x2sub(const float *m, int i0, int i1, int i2, int i3)
+inline void Matrix3::SetScale(const Vector3& scale)
 {
-	return m[i0] * m[i3] - m[i2] * m[i1];
+	m[0] = scale.x;
+	m[4] = scale.y;
+	m[8] = scale.z;
+}
+
+inline void Matrix3::SetScale(float scale)
+{
+	m[0] = scale;
+	m[4] = scale;
+	m[8] = scale;
+}
+
+inline Vector3 Matrix3::GetScale() const
+{
+	return {
+		sqrtf(m[0] * m[0] + m[3] * m[3] + m[6] * m[6]),
+		sqrtf(m[1] * m[1] + m[4] * m[4] + m[7] * m[7]),
+		sqrtf(m[2] * m[2] + m[5] * m[5] + m[8] * m[8])
+	};
+}
+
+inline Matrix3 Matrix3::Scaled(const Vector3 & scale) const
+{
+	return {
+		m[0] * scale.x, m[1] * scale.y, m[2] * scale.z,
+		m[3] * scale.x, m[4] * scale.y, m[5] * scale.z,
+		m[6] * scale.x, m[7] * scale.y, m[8] * scale.z
+	};
 }
 
 inline Matrix3 Matrix3::Inverse() const
 {
-	float det = 0.0f;
-	det += m[0] * det2x2sub(m, 4, 5, 7, 8);
-	det -= m[3] * det2x2sub(m, 1, 2, 7, 8);
-	det += m[6] * det2x2sub(m, 1, 2, 4, 5);
+	const float det =
+		m[0] * m[4] * m[8] +
+		m[3] * m[7] * m[2] +
+		m[6] * m[1] * m[5] -
+		m[6] * m[4] * m[2] -
+		m[3] * m[1] * m[8] -
+		m[0] * m[7] * m[5];
+	float invDet = 1.0f / det;
 
-	Matrix3 Inverse;
-	Inverse[0] = det2x2sub(m, 4, 5, 7, 8) / det;
-	Inverse[1] = -det2x2sub(m, 1, 2, 7, 8) / det;
-	Inverse[2] = det2x2sub(m, 1, 2, 4, 5) / det;
-	Inverse[3] = -det2x2sub(m, 3, 5, 6, 8) / det;
-	Inverse[4] = det2x2sub(m, 0, 2, 6, 8) / det;
-	Inverse[5] = -det2x2sub(m, 0, 2, 3, 5) / det;
-	Inverse[6] = det2x2sub(m, 3, 4, 6, 7) / det;
-	Inverse[7] = -det2x2sub(m, 0, 1, 6, 7) / det;
-	Inverse[8] = det2x2sub(m, 0, 1, 3, 4) / det;
-	return Inverse;
+	return {
+		(m[4] * m[8] - m[7] * m[5]) * invDet,
+		-(m[1] * m[8] - m[7] * m[2]) * invDet,
+		(m[1] * m[5] - m[4] * m[2]) * invDet,
+		-(m[3] * m[8] - m[6] * m[5]) * invDet,
+		(m[0] * m[8] - m[6] * m[2]) * invDet,
+		-(m[0] * m[5] - m[3] * m[2]) * invDet,
+		(m[3] * m[7] - m[6] * m[4]) * invDet,
+		-(m[0] * m[7] - m[6] * m[1]) * invDet,
+		(m[0] * m[4] - m[3] * m[1]) * invDet
+	};
 }
 
 inline Matrix3 Matrix3::Transpose() const
 {
-	Matrix3 Transpose;
-	Transpose[0] = m[0];
-	Transpose[1] = m[3];
-	Transpose[2] = m[6];
-	Transpose[3] = m[1];
-	Transpose[4] = m[4];
-	Transpose[5] = m[7];
-	Transpose[6] = m[2];
-	Transpose[7] = m[5];
-	Transpose[8] = m[8];
-	return Transpose;
+	return {
+		m[0], m[3], m[6],
+		m[1], m[4], m[7],
+		m[2], m[5], m[8]
+	};
+}
+
+//=============================================================================
+// Matrix3x4 Impl
+//=============================================================================
+
+inline constexpr Matrix3x4::Matrix3x4(const float* data)
+{
+	m[0] = data[0]; m[1] = data[1]; m[ 2] = data[2];  m[ 3] = data[3];
+	m[4] = data[4]; m[5] = data[5]; m[ 6] = data[6];  m[ 7] = data[7];
+	m[8] = data[8]; m[9] = data[9]; m[10] = data[10]; m[11] = data[11];
+}
+
+inline Matrix3x4::Matrix3x4(const Matrix3& matrix)
+{
+	m[0] = matrix[0]; m[1] = matrix[1]; m[ 2] = matrix[2]; m[ 3] = 0.0f;
+	m[4] = matrix[3]; m[5] = matrix[4]; m[ 6] = matrix[5]; m[ 7] = 0.0f;
+	m[8] = matrix[6]; m[9] = matrix[7]; m[10] = matrix[8]; m[11] = 0.0f;
+}
+
+inline Matrix3x4::Matrix3x4(const Matrix4& matrix)
+{
+	m[0] = matrix[0]; m[1] = matrix[1]; m[ 2] = matrix[ 2]; m[ 3] = matrix[3];
+	m[4] = matrix[4]; m[5] = matrix[5]; m[ 6] = matrix[ 6]; m[ 7] = matrix[7];
+	m[8] = matrix[8]; m[9] = matrix[9]; m[10] = matrix[10]; m[11] = matrix[11];
+}
+
+inline Matrix3x4::Matrix3x4(
+	float v00, float v01, float v02, float v03, 
+	float v10, float v11, float v12, float v13, 
+	float v20, float v21, float v22, float v23) 
+{
+	m[0] = v00; m[1] = v01; m[ 2] = v02; m[ 3] = v03;
+	m[4] = v10; m[5] = v11; m[ 6] = v12; m[ 7] = v13;
+	m[8] = v20; m[9] = v21; m[10] = v22; m[11] = v23;
+}
+
+inline Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
+{
+	SetRotation(rotation.RotationMatrix() * scale);
+	SetTranslation(translation);
+}
+
+inline Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+{
+	SetRotation(rotation.RotationMatrix().Scaled(scale));
+	SetTranslation(translation);
+}
+
+inline Matrix3x4& Matrix3x4::operator=(const Matrix3& rhs)
+{
+	m[0] = rhs[0]; m[1] = rhs[1]; m[ 2] = rhs[2]; m[ 3] = 0.0f;
+	m[4] = rhs[3]; m[5] = rhs[4]; m[ 6] = rhs[5]; m[ 7] = 0.0f;
+	m[8] = rhs[6]; m[9] = rhs[7]; m[10] = rhs[8]; m[11] = 0.0f;
+	return *this;
+}
+
+inline Matrix3x4& Matrix3x4::operator=(const Matrix4& rhs)
+{
+	m[0] = rhs[0]; m[1] = rhs[1]; m[ 2] = rhs[ 2]; m[ 3] = rhs[3];
+	m[4] = rhs[4]; m[5] = rhs[5]; m[ 6] = rhs[ 6]; m[ 7] = rhs[7];
+	m[8] = rhs[8]; m[9] = rhs[9]; m[10] = rhs[10]; m[11] = rhs[11];
+	return *this;
+}
+
+inline Matrix3x4 operator+(const Matrix3x4& m1, const Matrix3x4& m2)
+{
+	return {
+		m1[0] + m2[0], m1[1] + m2[1], m1[ 2] + m2[ 2], m1[ 3] + m2[ 3],
+		m1[4] + m2[4], m1[5] + m2[5], m1[ 6] + m2[ 6], m1[ 7] + m2[ 7],
+		m1[8] + m2[8], m1[9] + m2[9], m1[10] + m2[10], m1[11] + m2[11]
+	};
+}
+
+inline Matrix3x4 operator-(const Matrix3x4& m1, const Matrix3x4& m2)
+{
+	return {
+		m1[0] - m2[0], m1[1] - m2[1], m1[ 2] - m2[ 2], m1[ 3] - m2[3],
+		m1[4] - m2[4], m1[5] - m2[5], m1[ 6] - m2[ 6], m1[ 7] - m2[7],
+		m1[8] - m2[8], m1[9] - m2[9], m1[10] - m2[10], m1[11] - m2[11]
+	};
+}
+
+inline Matrix3x4 operator*(float f, const Matrix3x4& m)
+{
+	return m * f;
+}
+
+inline Matrix3x4 operator*(const Matrix3x4& m, float f)
+{
+	return {
+		m[0] * f, m[1] * f, m[ 2] * f, m[ 3] * f,
+		m[4] * f, m[5] * f, m[ 6] * f, m[ 7] * f,
+		m[8] * f, m[9] * f, m[10] * f, m[11] * f
+	};
+}
+
+inline Vector3 operator*(const Matrix3x4& m, const Vector3& v)
+{
+	return {
+		(m[0] * v.x + m[1] * v.y + m[ 2] * v.z + m[ 3]),
+		(m[4] * v.x + m[5] * v.y + m[ 6] * v.z + m[ 7]),
+		(m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11])
+	};
+}
+
+inline Vector3 operator*(const Matrix3x4& m, const Vector4& v)
+{
+	return {
+		(m[0] * v.x + m[1] * v.y + m[ 2] * v.z + m[ 3] * v.w),
+		(m[4] * v.x + m[5] * v.y + m[ 6] * v.z + m[ 7] * v.w),
+		(m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11] * v.w)
+	};
+}
+
+inline Matrix3x4 operator*(const Matrix3x4& m1, const Matrix3x4& m2)
+{
+	return {
+		m1[0] * m2[0] + m1[1] * m2[4] + m1[2] * m2[8],
+		m1[0] * m2[1] + m1[1] * m2[5] + m1[2] * m2[9],
+		m1[0] * m2[2] + m1[1] * m2[6] + m1[2] * m2[10],
+		m1[0] * m2[3] + m1[1] * m2[7] + m1[2] * m2[11] + m1[3],
+
+		m1[4] * m2[0] + m1[5] * m2[4] + m1[6] * m2[8],
+		m1[4] * m2[1] + m1[5] * m2[5] + m1[6] * m2[9],
+		m1[4] * m2[2] + m1[5] * m2[6] + m1[6] * m2[10],
+		m1[4] * m2[3] + m1[5] * m2[7] + m1[6] * m2[11] + m1[7],
+
+		m1[8] * m2[0] + m1[9] * m2[4] + m1[10] * m2[8],
+		m1[8] * m2[1] + m1[9] * m2[5] + m1[10] * m2[9],
+		m1[8] * m2[2] + m1[9] * m2[6] + m1[10] * m2[10],
+		m1[8] * m2[3] + m1[9] * m2[7] + m1[10] * m2[11] + m1[11]
+	};
+}
+
+inline Matrix4 operator*(const Matrix3x4& m1, const Matrix4& m2)
+{
+	return {
+		m1[0] * m2[0] + m1[1] * m2[4] + m1[2] * m2[8] + m1[3] * m2[12],
+		m1[0] * m2[1] + m1[1] * m2[5] + m1[2] * m2[9] + m1[3] * m2[13],
+		m1[0] * m2[2] + m1[1] * m2[6] + m1[2] * m2[10] + m1[3] * m2[14],
+		m1[0] * m2[3] + m1[1] * m2[7] + m1[2] * m2[11] + m1[3] * m2[15],
+
+		m1[4] * m2[0] + m1[5] * m2[4] + m1[6] * m2[8] + m1[7] * m2[12],
+		m1[4] * m2[1] + m1[5] * m2[5] + m1[6] * m2[9] + m1[7] * m2[13],
+		m1[4] * m2[2] + m1[5] * m2[6] + m1[6] * m2[10] + m1[7] * m2[14],
+		m1[4] * m2[3] + m1[5] * m2[7] + m1[6] * m2[11] + m1[7] * m2[15],
+
+		m1[8] * m2[0] + m1[9] * m2[4] + m1[10] * m2[8] + m1[11] * m2[12],
+		m1[8] * m2[1] + m1[9] * m2[5] + m1[10] * m2[9] + m1[11] * m2[13],
+		m1[8] * m2[2] + m1[9] * m2[6] + m1[10] * m2[10] + m1[11] * m2[14],
+		m1[8] * m2[3] + m1[9] * m2[7] + m1[10] * m2[11] + m1[11] * m2[15],
+
+		m2[12],
+		m2[13],
+		m2[14],
+		m2[15]
+	};
+}
+
+inline Matrix4 operator*(const Matrix4& lhs, const Matrix3x4& rhs)
+{
+	return {
+		lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20,
+		lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21,
+		lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22,
+		lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03,
+		lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20,
+		lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21,
+		lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22,
+		lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13,
+		lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20,
+		lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21,
+		lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22,
+		lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23,
+		lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20,
+		lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21,
+		lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22,
+		lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33
+	};
+}
+
+inline void Matrix3x4::SetTranslation(const Vector3& translation)
+{
+	m[3] = translation.x;
+	m[7] = translation.y;
+	m[11] = translation.z;
+}
+
+inline void Matrix3x4::SetRotation(const Matrix3& rotation)
+{
+	m[0] = rotation[0]; m[1] = rotation[1]; m[ 2] = rotation[2];
+	m[4] = rotation[3]; m[5] = rotation[4]; m[ 6] = rotation[5];
+	m[8] = rotation[6]; m[9] = rotation[7]; m[10] = rotation[8];
+}
+
+inline void Matrix3x4::SetScale(const Vector3& scale)
+{
+	m[0] = scale.x;
+	m[5] = scale.y;
+	m[10] = scale.z;
+}
+
+inline void Matrix3x4::SetScale(float scale)
+{
+	m[0] = scale;
+	m[5] = scale;
+	m[10] = scale;
+}
+
+inline Matrix3 Matrix3x4::ToMatrix3() const
+{
+	return {
+		m[0], m[1], m[2],
+		m[4], m[5], m[6],
+		m[8], m[9], m[10]
+	};
+}
+
+inline Matrix4 Matrix3x4::ToMatrix4() const
+{
+	return {
+		m[0], m[1], m[2], m[3],
+		m[4], m[5], m[6], m[7],
+		m[8], m[9], m[10], m[11],
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+}
+
+inline Matrix3 Matrix3x4::RotationMatrix() const
+{
+	Vector3 invScale(
+		1.0f / sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
+		1.0f / sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]),
+		1.0f / sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
+	);
+
+	return ToMatrix3().Scaled(invScale);
+}
+
+inline Vector3 Matrix3x4::Translation() const
+{
+	return { m[3], m[7], m[11] };
+}
+
+inline Vector3 Matrix3x4::Scale() const
+{
+	return Vector3(
+		sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
+		sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]),
+		sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
+	);
+}
+
+inline void Matrix3x4::Decompose(Vector3 & translation, Quaternion & rotation, Vector3 & scale) const
+{
+	translation.x = m[3];
+	translation.y = m[7];
+	translation.z = m[11];
+
+	scale.x = sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]);
+	scale.y = sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]);
+	scale.z = sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10]);
+
+	Vector3 invScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
+	rotation = Quaternion(ToMatrix3().Scaled(invScale));
+}
+
+inline Matrix3x4 Matrix3x4::Inverse() const
+{
+	float det = 
+		m[0] * m[5] * m[10] +
+		m[4] * m[9] * m[2] +
+		m[8] * m[1] * m[6] -
+		m[8] * m[5] * m[2] -
+		m[4] * m[1] * m[10] -
+		m[0] * m[9] * m[6];
+
+	float invDet = 1.0f / det;
+	Matrix3x4 ret;
+
+	ret.m00 = (m[5] * m[10] - m[9] * m[6]) * invDet;
+	ret.m01 = -(m[1] * m[10] - m[9] * m[2]) * invDet;
+	ret.m02 = (m[1] * m[6] - m[5] * m[2]) * invDet;
+	ret.m03 = -(m[3] * ret.m00 + m[7] * ret.m01 + m[11] * ret.m02);
+	ret.m10 = -(m[4] * m[10] - m[8] * m[6]) * invDet;
+	ret.m11 = (m[0] * m[10] - m[8] * m[2]) * invDet;
+	ret.m12 = -(m[0] * m[6] - m[4] * m[2]) * invDet;
+	ret.m13 = -(m[3] * ret.m10 + m[7] * ret.m11 + m[11] * ret.m12);
+	ret.m20 = (m[4] * m[9] - m[8] * m[5]) * invDet;
+	ret.m21 = -(m[0] * m[9] - m[8] * m[1]) * invDet;
+	ret.m22 = (m[0] * m[5] - m[4] * m[1]) * invDet;
+	ret.m23 = -(m[3] * ret.m20 + m[7] * ret.m21 + m[11] * ret.m22);
+
+	return ret;
 }
 
 //=============================================================================
@@ -876,6 +1627,11 @@ inline constexpr void Matrix4::Set(const Matrix4& M)
 	m[12] = M[12]; m[13] = M[13]; m[14] = M[14]; m[15] = M[15];
 }
 
+inline float det2x2sub(const float *m, int i0, int i1, int i2, int i3)
+{
+	return m[i0] * m[i3] - m[i2] * m[i1];
+}
+
 inline float det3x3sub(const float *m, int i0, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
 {
 	float det = 0.0f;
@@ -939,7 +1695,7 @@ inline Matrix4 Matrix4::Rotate(const Vector3& axis, float angle)
 {
 	const float s = sinf(angle);
 	const float c = 1.0f - cosf(angle);
-	Vector3 v = axis.Normalize();
+	Vector3 v = axis.GetNormalize();
 	const float xx = v.x * v.x;
 	const float xy = v.x * v.y;
 	const float xz = v.z * v.x;
@@ -1040,9 +1796,9 @@ inline Matrix4 Matrix4::Perspective(float fieldOfView, float aspectRatio, float 
 
 inline Matrix4 Matrix4::LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 {
-	const Vector3 z = (eye - dir).Normalize();
-	const Vector3 x = CrossProduct(up, z).Normalize();
-	//const Vector3 y = CrossProduct(z, x).Normalize(); // TODO: удалить?
+	const Vector3 z = (eye - dir).GetNormalize();
+	const Vector3 x = CrossProduct(up, z).GetNormalize();
+	//const Vector3 y = CrossProduct(z, x).GetNormalize(); // TODO: удалить?
 	const Vector3 y = CrossProduct(z, x);
 
 	Matrix4 m0;

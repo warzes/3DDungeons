@@ -55,6 +55,9 @@
       <Filter>ExampleDemo</Filter>
     </ClInclude>
     <ClInclude Include="ExampleDemo.h" />
+    <ClInclude Include="X_Debug.h">
+      <Filter>ExampleDemo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

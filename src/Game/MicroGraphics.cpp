@@ -308,8 +308,8 @@ bool Model::createBuffer()
 void ICamera::Look(const Vector3& Position, const Vector3& Reference)
 {
 	position = Position;
-	z = (Position - Reference).Normalize();
-	x = CrossProduct(Vector3::Up, z).Normalize();
+	z = (Position - Reference).GetNormalize();
+	x = CrossProduct(Vector3::Up, z).GetNormalize();
 	y = CrossProduct(z, x);
 
 	calculateViewMatrix();
