@@ -58,13 +58,23 @@ void Fatal(const std::string& msg);
 // Input System
 //=============================================================================
 
+enum class MouseButton
+{
+	Left,
+	Middle,
+	Right
+};
+
 [[nodiscard]] bool IsKeyDown(uint8_t key);
 [[nodiscard]] bool IsKeyPressed(uint8_t key);
 
-[[nodiscard]] bool IsMouseButtonDown(uint8_t button);
-[[nodiscard]] bool IsMouseButtonClick(uint8_t button);
-[[nodiscard]] Point2 GetCursorPosition();
-void SetCursorPosition(int x, int y);
+[[nodiscard]] bool IsMouseButtonDown(MouseButton button);
+[[nodiscard]] bool IsMouseButtonClick(MouseButton button);
+
+void SetCursorPosition(int x, int y);     // Set mouse position XY
+[[nodiscard]] Point2 GetCursorPosition(); // Get mouse position XY
+[[nodiscard]] Point2 GetCursorDelta();    // Get mouse delta between frames
+void SetMouseVisible(bool visible);       // Enables/Disables cursor(lock/unlock cursor)
 
 //=============================================================================
 // Window System

@@ -88,6 +88,10 @@ public:
 	constexpr Point2& operator=(Point2&&) = default;
 	constexpr Point2& operator=(const Point2&) = default;
 
+	friend Point2 operator-(const Point2& u, const Point2& v) { return { u.x - v.x, u.y - v.y }; }
+
+	Point2& operator+=(const Point2& u) { x += u.x; y += u.y; return *this; }
+
 	int x = 0;
 	int y = 0;
 };

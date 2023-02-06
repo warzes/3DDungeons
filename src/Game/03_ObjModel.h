@@ -53,8 +53,6 @@ Model model;
 Model customModel;
 
 FlyingCamera cam;
-int LastCursorX = 0;
-int LastCursorY = 0;
 
 void ExampleInit()
 {
@@ -82,9 +80,9 @@ void ExampleInit()
 		customModel.Create(std::move(meshData));
 	}
 
-	LastCursorX = GetCursorPosition().x;
-	LastCursorY = GetCursorPosition().y;
 	cam.Look({ 0.0f, 3.0f, 6.0f }, { 0.0f, 0.0f, 0.0f });
+
+	//SetMouseVisible(false);
 }
 
 void ExampleClose()
@@ -97,14 +95,12 @@ void ExampleClose()
 
 void ExampleFrame()
 {
-	auto npos = GetCursorPosition();
-	if (npos.x != LastCursorX || npos.y != LastCursorY)
+	auto deltaCursor = GetCursorDelta();
+	if ( deltaCursor.x != 0 || deltaCursor.y != 0)
 	{
-		if (IsMouseButtonDown(1))
-			cam.OnMouseMove(LastCursorX - npos.x, LastCursorY - npos.y);
+		if (IsMouseButtonDown(MouseButton::Right))
+			cam.OnMouseMove(deltaCursor.x, deltaCursor.y);
 	}
-	LastCursorX = npos.x;
-	LastCursorY = npos.y;
 
 	short Keys = 0x0000;
 	if (IsKeyDown('W')) Keys |= CAMERA_KEY_W;

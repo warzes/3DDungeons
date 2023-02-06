@@ -66,6 +66,8 @@ namespace window
 	float WindowClientAspectRatio = 0.0f;
 	bool IsWindowRunning = false;
 	bool WindowActive = true;
+	bool Fullscreen = false;
+	bool Minimized = false;
 }
 //-----------------------------------------------------------------------------
 namespace input
@@ -73,10 +75,72 @@ namespace input
 	uint8_t KeyState[256];
 	uint8_t MouseButtonState[3];
 	Point2 CursorPosition;
+	Point2 CursorMove;
+	bool MouseVisible = true;
+	bool MouseVisibleInternal = true;
 
 	constexpr uint8_t Up = 0;
 	constexpr uint8_t Down = 1;
 	constexpr uint8_t Pressed = 2;
+
+	inline size_t getIdMouseButton(MouseButton btn)
+	{
+		switch( btn )
+		{
+		case MouseButton::Left:   return 0;
+		case MouseButton::Middle: return 2;
+		case MouseButton::Right:  return 1;
+		}
+	}
+
+	// Update mouse clipping region.
+	inline void updateMouseClipping()
+	{
+#if defined(_WIN32)
+		if( input::MouseVisibleInternal )
+			ClipCursor(nullptr);
+		else
+		{
+			POINT point = { 0 };
+			ClientToScreen(window::Win32WindowHandle, &point);
+			RECT mouseRect = {
+				point.x, 
+				point.y,
+				point.x + GetWindowWidth(),
+				point.y + GetWindowHeight()
+			};
+			ClipCursor(&mouseRect);
+		}
+#endif
+	}
+
+	// Update mouse visibility and clipping region to the OS.
+	inline void updateMouseVisible()
+	{
+		// When the window is unfocused, mouse should never be hidden
+		bool newMouseVisible = window::WindowActive ? input::MouseVisible : true;
+		if( newMouseVisible != input::MouseVisibleInternal )
+		{
+#if defined(_WIN32)
+			ShowCursor(newMouseVisible ? TRUE : FALSE);
+#endif
+			input::MouseVisibleInternal = newMouseVisible;
+		}
+
+		updateMouseClipping();
+	}
+
+	// Refresh the internally tracked mouse cursor position.
+	inline void updateMousePosition()
+	{
+#if defined(_WIN32)
+		POINT screenPosition;
+		GetCursorPos(&screenPosition);
+		ScreenToClient(window::Win32WindowHandle, &screenPosition);
+		CursorPosition.x = screenPosition.x;
+		CursorPosition.y = screenPosition.y;
+#endif
+	}
 }
 //-----------------------------------------------------------------------------
 namespace render
@@ -159,15 +223,15 @@ bool IsKeyPressed(uint8_t key)
 	return pressed;
 }
 //-----------------------------------------------------------------------------
-bool IsMouseButtonDown(uint8_t button)
+bool IsMouseButtonDown(MouseButton button)
 {
-	return (input::MouseButtonState[button] != input::Up);
+	return (input::MouseButtonState[input::getIdMouseButton(button)] != input::Up);
 }
 //-----------------------------------------------------------------------------
-bool IsMouseButtonClick(uint8_t button)
+bool IsMouseButtonClick(MouseButton button)
 {
-	const bool pressed = (input::MouseButtonState[button] == input::Pressed);
-	input::MouseButtonState[button] = input::Down;
+	const bool pressed = (input::MouseButtonState[input::getIdMouseButton(button)] == input::Pressed);
+	input::MouseButtonState[input::getIdMouseButton(button)] = input::Down;
 	return pressed;
 }
 //-----------------------------------------------------------------------------
@@ -178,12 +242,27 @@ Point2 GetCursorPosition()
 //-----------------------------------------------------------------------------
 void SetCursorPosition(int x, int y)
 {
+	input::CursorPosition = { x, y };
 #if defined(_WIN32)
 	POINT pos = { x, y };
 	ClientToScreen(window::Win32WindowHandle, &pos);
 	SetCursorPos(pos.x, pos.y);
 #endif // _WIN32
-	input::CursorPosition = { x, y };
+
+}
+//-----------------------------------------------------------------------------
+Point2 GetCursorDelta()
+{
+	return input::CursorMove;
+}
+//-----------------------------------------------------------------------------
+void SetMouseVisible(bool visible)
+{
+	if( visible != input::MouseVisible )
+	{
+		input::MouseVisible = visible;
+		input::updateMouseVisible();
+	}
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -211,13 +290,55 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		return 0;
 
 	case WM_ACTIVATE:
-		window::WindowActive = (LOWORD(wParam) != WA_INACTIVE);
-		return 0;
+		{
+			bool newFocus = LOWORD(wParam) != WA_INACTIVE;
+			if( newFocus != window::WindowActive )
+			{
+				window::WindowActive = newFocus;
+				if( window::WindowActive ) // gainFocusEvent
+				{
+					if ( window::Minimized) 
+						ShowWindow(window::Win32WindowHandle, SW_RESTORE);
+
+					// If fullscreen, automatically restore mouse focus
+					if ( window::Fullscreen ) 
+						input::updateMouseVisible();
+				}
+				else // loseFocusEvent
+				{
+					// input reset
+					memset(input::KeyState, 0, sizeof(input::KeyState[0])*Countof(input::KeyState));
+					memset(input::MouseButtonState, 0, sizeof(input::MouseButtonState[0]) * Countof(input::MouseButtonState));
+					input::CursorMove = { 0 };
+
+					// If fullscreen, minimize on focus loss
+					if( window::Fullscreen )
+						ShowWindow(window::Win32WindowHandle, SW_MINIMIZE);
+					
+					// Stop mouse cursor hiding & clipping
+					input::updateMouseVisible();
+				}
+			}
+		}
+		break;
 
 	case WM_SIZE:
-		window::WindowClientWidth = LOWORD(lParam);
-		window::WindowClientHeight = HIWORD(lParam);
-		window::WindowClientAspectRatio = static_cast<float>(window::WindowClientWidth) / static_cast<float>(window::WindowClientHeight);
+		{
+			window::Minimized = (wParam == SIZE_MINIMIZED);
+			if( !window::Minimized )
+			{
+				RECT rect;
+				GetClientRect(window::Win32WindowHandle, &rect);
+				window::WindowClientWidth = rect.right;
+				window::WindowClientHeight = rect.bottom;
+				window::WindowClientAspectRatio = static_cast<float>(window::WindowClientWidth) / static_cast<float>(window::WindowClientHeight);
+			}
+
+			// If mouse is currently hidden, update the clip region
+			if( !input::MouseVisibleInternal )
+				input::updateMouseClipping();
+		}
+		
 		break;
 
 		//case WM_CHAR:
@@ -241,26 +362,47 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		return 0;
 
 	case WM_LBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
 	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		if( message == WM_LBUTTONDOWN ) input::MouseButtonState[0] = input::Pressed;
+		if( message == WM_RBUTTONDOWN ) input::MouseButtonState[1] = input::Pressed;
+		if( message == WM_MBUTTONDOWN ) input::MouseButtonState[2] = input::Pressed;
+		// Make sure we track the button release even if mouse moves outside the window
+		SetCapture(window::Win32WindowHandle);
+		// Re-establish mouse cursor hiding & clipping
+		if( !input::MouseVisible && input::MouseVisibleInternal )
+			input::updateMouseVisible();
+		return 0;
+
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
 	case WM_MBUTTONUP:
-		input::CursorPosition.x = (int)LOWORD(lParam);
-		input::CursorPosition.y = (int)HIWORD(lParam);
-
-		if (message == WM_LBUTTONDOWN || message == WM_LBUTTONUP)
-			input::MouseButtonState[0] = (message == WM_LBUTTONDOWN ? input::Pressed : input::Up);
-		if (message == WM_RBUTTONDOWN || message == WM_RBUTTONUP)
-			input::MouseButtonState[1] = (message == WM_RBUTTONDOWN ? input::Pressed : input::Up);
-		if (message == WM_MBUTTONDOWN || message == WM_MBUTTONUP)
-			input::MouseButtonState[2] = (message == WM_MBUTTONDOWN ? input::Pressed : input::Up);
-
+		// End capture when there are no more mouse buttons held down
+		if ( input::MouseButtonState[0] + input::MouseButtonState[1] + input::MouseButtonState[2] > 0)
+			ReleaseCapture();
+		if (message == WM_LBUTTONUP) input::MouseButtonState[0] = input::Up;
+		if (message == WM_RBUTTONUP) input::MouseButtonState[1] = input::Up;
+		if (message == WM_MBUTTONUP) input::MouseButtonState[2] = input::Up;
 		return 0;
 
 	case WM_MOUSEMOVE:
-		input::CursorPosition.x = (int)LOWORD(lParam);
-		input::CursorPosition.y = (int)HIWORD(lParam);
+		{
+			Point2 newPosition = { (int)LOWORD(lParam), (int)HIWORD(lParam) };
+
+			// Do not transmit mouse move when mouse should be hidden, but is not due to no input focus
+			if( input::MouseVisibleInternal == input::MouseVisible )
+			{
+				Point2 delta = newPosition - input::CursorPosition;
+				input::CursorMove += delta;
+				// Recenter in hidden mouse cursor mode to allow endless relative motion
+				if( !input::MouseVisibleInternal && (delta.x != 0 || delta.y != 0) )
+					SetCursorPosition(GetWindowWidth()/2, GetWindowHeight()/2);
+				else
+					input::CursorPosition = newPosition;
+			}
+			else
+				input::CursorPosition = newPosition;
+		}
 		return 0;
 
 	case WM_DESTROY:
@@ -401,6 +543,9 @@ bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
 
 	OpenGLInit(OpenGLGetProcAddress);
 
+	input::updateMouseVisible();
+	input::updateMousePosition();
+
 	window::IsWindowRunning = true;
 	return true;
 #endif // _WIN32
@@ -433,7 +578,7 @@ bool WindowSystemShouldClose()
 {
 	return !window::IsWindowRunning;
 }
-
+//-----------------------------------------------------------------------------
 void WindowSystemUpdate()
 {
 #if defined(_WIN32)
@@ -598,6 +743,7 @@ void AppSystemBeginFrame()
 //-----------------------------------------------------------------------------
 void AppSystemEndFrame()
 {
+	input::CursorMove = { 0 };
 	WindowSystemUpdate();
 #if defined(_WIN32)
 	QueryPerformanceCounter(&core::CurrentTime);
