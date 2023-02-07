@@ -210,7 +210,7 @@
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="ExampleDemo.h" />
     <ClInclude Include="MicroAdvance.h" />
-    <ClInclude Include="MicroCollisions.h" />
+    <ClInclude Include="MicroGeometry.h" />
     <ClInclude Include="MicroEngine.h" />
     <ClInclude Include="MicroGraphics.h" />
     <ClInclude Include="MicroMath.h" />
@@ -236,6 +236,7 @@
     <ClInclude Include="X_Debug.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="MicroGeometry.inl" />
     <None Include="MicroMath.inl" />
     <None Include="temp\DirectXCollision.inl" />
     <None Include="temp\DirectXMathConvert.inl" />

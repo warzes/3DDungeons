@@ -1,9 +1,52 @@
 #pragma once
 
+#include <DirectXMath.h>
+
 FlyingCamera cam;
+
+class Matrix4x4f
+{
+public:
+	float m_Data[16];
+
+	Matrix4x4f& SetIdentity();
+	void SetPosition(const Vector3& v);
+
+	float& Get(int row, int column) { return m_Data[row + (column * 4)]; }
+	const float& Get(int row, int column)const { return m_Data[row + (column * 4)]; }
+
+};
+
+Matrix4x4f& Matrix4x4f::SetIdentity()
+{
+	Get(0, 0) = 1.0;	Get(0, 1) = 0.0;	Get(0, 2) = 0.0;	Get(0, 3) = 0.0;
+	Get(1, 0) = 0.0;	Get(1, 1) = 1.0;	Get(1, 2) = 0.0;	Get(1, 3) = 0.0;
+	Get(2, 0) = 0.0;	Get(2, 1) = 0.0;	Get(2, 2) = 1.0;	Get(2, 3) = 0.0;
+	Get(3, 0) = 0.0;	Get(3, 1) = 0.0;	Get(3, 2) = 0.0;	Get(3, 3) = 1.0;
+	return *this;
+}
+
+inline void Matrix4x4f::SetPosition(const Vector3& v)
+{
+	Get(0, 3) = v.x; Get(1, 3) = v.y; Get(2, 3) = v.z;
+}
+
 
 void ExampleInit()
 {
+	Matrix4 t1;
+	t1.SetTranslation({ 2.0f, 3.0f, 4.0f });
+
+	Matrix4x4f t2;
+	t2 = t2.SetIdentity();
+	t2.SetPosition({ 2.0f, 3.0f, 4.0f });
+
+	DirectX::XMMATRIX t3 = DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f);
+
+
+
+
+
 	Matrix3x4 m1(
 		1.1f, 2.2f, 3.3f, 4.4f,
 		5.5f, 6.6f, 7.7f, 8.8f,

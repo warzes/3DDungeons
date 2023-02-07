@@ -36,7 +36,7 @@
     <ClInclude Include="MicroEngine.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
-    <ClInclude Include="MicroCollisions.h">
+    <ClInclude Include="MicroGeometry.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
     <ClInclude Include="MicroRender.h">
@@ -172,6 +172,9 @@
     </None>
     <None Include="temp\DirectXPackedVector.inl">
       <Filter>MicroEngine\temp</Filter>
+    </None>
+    <None Include="MicroGeometry.inl">
+      <Filter>MicroEngine</Filter>
     </None>
   </ItemGroup>
 </Project>
