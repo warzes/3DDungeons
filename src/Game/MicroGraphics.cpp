@@ -356,7 +356,7 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 {
 	if (dx != 0)
 	{
-		const float DeltaX = (float)dx * m_sensitivity * -1;
+		const float DeltaX = (float)dx * m_sensitivity;
 
 		x = Rotate(x, DeltaX, Vector3::Up);
 		y = Rotate(y, DeltaX, Vector3::Up);
@@ -365,7 +365,7 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 
 	if (dy != 0)
 	{
-		const float DeltaY = (float)dy * m_sensitivity * -1;
+		const float DeltaY = (float)dy * m_sensitivity;
 
 		y = Rotate(y, DeltaY, x);
 		z = Rotate(z, DeltaY, x);

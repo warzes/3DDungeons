@@ -685,14 +685,14 @@ inline constexpr Matrix3x4::Matrix3x4(const float* data)
 	m[8] = data[8]; m[9] = data[9]; m[10] = data[10]; m[11] = data[11];
 }
 
-inline Matrix3x4::Matrix3x4(const Matrix3& matrix)
+inline constexpr Matrix3x4::Matrix3x4(const Matrix3& matrix)
 {
 	m[0] = matrix[0]; m[1] = matrix[1]; m[ 2] = matrix[2]; m[ 3] = 0.0f;
 	m[4] = matrix[3]; m[5] = matrix[4]; m[ 6] = matrix[5]; m[ 7] = 0.0f;
 	m[8] = matrix[6]; m[9] = matrix[7]; m[10] = matrix[8]; m[11] = 0.0f;
 }
 
-inline Matrix3x4::Matrix3x4(const Matrix4& matrix)
+inline constexpr Matrix3x4::Matrix3x4(const Matrix4& matrix)
 {
 	m[0] = matrix[0]; m[1] = matrix[1]; m[ 2] = matrix[ 2]; m[ 3] = matrix[ 3];
 	m[4] = matrix[4]; m[5] = matrix[5]; m[ 6] = matrix[ 6]; m[ 7] = matrix[ 7];
@@ -912,12 +912,12 @@ inline Matrix3 Matrix3x4::RotationMatrix() const
 	return ToMatrix3().Scaled(invScale);
 }
 
-inline Vector3 Matrix3x4::Translation() const
+inline Vector3 Matrix3x4::GetTranslation() const
 {
 	return { m[3], m[7], m[11] };
 }
 
-inline Vector3 Matrix3x4::Scale() const
+inline Vector3 Matrix3x4::GetScale() const
 {
 	return {
 		sqrtf(m[0] * m[0] + m[4] * m[4] + m[ 8] * m[ 8]),
@@ -979,14 +979,6 @@ inline constexpr Matrix4::Matrix4(const float* f)
 	m[12] = f[12]; m[13] = f[13]; m[14] = f[14]; m[15] = f[15];
 }
 
-inline constexpr Matrix4::Matrix4(const Vector4& col1, const Vector4& col2, const Vector4& col3, const Vector4& col4)
-{
-	m[0] = col1.x; m[4] = col2.x; m[8] = col3.x; m[12] = col4.x;
-	m[1] = col1.y; m[5] = col2.y; m[9] = col3.y; m[13] = col4.y;
-	m[2] = col1.z; m[6] = col2.z; m[10] = col3.z; m[14] = col4.z;
-	m[3] = col1.w; m[7] = col2.w; m[11] = col3.w; m[15] = col4.w;
-}
-
 inline constexpr Matrix4::Matrix4(
 	float  m0, float  m1, float  m2, float  m3,
 	float  m4, float  m5, float  m6, float  m7,
@@ -1001,41 +993,104 @@ inline constexpr Matrix4::Matrix4(
 
 inline constexpr Matrix4::Matrix4(const Matrix3& mat)
 {
-	m[0] = mat[0]; m[4] = mat[3]; m[8] = mat[6]; m[12] = 0.0f;
-	m[1] = mat[1]; m[5] = mat[4]; m[9] = mat[7]; m[13] = 0.0f;
+	m[0] = mat[0]; m[4] = mat[3]; m[ 8] = mat[6]; m[12] = 0.0f;
+	m[1] = mat[1]; m[5] = mat[4]; m[ 9] = mat[7]; m[13] = 0.0f;
 	m[2] = mat[2]; m[6] = mat[5]; m[10] = mat[8]; m[14] = 0.0f;
 	m[3] = 0.0f;   m[7] = 0.0f;   m[11] = 0.0f;   m[15] = 1.0f;
+}
+
+inline constexpr Matrix4::Matrix4(const Matrix3x4& mat)
+{
+	m[0] = mat[0]; m[4] = mat[4]; m[ 8] = mat[ 8]; m[12] = 0.0f;
+	m[1] = mat[1]; m[5] = mat[5]; m[ 9] = mat[ 9]; m[13] = 0.0f;
+	m[2] = mat[2]; m[6] = mat[6]; m[10] = mat[10]; m[14] = 0.0f;
+	m[3] = mat[3]; m[7] = mat[7]; m[11] = mat[11]; m[15] = 1.0f;
+}
+
+inline Matrix4& Matrix4::operator=(const Matrix3& rhs)
+{
+	m[ 0] = rhs[0]; m[ 1] = rhs[1]; m[ 2] = rhs[2]; m[ 3] = 0.0f;
+	m[ 4] = rhs[3]; m[ 5] = rhs[4]; m[ 6] = rhs[5]; m[ 7] = 0.0f;
+	m[ 8] = rhs[6]; m[ 9] = rhs[7]; m[10] = rhs[8]; m[11] = 0.0f;
+	m[12] = 0.0f;   m[13] = 0.0f;   m[14] = 0.0f;   m[15] = 1.0f;
+	return *this;
+}
+
+inline Matrix4 operator+(const Matrix4& m1, const Matrix4& m2)
+{
+	return {
+		m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3],
+		m1[4] + m2[4], m1[5] + m2[5], m1[6] + m2[6], m1[7] + m2[7],
+		m1[8] + m2[8], m1[9] + m2[9], m1[10] + m2[10], m1[11] + m2[11],
+		m1[12] + m2[12], m1[13] + m2[13], m1[14] + m2[14], m1[15] + m2[15]
+	};
+}
+
+inline Matrix4 operator-(const Matrix4& m1, const Matrix4& m2)
+{
+	return {
+		m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2], m1[3] - m2[3],
+		m1[4] - m2[4], m1[5] - m2[5], m1[6] - m2[6], m1[7] - m2[7],
+		m1[8] - m2[8], m1[9] - m2[9], m1[10] - m2[10], m1[11] - m2[11],
+		m1[12] - m2[12], m1[13] - m2[13], m1[14] - m2[14], m1[15] - m2[15]
+	};
+}
+
+inline Matrix4 operator*(const Matrix4& m, float f)
+{
+	return {
+		m[0] * f, m[1] * f, m[2] * f, m[3] * f,
+		m[4] * f, m[5] * f, m[6] * f, m[7] * f,
+		m[8] * f, m[9] * f, m[10] * f, m[11] * f,
+		m[12] * f, m[13] * f, m[14] * f, m[15] * f
+	};
+}
+
+inline Matrix4 operator*(float f, const Matrix4& m)
+{
+	return m * f;
+}
+
+inline Vector3 operator*(const Matrix4& m, const Vector3& rhs)
+{
+	float invW = 1.0f / (m[12] * rhs.x + m[13] * rhs.y + m[14] * rhs.z + m[15]);
+
+	return {
+		(m[0] * rhs.x + m[1] * rhs.y + m[2] * rhs.z + m[3]) * invW,
+		(m[4] * rhs.x + m[5] * rhs.y + m[6] * rhs.z + m[7]) * invW,
+		(m[8] * rhs.x + m[9] * rhs.y + m[10] * rhs.z + m[11]) * invW
+	};
+}
+
+inline Vector4 operator*(const Matrix4& m, const Vector4& rhs)
+{
+	return {
+		m[0] * rhs.x + m[1] * rhs.y + m[2] * rhs.z + m[3] * rhs.w,
+		m[4] * rhs.x + m[5] * rhs.y + m[6] * rhs.z + m[7] * rhs.w,
+		m[8] * rhs.x + m[9] * rhs.y + m[10] * rhs.z + m[11] * rhs.w,
+		m[12] * rhs.x + m[13] * rhs.y + m[14] * rhs.z + m[15] * rhs.w
+	};
 }
 
 inline Matrix4 operator*(const Matrix4& m1, const Matrix4& m2)
 {
 	return {
-		m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3],
-		m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3],
-		m1[2] * m2[0] + m1[6] * m2[1] + m1[10] * m2[2] + m1[14] * m2[3],
-		m1[3] * m2[0] + m1[7] * m2[1] + m1[11] * m2[2] + m1[15] * m2[3],
-		m1[0] * m2[4] + m1[4] * m2[5] + m1[8] * m2[6] + m1[12] * m2[7],
-		m1[1] * m2[4] + m1[5] * m2[5] + m1[9] * m2[6] + m1[13] * m2[7],
-		m1[2] * m2[4] + m1[6] * m2[5] + m1[10] * m2[6] + m1[14] * m2[7],
-		m1[3] * m2[4] + m1[7] * m2[5] + m1[11] * m2[6] + m1[15] * m2[7],
-		m1[0] * m2[8] + m1[4] * m2[9] + m1[8] * m2[10] + m1[12] * m2[11],
-		m1[1] * m2[8] + m1[5] * m2[9] + m1[9] * m2[10] + m1[13] * m2[11],
-		m1[2] * m2[8] + m1[6] * m2[9] + m1[10] * m2[10] + m1[14] * m2[11],
-		m1[3] * m2[8] + m1[7] * m2[9] + m1[11] * m2[10] + m1[15] * m2[11],
-		m1[0] * m2[12] + m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15],
-		m1[1] * m2[12] + m1[5] * m2[13] + m1[9] * m2[14] + m1[13] * m2[15],
-		m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15],
-		m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15],
-	};
-}
-
-inline Vector4 operator*(const Matrix4& m, const Vector4& u)
-{
-	return {
-		m[0] * u.x + m[4] * u.y + m[8] * u.z + m[12] * u.w,
-		m[1] * u.x + m[5] * u.y + m[9] * u.z + m[13] * u.w,
-		m[2] * u.x + m[6] * u.y + m[10] * u.z + m[14] * u.w,
-		m[3] * u.x + m[7] * u.y + m[11] * u.z + m[15] * u.w,
+		m1[0] * m2[0] + m1[1] * m2[4] + m1[2] * m2[8] + m1[3] * m2[12],
+		m1[0] * m2[1] + m1[1] * m2[5] + m1[2] * m2[9] + m1[3] * m2[13],
+		m1[0] * m2[2] + m1[1] * m2[6] + m1[2] * m2[10] + m1[3] * m2[14],
+		m1[0] * m2[3] + m1[1] * m2[7] + m1[2] * m2[11] + m1[3] * m2[15],
+		m1[4] * m2[0] + m1[5] * m2[4] + m1[6] * m2[8] + m1[7] * m2[12],
+		m1[4] * m2[1] + m1[5] * m2[5] + m1[6] * m2[9] + m1[7] * m2[13],
+		m1[4] * m2[2] + m1[5] * m2[6] + m1[6] * m2[10] + m1[7] * m2[14],
+		m1[4] * m2[3] + m1[5] * m2[7] + m1[6] * m2[11] + m1[7] * m2[15],
+		m1[8] * m2[0] + m1[9] * m2[4] + m1[10] * m2[8] + m1[11] * m2[12],
+		m1[8] * m2[1] + m1[9] * m2[5] + m1[10] * m2[9] + m1[11] * m2[13],
+		m1[8] * m2[2] + m1[9] * m2[6] + m1[10] * m2[10] + m1[11] * m2[14],
+		m1[8] * m2[3] + m1[9] * m2[7] + m1[10] * m2[11] + m1[11] * m2[15],
+		m1[12] * m2[0] + m1[13] * m2[4] + m1[14] * m2[8] + m1[15] * m2[12],
+		m1[12] * m2[1] + m1[13] * m2[5] + m1[14] * m2[9] + m1[15] * m2[13],
+		m1[12] * m2[2] + m1[13] * m2[6] + m1[14] * m2[10] + m1[15] * m2[14],
+		m1[12] * m2[3] + m1[13] * m2[7] + m1[14] * m2[11] + m1[15] * m2[15]
 	};
 }
 
@@ -1067,69 +1122,163 @@ inline constexpr void Matrix4::Set(const Matrix4& M)
 	m[12] = M[12]; m[13] = M[13]; m[14] = M[14]; m[15] = M[15];
 }
 
-inline float det2x2sub(const float *m, int i0, int i1, int i2, int i3)
+inline void Matrix4::SetTranslation(const Vector3 & translation)
 {
-	return m[i0] * m[i3] - m[i2] * m[i1];
+	m[3] = translation.x;
+	m[7] = translation.y;
+	m[11] = translation.z;
 }
 
-inline float det3x3sub(const float *m, int i0, int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8)
+inline void Matrix4::SetRotation(const Matrix3& rotation)
 {
-	float det = 0.0f;
-	det += m[i0] * det2x2sub(m, i4, i5, i7, i8);
-	det -= m[i3] * det2x2sub(m, i1, i2, i7, i8);
-	det += m[i6] * det2x2sub(m, i1, i2, i4, i5);
-	return det;
+	m[0] = rotation[0]; m[1] = rotation[1]; m[2] = rotation[2];
+	m[4] = rotation[3]; m[5] = rotation[4]; m[6] = rotation[5];
+	m[8] = rotation[6]; m[9] = rotation[7]; m[10] = rotation[8];
+}
+
+inline void Matrix4::SetScale(const Vector3& scale)
+{
+	m[0] = scale.x;
+	m[5] = scale.y;
+	m[10] = scale.z;
+}
+
+inline void Matrix4::SetScale(float scale)
+{
+	m[0] = scale;
+	m[5] = scale;
+	m[10] = scale;
+}
+
+inline Matrix3 Matrix4::ToMatrix3() const
+{
+	return {
+		m[0], m[1], m[2],
+		m[4], m[5], m[6],
+		m[8], m[9], m[10]
+	};
+}
+
+inline Matrix3 Matrix4::RotationMatrix() const
+{
+	Vector3 invScale(
+		1.0f / sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
+		1.0f / sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]),
+		1.0f / sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
+	);
+	return ToMatrix3().Scaled(invScale);
+}
+
+inline Vector3 Matrix4::GetTranslation() const
+{
+	return { m[3], m[7], m[11] };
+}
+
+inline Quaternion Matrix4::GetRotation() const
+{
+	return Quaternion(RotationMatrix());
+}
+
+inline Vector3 Matrix4::GetScale() const
+{
+	return {
+		sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
+		sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]),
+		sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
+	};
 }
 
 inline Matrix4 Matrix4::Inverse() const
 {
-	float det = 0.0f;
-	det += m[0] * det3x3sub(m, 5, 6, 7, 9, 10, 11, 13, 14, 15);
-	det -= m[4] * det3x3sub(m, 1, 2, 3, 9, 10, 11, 13, 14, 15);
-	det += m[8] * det3x3sub(m, 1, 2, 3, 5, 6, 7, 13, 14, 15);
-	det -= m[12] * det3x3sub(m, 1, 2, 3, 5, 6, 7, 9, 10, 11);
+	float v0 = m[8] * m[13] - m[9] * m[12];
+	float v1 = m[8] * m[14] - m[10] * m[12];
+	float v2 = m[8] * m[15] - m[11] * m[12];
+	float v3 = m[9] * m[14] - m[10] * m[13];
+	float v4 = m[9] * m[15] - m[11] * m[13];
+	float v5 = m[10] * m[15] - m[11] * m[14];
 
-	Matrix4 Inverse;
-	Inverse[0] = det3x3sub(m, 5, 6, 7, 9, 10, 11, 13, 14, 15) / det;
-	Inverse[1] = -det3x3sub(m, 1, 2, 3, 9, 10, 11, 13, 14, 15) / det;
-	Inverse[2] = det3x3sub(m, 1, 2, 3, 5, 6, 7, 13, 14, 15) / det;
-	Inverse[3] = -det3x3sub(m, 1, 2, 3, 5, 6, 7, 9, 10, 11) / det;
-	Inverse[4] = -det3x3sub(m, 4, 6, 7, 8, 10, 11, 12, 14, 15) / det;
-	Inverse[5] = det3x3sub(m, 0, 2, 3, 8, 10, 11, 12, 14, 15) / det;
-	Inverse[6] = -det3x3sub(m, 0, 2, 3, 4, 6, 7, 12, 14, 15) / det;
-	Inverse[7] = det3x3sub(m, 0, 2, 3, 4, 6, 7, 8, 10, 11) / det;
-	Inverse[8] = det3x3sub(m, 4, 5, 7, 8, 9, 11, 12, 13, 15) / det;
-	Inverse[9] = -det3x3sub(m, 0, 1, 3, 8, 9, 11, 12, 13, 15) / det;
-	Inverse[10] = det3x3sub(m, 0, 1, 3, 4, 5, 7, 12, 13, 15) / det;
-	Inverse[11] = -det3x3sub(m, 0, 1, 3, 4, 5, 7, 8, 9, 11) / det;
-	Inverse[12] = -det3x3sub(m, 4, 5, 6, 8, 9, 10, 12, 13, 14) / det;
-	Inverse[13] = det3x3sub(m, 0, 1, 2, 8, 9, 10, 12, 13, 14) / det;
-	Inverse[14] = -det3x3sub(m, 0, 1, 2, 4, 5, 6, 12, 13, 14) / det;
-	Inverse[15] = det3x3sub(m, 0, 1, 2, 4, 5, 6, 8, 9, 10) / det;
-	return Inverse;
+	float i00 = (v5 * m[5] - v4 * m[6] + v3 * m[7]);
+	float i10 = -(v5 * m[4] - v2 * m[6] + v1 * m[7]);
+	float i20 = (v4 * m[4] - v2 * m[5] + v0 * m[7]);
+	float i30 = -(v3 * m[4] - v1 * m[5] + v0 * m[6]);
+
+	float invDet = 1.0f / (i00 * m[0] + i10 * m[1] + i20 * m[2] + i30 * m[3]);
+
+	i00 *= invDet;
+	i10 *= invDet;
+	i20 *= invDet;
+	i30 *= invDet;
+
+	float i01 = -(v5 * m[1] - v4 * m[2] + v3 * m[3]) * invDet;
+	float i11 = (v5 * m[0] - v2 * m[2] + v1 * m[3]) * invDet;
+	float i21 = -(v4 * m[0] - v2 * m[1] + v0 * m[3]) * invDet;
+	float i31 = (v3 * m[0] - v1 * m[1] + v0 * m[2]) * invDet;
+
+	v0 = m[4] * m[13] - m[5] * m[12];
+	v1 = m[4] * m[14] - m[6] * m[12];
+	v2 = m[4] * m[15] - m[7] * m[12];
+	v3 = m[5] * m[14] - m[6] * m[13];
+	v4 = m[5] * m[15] - m[7] * m[13];
+	v5 = m[6] * m[15] - m[7] * m[14];
+
+	float i02 = (v5 * m[1] - v4 * m[2] + v3 * m[3]) * invDet;
+	float i12 = -(v5 * m[0] - v2 * m[2] + v1 * m[3]) * invDet;
+	float i22 = (v4 * m[0] - v2 * m[1] + v0 * m[3]) * invDet;
+	float i32 = -(v3 * m[0] - v1 * m[1] + v0 * m[2]) * invDet;
+
+	v0 = m[9] * m[4] - m[8] * m[5];
+	v1 = m[10] * m[4] - m[8] * m[6];
+	v2 = m[11] * m[4] - m[8] * m[7];
+	v3 = m[10] * m[5] - m[9] * m[6];
+	v4 = m[11] * m[5] - m[9] * m[7];
+	v5 = m[11] * m[6] - m[10] * m[7];
+
+	float i03 = -(v5 * m[1] - v4 * m[2] + v3 * m[3]) * invDet;
+	float i13 = (v5 * m[0] - v2 * m[2] + v1 * m[3]) * invDet;
+	float i23 = -(v4 * m[0] - v2 * m[1] + v0 * m[3]) * invDet;
+	float i33 = (v3 * m[0] - v1 * m[1] + v0 * m[2]) * invDet;
+
+	return Matrix4(
+		i00, i01, i02, i03,
+		i10, i11, i12, i13,
+		i20, i21, i22, i23,
+		i30, i31, i32, i33
+	);
 }
 
 inline Matrix4 Matrix4::Transpose() const
 {
-	Matrix4 Transpose;
-	Transpose[0] = m[0];
-	Transpose[1] = m[4];
-	Transpose[2] = m[8];
-	Transpose[3] = m[12];
-	Transpose[4] = m[1];
-	Transpose[5] = m[5];
-	Transpose[6] = m[9];
-	Transpose[7] = m[13];
-	Transpose[8] = m[2];
-	Transpose[9] = m[6];
-	Transpose[10] = m[10];
-	Transpose[11] = m[14];
-	Transpose[12] = m[3];
-	Transpose[13] = m[7];
-	Transpose[14] = m[11];
-	Transpose[15] = m[15];
-	return Transpose;
+	return {
+		m[0], m[4], m[ 8], m[12],
+		m[1], m[5], m[ 9], m[13],
+		m[2], m[6], m[10], m[14],
+		m[3], m[7], m[11], m[15]
+	};
 }
+
+inline void Matrix4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
+{
+	translation = GetTranslation();
+	scale = GetScale();
+
+	Vector3 invScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
+	rotation = Quaternion(ToMatrix3().Scaled(invScale));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 inline Matrix4 Matrix4::Rotate(const Vector3& axis, float angle)
 {

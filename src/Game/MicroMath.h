@@ -470,9 +470,8 @@ public:
 	void SetScale(const Vector3& scale);
 	void SetScale(float scale);
 
-	// Return the scaling part.
-	Vector3 GetScale() const;
-	Matrix3 Scaled(const Vector3& scale) const;
+	[[nodiscard]] Vector3 GetScale() const;
+	[[nodiscard]] Matrix3 Scaled(const Vector3& scale) const;
 
 	[[nodiscard]] Matrix3 Inverse() const;
 	[[nodiscard]] Matrix3 Transpose() const;
@@ -495,8 +494,8 @@ public:
 	constexpr Matrix3x4(Matrix3x4&&) = default;
 	constexpr Matrix3x4(const Matrix3x4&) = default;
 	constexpr Matrix3x4(const float* f);
-	Matrix3x4(const Matrix3& matrix);
-	Matrix3x4(const Matrix4& matrix);
+	constexpr Matrix3x4(const Matrix3& matrix);
+	constexpr Matrix3x4(const Matrix4& matrix);
 	Matrix3x4(float v00, float v01, float v02, float v03,
 		float v10, float v11, float v12, float v13,
 		float v20, float v21, float v22, float v23);
@@ -526,13 +525,13 @@ public:
 	void SetScale(const Vector3& scale);
 	void SetScale(float scale);
 
-	Matrix3 ToMatrix3() const;
-	Matrix4 ToMatrix4() const;
+	[[nodiscard]] Matrix3 ToMatrix3() const;
+	[[nodiscard]] Matrix4 ToMatrix4() const;
 
-	Matrix3 RotationMatrix() const;
-	Vector3 Translation() const;
-	Quaternion Rotation() const { return Quaternion(RotationMatrix()); }
-	Vector3 Scale() const;
+	[[nodiscard]] Matrix3 RotationMatrix() const;
+	[[nodiscard]] Vector3 GetTranslation() const;
+	[[nodiscard]] Quaternion GetRotation() const { return Quaternion(RotationMatrix()); }
+	[[nodiscard]] Vector3 GetScale() const;
 
 	void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
 	Matrix3x4 Inverse() const;
@@ -555,22 +554,28 @@ public:
 	constexpr Matrix4(Matrix4&&) = default;
 	constexpr Matrix4(const Matrix4&) = default;
 	constexpr Matrix4(const float* f);
-	constexpr Matrix4(const Vector4 &col1, const Vector4 &col2, const Vector4 &col3, const Vector4 &col4);
 	constexpr Matrix4(
 		float  m0, float  m1, float  m2, float  m3,
 		float  m4, float  m5, float  m6, float  m7,
 		float  m8, float  m9, float m10, float m11,
 		float m12, float m13, float m14, float m15);
-	constexpr explicit Matrix4(const Matrix3 &mat);
+	constexpr Matrix4(const Matrix3 &mat);
+	constexpr Matrix4(const Matrix3x4 &mat);
 
 	constexpr Matrix4& operator=(Matrix4&&) = default;
 	constexpr Matrix4& operator=(const Matrix4&) = default;
+	Matrix4& operator=(const Matrix3& rhs);
 
-	constexpr float& operator[](size_t i) { return m[i]; }
-	constexpr const float operator[](size_t i) const { return m[i]; }
+	constexpr float& operator[](size_t i) noexcept { return m[i]; }
+	constexpr const float operator[](size_t i) const noexcept { return m[i]; }
 
-	friend Matrix4 operator*(const Matrix4 &Matrix1, const Matrix4 &Matrix2);
+	friend Matrix4 operator+(const Matrix4 &m1, const Matrix4 &m2);
+	friend Matrix4 operator-(const Matrix4 &m1, const Matrix4 &m2);
+	friend Matrix4 operator*(const Matrix4 &m, float f);
+	friend Matrix4 operator*(float f, const Matrix4 &m);
+	friend Vector3 operator*(const Matrix4 &m, const Vector3 &u);
 	friend Vector4 operator*(const Matrix4 &m, const Vector4 &u);
+	friend Matrix4 operator*(const Matrix4 &m1, const Matrix4 &m2);
 
 	constexpr void Set(const float* f);
 	constexpr void Set(
@@ -580,11 +585,27 @@ public:
 		float m12, float m13, float m14, float m15);
 	constexpr void Set(const Matrix4& M);
 
+	void SetTranslation(const Vector3& translation);
+	void SetRotation(const Matrix3& rotation);
+	void SetScale(const Vector3& scale);
+	void SetScale(float scale);
+
+	[[nodiscard]] Matrix3 ToMatrix3() const;
+
+	// Return the rotation matrix with scaling removed.
+	[[nodiscard]] Matrix3 RotationMatrix() const;
+
+	[[nodiscard]] Vector3 GetTranslation() const;
+	[[nodiscard]] Quaternion GetRotation() const;
+	[[nodiscard]] Vector3 GetScale() const;
+
 	[[nodiscard]] Matrix4 Inverse() const;
 	[[nodiscard]] Matrix4 Transpose() const;
 
-	void Decompose(Vector3& outScale, Quaternion& outRotation, Vector3& outTranslation) const;
+	void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
 
+
+	// эти функции расчитаны на строки, а я переделал под столбцы
 	[[nodiscard]] static Matrix4 Rotate(const Vector3& axis, float angle);
 	[[nodiscard]] static Matrix4 RotateX(float angle);
 	[[nodiscard]] static Matrix4 RotateY(float angle);
