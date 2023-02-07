@@ -4,17 +4,24 @@ FlyingCamera cam;
 
 void ExampleInit()
 {
-	Matrix3 m1(
-		1.1f, 2.2f, 3.3f,
-		4.4f, 5.5f, 6.6f,
-		7.7f, 8.8f, 9.9f);
+	Matrix3x4 m1(
+		1.1f, 2.2f, 3.3f, 4.4f,
+		5.5f, 6.6f, 7.7f, 8.8f,
+		9.9f, 10.0f, 11.0f, 12.0f);
 
-	Matrix3 m2(
-		4.1f, 1.2f, 1.3f,
-		3.4f, 7.5f, 2.6f,
-		4.7f, 5.8f, 2.9f);
+	Matrix4 m2(
+		4.1f, 1.2f, 1.3f, 3.4f,
+		7.5f, 2.6f, 4.7f, 5.8f,
+		2.9f, 3.4f, 5.6f, 2.8f,
+		2.1f, 5.2f, 7.8f, 9.9f);
 
-	Matrix3 m3 = m1.Inverse();
+	Matrix4 m3 = m1 * m2;
+
+	Matrix3x4 m4 = m1 * m2;
+
+	Matrix3x4 m5 = m4.Inverse();
+
+	Matrix4 m6 = m3 * m4;
 
 	cam.Look({ 0.0f, 3.0f, 6.0f }, { 0.0f, 0.0f, 0.0f });
 }

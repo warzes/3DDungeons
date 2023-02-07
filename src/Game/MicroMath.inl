@@ -680,22 +680,22 @@ inline Matrix3 Matrix3::Transpose() const
 
 inline constexpr Matrix3x4::Matrix3x4(const float* data)
 {
-	m[0] = data[0]; m[1] = data[1]; m[2] = data[2];  m[3] = data[3];
-	m[4] = data[4]; m[5] = data[5]; m[6] = data[6];  m[7] = data[7];
+	m[0] = data[0]; m[1] = data[1]; m[ 2] = data[ 2]; m[ 3] = data[ 3];
+	m[4] = data[4]; m[5] = data[5]; m[ 6] = data[ 6]; m[ 7] = data[ 7];
 	m[8] = data[8]; m[9] = data[9]; m[10] = data[10]; m[11] = data[11];
 }
 
 inline Matrix3x4::Matrix3x4(const Matrix3& matrix)
 {
-	m[0] = matrix[0]; m[1] = matrix[1]; m[2] = matrix[2]; m[3] = 0.0f;
-	m[4] = matrix[3]; m[5] = matrix[4]; m[6] = matrix[5]; m[7] = 0.0f;
+	m[0] = matrix[0]; m[1] = matrix[1]; m[ 2] = matrix[2]; m[ 3] = 0.0f;
+	m[4] = matrix[3]; m[5] = matrix[4]; m[ 6] = matrix[5]; m[ 7] = 0.0f;
 	m[8] = matrix[6]; m[9] = matrix[7]; m[10] = matrix[8]; m[11] = 0.0f;
 }
 
 inline Matrix3x4::Matrix3x4(const Matrix4& matrix)
 {
-	m[0] = matrix[0]; m[1] = matrix[1]; m[2] = matrix[2]; m[3] = matrix[3];
-	m[4] = matrix[4]; m[5] = matrix[5]; m[6] = matrix[6]; m[7] = matrix[7];
+	m[0] = matrix[0]; m[1] = matrix[1]; m[ 2] = matrix[ 2]; m[ 3] = matrix[ 3];
+	m[4] = matrix[4]; m[5] = matrix[5]; m[ 6] = matrix[ 6]; m[ 7] = matrix[ 7];
 	m[8] = matrix[8]; m[9] = matrix[9]; m[10] = matrix[10]; m[11] = matrix[11];
 }
 
@@ -704,8 +704,8 @@ inline Matrix3x4::Matrix3x4(
 	float v10, float v11, float v12, float v13,
 	float v20, float v21, float v22, float v23)
 {
-	m[0] = v00; m[1] = v01; m[2] = v02; m[3] = v03;
-	m[4] = v10; m[5] = v11; m[6] = v12; m[7] = v13;
+	m[0] = v00; m[1] = v01; m[ 2] = v02; m[ 3] = v03;
+	m[4] = v10; m[5] = v11; m[ 6] = v12; m[ 7] = v13;
 	m[8] = v20; m[9] = v21; m[10] = v22; m[11] = v23;
 }
 
@@ -723,16 +723,16 @@ inline Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotati
 
 inline Matrix3x4& Matrix3x4::operator=(const Matrix3& rhs)
 {
-	m[0] = rhs[0]; m[1] = rhs[1]; m[2] = rhs[2]; m[3] = 0.0f;
-	m[4] = rhs[3]; m[5] = rhs[4]; m[6] = rhs[5]; m[7] = 0.0f;
+	m[0] = rhs[0]; m[1] = rhs[1]; m[ 2] = rhs[2]; m[ 3] = 0.0f;
+	m[4] = rhs[3]; m[5] = rhs[4]; m[ 6] = rhs[5]; m[ 7] = 0.0f;
 	m[8] = rhs[6]; m[9] = rhs[7]; m[10] = rhs[8]; m[11] = 0.0f;
 	return *this;
 }
 
 inline Matrix3x4& Matrix3x4::operator=(const Matrix4& rhs)
 {
-	m[0] = rhs[0]; m[1] = rhs[1]; m[2] = rhs[2]; m[3] = rhs[3];
-	m[4] = rhs[4]; m[5] = rhs[5]; m[6] = rhs[6]; m[7] = rhs[7];
+	m[0] = rhs[0]; m[1] = rhs[1]; m[ 2] = rhs[ 2]; m[ 3] = rhs[ 3];
+	m[4] = rhs[4]; m[5] = rhs[5]; m[ 6] = rhs[ 6]; m[ 7] = rhs[ 7];
 	m[8] = rhs[8]; m[9] = rhs[9]; m[10] = rhs[10]; m[11] = rhs[11];
 	return *this;
 }
@@ -740,8 +740,8 @@ inline Matrix3x4& Matrix3x4::operator=(const Matrix4& rhs)
 inline Matrix3x4 operator+(const Matrix3x4& m1, const Matrix3x4& m2)
 {
 	return {
-		m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3],
-		m1[4] + m2[4], m1[5] + m2[5], m1[6] + m2[6], m1[7] + m2[7],
+		m1[0] + m2[0], m1[1] + m2[1], m1[ 2] + m2[ 2], m1[ 3] + m2[ 3],
+		m1[4] + m2[4], m1[5] + m2[5], m1[ 6] + m2[ 6], m1[ 7] + m2[ 7],
 		m1[8] + m2[8], m1[9] + m2[9], m1[10] + m2[10], m1[11] + m2[11]
 	};
 }
@@ -749,8 +749,8 @@ inline Matrix3x4 operator+(const Matrix3x4& m1, const Matrix3x4& m2)
 inline Matrix3x4 operator-(const Matrix3x4& m1, const Matrix3x4& m2)
 {
 	return {
-		m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2], m1[3] - m2[3],
-		m1[4] - m2[4], m1[5] - m2[5], m1[6] - m2[6], m1[7] - m2[7],
+		m1[0] - m2[0], m1[1] - m2[1], m1[ 2] - m2[ 2], m1[ 3] - m2[ 3],
+		m1[4] - m2[4], m1[5] - m2[5], m1[ 6] - m2[ 6], m1[ 7] - m2[ 7],
 		m1[8] - m2[8], m1[9] - m2[9], m1[10] - m2[10], m1[11] - m2[11]
 	};
 }
@@ -763,8 +763,8 @@ inline Matrix3x4 operator*(float f, const Matrix3x4& m)
 inline Matrix3x4 operator*(const Matrix3x4& m, float f)
 {
 	return {
-		m[0] * f, m[1] * f, m[2] * f, m[3] * f,
-		m[4] * f, m[5] * f, m[6] * f, m[7] * f,
+		m[0] * f, m[1] * f, m[ 2] * f, m[ 3] * f,
+		m[4] * f, m[5] * f, m[ 6] * f, m[ 7] * f,
 		m[8] * f, m[9] * f, m[10] * f, m[11] * f
 	};
 }
@@ -772,8 +772,8 @@ inline Matrix3x4 operator*(const Matrix3x4& m, float f)
 inline Vector3 operator*(const Matrix3x4& m, const Vector3& v)
 {
 	return {
-		(m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3]),
-		(m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7]),
+		(m[0] * v.x + m[1] * v.y + m[ 2] * v.z + m[ 3]),
+		(m[4] * v.x + m[5] * v.y + m[ 6] * v.z + m[ 7]),
 		(m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11])
 	};
 }
@@ -781,8 +781,8 @@ inline Vector3 operator*(const Matrix3x4& m, const Vector3& v)
 inline Vector3 operator*(const Matrix3x4& m, const Vector4& v)
 {
 	return {
-		(m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3] * v.w),
-		(m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7] * v.w),
+		(m[0] * v.x + m[1] * v.y + m[ 2] * v.z + m[ 3] * v.w),
+		(m[4] * v.x + m[5] * v.y + m[ 6] * v.z + m[ 7] * v.w),
 		(m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11] * v.w)
 	};
 }
@@ -790,18 +790,18 @@ inline Vector3 operator*(const Matrix3x4& m, const Vector4& v)
 inline Matrix3x4 operator*(const Matrix3x4& m1, const Matrix3x4& m2)
 {
 	return {
-		m1[0] * m2[0] + m1[1] * m2[4] + m1[2] * m2[8],
-		m1[0] * m2[1] + m1[1] * m2[5] + m1[2] * m2[9],
-		m1[0] * m2[2] + m1[1] * m2[6] + m1[2] * m2[10],
-		m1[0] * m2[3] + m1[1] * m2[7] + m1[2] * m2[11] + m1[3],
+		m1[0] * m2[0] + m1[1] * m2[4] + m1[ 2] * m2[ 8],
+		m1[0] * m2[1] + m1[1] * m2[5] + m1[ 2] * m2[ 9],
+		m1[0] * m2[2] + m1[1] * m2[6] + m1[ 2] * m2[10],
+		m1[0] * m2[3] + m1[1] * m2[7] + m1[ 2] * m2[11] + m1[ 3],
 
-		m1[4] * m2[0] + m1[5] * m2[4] + m1[6] * m2[8],
-		m1[4] * m2[1] + m1[5] * m2[5] + m1[6] * m2[9],
-		m1[4] * m2[2] + m1[5] * m2[6] + m1[6] * m2[10],
-		m1[4] * m2[3] + m1[5] * m2[7] + m1[6] * m2[11] + m1[7],
+		m1[4] * m2[0] + m1[5] * m2[4] + m1[ 6] * m2[ 8],
+		m1[4] * m2[1] + m1[5] * m2[5] + m1[ 6] * m2[ 9],
+		m1[4] * m2[2] + m1[5] * m2[6] + m1[ 6] * m2[10],
+		m1[4] * m2[3] + m1[5] * m2[7] + m1[ 6] * m2[11] + m1[ 7],
 
-		m1[8] * m2[0] + m1[9] * m2[4] + m1[10] * m2[8],
-		m1[8] * m2[1] + m1[9] * m2[5] + m1[10] * m2[9],
+		m1[8] * m2[0] + m1[9] * m2[4] + m1[10] * m2[ 8],
+		m1[8] * m2[1] + m1[9] * m2[5] + m1[10] * m2[ 9],
 		m1[8] * m2[2] + m1[9] * m2[6] + m1[10] * m2[10],
 		m1[8] * m2[3] + m1[9] * m2[7] + m1[10] * m2[11] + m1[11]
 	};
@@ -810,18 +810,18 @@ inline Matrix3x4 operator*(const Matrix3x4& m1, const Matrix3x4& m2)
 inline Matrix4 operator*(const Matrix3x4& m1, const Matrix4& m2)
 {
 	return {
-		m1[0] * m2[0] + m1[1] * m2[4] + m1[2] * m2[8] + m1[3] * m2[12],
-		m1[0] * m2[1] + m1[1] * m2[5] + m1[2] * m2[9] + m1[3] * m2[13],
-		m1[0] * m2[2] + m1[1] * m2[6] + m1[2] * m2[10] + m1[3] * m2[14],
-		m1[0] * m2[3] + m1[1] * m2[7] + m1[2] * m2[11] + m1[3] * m2[15],
+		m1[0] * m2[0] + m1[1] * m2[4] + m1[ 2] * m2[ 8] + m1[ 3] * m2[12],
+		m1[0] * m2[1] + m1[1] * m2[5] + m1[ 2] * m2[ 9] + m1[ 3] * m2[13],
+		m1[0] * m2[2] + m1[1] * m2[6] + m1[ 2] * m2[10] + m1[ 3] * m2[14],
+		m1[0] * m2[3] + m1[1] * m2[7] + m1[ 2] * m2[11] + m1[ 3] * m2[15],
 
-		m1[4] * m2[0] + m1[5] * m2[4] + m1[6] * m2[8] + m1[7] * m2[12],
-		m1[4] * m2[1] + m1[5] * m2[5] + m1[6] * m2[9] + m1[7] * m2[13],
-		m1[4] * m2[2] + m1[5] * m2[6] + m1[6] * m2[10] + m1[7] * m2[14],
-		m1[4] * m2[3] + m1[5] * m2[7] + m1[6] * m2[11] + m1[7] * m2[15],
+		m1[4] * m2[0] + m1[5] * m2[4] + m1[ 6] * m2[ 8] + m1[ 7] * m2[12],
+		m1[4] * m2[1] + m1[5] * m2[5] + m1[ 6] * m2[ 9] + m1[ 7] * m2[13],
+		m1[4] * m2[2] + m1[5] * m2[6] + m1[ 6] * m2[10] + m1[ 7] * m2[14],
+		m1[4] * m2[3] + m1[5] * m2[7] + m1[ 6] * m2[11] + m1[ 7] * m2[15],
 
-		m1[8] * m2[0] + m1[9] * m2[4] + m1[10] * m2[8] + m1[11] * m2[12],
-		m1[8] * m2[1] + m1[9] * m2[5] + m1[10] * m2[9] + m1[11] * m2[13],
+		m1[8] * m2[0] + m1[9] * m2[4] + m1[10] * m2[ 8] + m1[11] * m2[12],
+		m1[8] * m2[1] + m1[9] * m2[5] + m1[10] * m2[ 9] + m1[11] * m2[13],
 		m1[8] * m2[2] + m1[9] * m2[6] + m1[10] * m2[10] + m1[11] * m2[14],
 		m1[8] * m2[3] + m1[9] * m2[7] + m1[10] * m2[11] + m1[11] * m2[15],
 
@@ -834,60 +834,59 @@ inline Matrix4 operator*(const Matrix3x4& m1, const Matrix4& m2)
 
 inline Matrix4 operator*(const Matrix4& lhs, const Matrix3x4& rhs)
 {
-	return {};
-	/*return {
-		lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20,
-		lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21,
-		lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22,
-		lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03,
-		lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20,
-		lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21,
-		lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22,
-		lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13,
-		lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20,
-		lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21,
-		lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22,
-		lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23,
-		lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20,
-		lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21,
-		lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22,
-		lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33
-	};*/
+	return {
+		lhs[0] * rhs[0] + lhs[1] * rhs[4] + lhs[2] * rhs[8],
+		lhs[0] * rhs[1] + lhs[1] * rhs[5] + lhs[2] * rhs[9],
+		lhs[0] * rhs[2] + lhs[1] * rhs[6] + lhs[2] * rhs[10],
+		lhs[0] * rhs[3] + lhs[1] * rhs[7] + lhs[2] * rhs[11] + lhs[3],
+		lhs[4] * rhs[0] + lhs[5] * rhs[4] + lhs[6] * rhs[8],
+		lhs[4] * rhs[1] + lhs[5] * rhs[5] + lhs[6] * rhs[9],
+		lhs[4] * rhs[2] + lhs[5] * rhs[6] + lhs[6] * rhs[10],
+		lhs[4] * rhs[3] + lhs[5] * rhs[7] + lhs[6] * rhs[11] + lhs[7],
+		lhs[8] * rhs[0] + lhs[9] * rhs[4] + lhs[10] * rhs[8],
+		lhs[8] * rhs[1] + lhs[9] * rhs[5] + lhs[10] * rhs[9],
+		lhs[8] * rhs[2] + lhs[9] * rhs[6] + lhs[10] * rhs[10],
+		lhs[8] * rhs[3] + lhs[9] * rhs[7] + lhs[10] * rhs[11] + lhs[11],
+		lhs[12] * rhs[0] + lhs[13] * rhs[4] + lhs[14] * rhs[8],
+		lhs[12] * rhs[1] + lhs[13] * rhs[5] + lhs[14] * rhs[9],
+		lhs[12] * rhs[2] + lhs[13] * rhs[6] + lhs[14] * rhs[10],
+		lhs[12] * rhs[3] + lhs[13] * rhs[7] + lhs[14] * rhs[11] + lhs[15]
+	};
 }
 
 inline void Matrix3x4::SetTranslation(const Vector3& translation)
 {
-	m[3] = translation.x;
-	m[7] = translation.y;
+	m[ 3] = translation.x;
+	m[ 7] = translation.y;
 	m[11] = translation.z;
 }
 
 inline void Matrix3x4::SetRotation(const Matrix3& rotation)
 {
-	m[0] = rotation[0]; m[1] = rotation[1]; m[2] = rotation[2];
-	m[4] = rotation[3]; m[5] = rotation[4]; m[6] = rotation[5];
+	m[0] = rotation[0]; m[1] = rotation[1]; m[ 2] = rotation[2];
+	m[4] = rotation[3]; m[5] = rotation[4]; m[ 6] = rotation[5];
 	m[8] = rotation[6]; m[9] = rotation[7]; m[10] = rotation[8];
 }
 
 inline void Matrix3x4::SetScale(const Vector3& scale)
 {
-	m[0] = scale.x;
-	m[5] = scale.y;
+	m[ 0] = scale.x;
+	m[ 5] = scale.y;
 	m[10] = scale.z;
 }
 
 inline void Matrix3x4::SetScale(float scale)
 {
-	m[0] = scale;
-	m[5] = scale;
+	m[ 0] = scale;
+	m[ 5] = scale;
 	m[10] = scale;
 }
 
 inline Matrix3 Matrix3x4::ToMatrix3() const
 {
 	return {
-		m[0], m[1], m[2],
-		m[4], m[5], m[6],
+		m[0], m[1], m[ 2],
+		m[4], m[5], m[ 6],
 		m[8], m[9], m[10]
 	};
 }
@@ -895,18 +894,18 @@ inline Matrix3 Matrix3x4::ToMatrix3() const
 inline Matrix4 Matrix3x4::ToMatrix4() const
 {
 	return {
-		m[0], m[1], m[2], m[3],
-		m[4], m[5], m[6], m[7],
+		m[0], m[1], m[ 2], m[ 3],
+		m[4], m[5], m[ 6], m[ 7],
 		m[8], m[9], m[10], m[11],
-		0.0f, 0.0f, 0.0f, 1.0f
+		0.0f, 0.0f, 0.0f,  1.0f
 	};
 }
 
 inline Matrix3 Matrix3x4::RotationMatrix() const
 {
 	Vector3 invScale(
-		1.0f / sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
-		1.0f / sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]),
+		1.0f / sqrtf(m[0] * m[0] + m[4] * m[4] + m[ 8] * m[ 8]),
+		1.0f / sqrtf(m[1] * m[1] + m[5] * m[5] + m[ 9] * m[ 9]),
 		1.0f / sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
 	);
 
@@ -920,21 +919,21 @@ inline Vector3 Matrix3x4::Translation() const
 
 inline Vector3 Matrix3x4::Scale() const
 {
-	return Vector3(
-		sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
-		sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]),
+	return {
+		sqrtf(m[0] * m[0] + m[4] * m[4] + m[ 8] * m[ 8]),
+		sqrtf(m[1] * m[1] + m[5] * m[5] + m[ 9] * m[ 9]),
 		sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
-	);
+	};
 }
 
 inline void Matrix3x4::Decompose(Vector3 & translation, Quaternion & rotation, Vector3 & scale) const
 {
-	translation.x = m[3];
-	translation.y = m[7];
+	translation.x = m[ 3];
+	translation.y = m[ 7];
 	translation.z = m[11];
 
-	scale.x = sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]);
-	scale.y = sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]);
+	scale.x = sqrtf(m[0] * m[0] + m[4] * m[4] + m[ 8] * m[ 8]);
+	scale.y = sqrtf(m[1] * m[1] + m[5] * m[5] + m[ 9] * m[ 9]);
 	scale.z = sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10]);
 
 	Vector3 invScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
@@ -943,30 +942,28 @@ inline void Matrix3x4::Decompose(Vector3 & translation, Quaternion & rotation, V
 
 inline Matrix3x4 Matrix3x4::Inverse() const
 {
-	float det =
+	const float det = 
 		m[0] * m[5] * m[10] +
 		m[4] * m[9] * m[2] +
 		m[8] * m[1] * m[6] -
 		m[8] * m[5] * m[2] -
 		m[4] * m[1] * m[10] -
 		m[0] * m[9] * m[6];
+	const float invDet = 1.0f / det;
 
-	float invDet = 1.0f / det;
 	Matrix3x4 ret;
-
-	//ret.m00 = (m[5] * m[10] - m[9] * m[6]) * invDet;
-	//ret.m01 = -(m[1] * m[10] - m[9] * m[2]) * invDet;
-	//ret.m02 = (m[1] * m[6] - m[5] * m[2]) * invDet;
-	//ret.m03 = -(m[3] * ret.m00 + m[7] * ret.m01 + m[11] * ret.m02);
-	//ret.m10 = -(m[4] * m[10] - m[8] * m[6]) * invDet;
-	//ret.m11 = (m[0] * m[10] - m[8] * m[2]) * invDet;
-	//ret.m12 = -(m[0] * m[6] - m[4] * m[2]) * invDet;
-	//ret.m13 = -(m[3] * ret.m10 + m[7] * ret.m11 + m[11] * ret.m12);
-	//ret.m20 = (m[4] * m[9] - m[8] * m[5]) * invDet;
-	//ret.m21 = -(m[0] * m[9] - m[8] * m[1]) * invDet;
-	//ret.m22 = (m[0] * m[5] - m[4] * m[1]) * invDet;
-	//ret.m23 = -(m[3] * ret.m20 + m[7] * ret.m21 + m[11] * ret.m22);
-
+	ret[0] = (m[5] * m[10] - m[9] * m[6]) * invDet;
+	ret[1] = -(m[1] * m[10] - m[9] * m[2]) * invDet;
+	ret[2] = (m[1] * m[6] - m[5] * m[2]) * invDet;
+	ret[3] = -(m[3] * ret[0] + m[7] * ret[1] + m[11] * ret[2]);
+	ret[4] = -(m[4] * m[10] - m[8] * m[6]) * invDet;
+	ret[5] = (m[0] * m[10] - m[8] * m[2]) * invDet;
+	ret[6] = -(m[0] * m[6] - m[4] * m[2]) * invDet;
+	ret[7] = -(m[3] * ret[4] + m[7] * ret[5] + m[11] * ret[6]);
+	ret[8] = (m[4] * m[9] - m[8] * m[5]) * invDet;
+	ret[9] = -(m[0] * m[9] - m[8] * m[1]) * invDet;
+	ret[10] = (m[0] * m[5] - m[4] * m[1]) * invDet;
+	ret[11] = -(m[3] * ret[8] + m[7] * ret[9] + m[11] * ret[10]);
 	return ret;
 }
 
