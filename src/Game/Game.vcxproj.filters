@@ -18,6 +18,15 @@
     <ClCompile Include="MicroOpenGLLoader.cpp">
       <Filter>MicroEngine\utils</Filter>
     </ClCompile>
+    <ClCompile Include="temp\SHMath\DirectXSH.cpp">
+      <Filter>MicroEngine\temp\SHMath</Filter>
+    </ClCompile>
+    <ClCompile Include="temp\Stereo3D\Stereo3DMatrixHelper.cpp">
+      <Filter>MicroEngine\temp\Stereo3D</Filter>
+    </ClCompile>
+    <ClCompile Include="temp.cpp">
+      <Filter>MicroEngine\temp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
@@ -58,6 +67,54 @@
     <ClInclude Include="X_Debug.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
+    <ClInclude Include="temp\DirectXColors.h">
+      <Filter>MicroEngine\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\DirectXMath.h">
+      <Filter>MicroEngine\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\DirectXPackedVector.h">
+      <Filter>MicroEngine\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\DirectXCollision.h">
+      <Filter>MicroEngine\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathAVX.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathAVX2.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathBE.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathF16C.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathFMA3.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathFMA4.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathSSE3.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Extensions\DirectXMathSSE4.h">
+      <Filter>MicroEngine\temp\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\MatrixStack\DirectXMatrixStack.h">
+      <Filter>MicroEngine\temp\MatrixStack</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\SHMath\DirectXSH.h">
+      <Filter>MicroEngine\temp\SHMath</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\Stereo3D\Stereo3DMatrixHelper.h">
+      <Filter>MicroEngine\temp\Stereo3D</Filter>
+    </ClInclude>
+    <ClInclude Include="temp\XDSP\XDSP.h">
+      <Filter>MicroEngine\temp\XDSP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">
@@ -75,5 +132,46 @@
     <Filter Include="MicroEngine\utils">
       <UniqueIdentifier>{f9feb1f4-25b5-4689-a3c4-c9342d8d26e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MicroEngine\temp">
+      <UniqueIdentifier>{a67cc640-22e6-42f4-b563-70f240187b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\temp\Extensions">
+      <UniqueIdentifier>{cc155037-43a3-4404-927e-8cdbb1bb76ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\temp\MatrixStack">
+      <UniqueIdentifier>{442ad825-f79a-464c-999e-565c3aaf4140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\temp\SHMath">
+      <UniqueIdentifier>{34d33007-8aa1-47ca-a877-2b0769a45595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\temp\Stereo3D">
+      <UniqueIdentifier>{c1381867-1d3d-47dc-bf37-64a1ae596be4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\temp\XDSP">
+      <UniqueIdentifier>{635fa284-4b10-4462-a7e8-41c8774ffbab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MicroMath.inl">
+      <Filter>MicroEngine</Filter>
+    </None>
+    <None Include="temp\DirectXCollision.inl">
+      <Filter>MicroEngine\temp</Filter>
+    </None>
+    <None Include="temp\DirectXMathConvert.inl">
+      <Filter>MicroEngine\temp</Filter>
+    </None>
+    <None Include="temp\DirectXMathMatrix.inl">
+      <Filter>MicroEngine\temp</Filter>
+    </None>
+    <None Include="temp\DirectXMathMisc.inl">
+      <Filter>MicroEngine\temp</Filter>
+    </None>
+    <None Include="temp\DirectXMathVector.inl">
+      <Filter>MicroEngine\temp</Filter>
+    </None>
+    <None Include="temp\DirectXPackedVector.inl">
+      <Filter>MicroEngine\temp</Filter>
+    </None>
   </ItemGroup>
 </Project>
