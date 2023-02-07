@@ -31,17 +31,87 @@ inline void Matrix4x4f::SetPosition(const Vector3& v)
 	Get(0, 3) = v.x; Get(1, 3) = v.y; Get(2, 3) = v.z;
 }
 
+typedef struct Matrix {
+	float m0, m4, m8, m12;  // Matrix first row (4 components)
+	float m1, m5, m9, m13;  // Matrix second row (4 components)
+	float m2, m6, m10, m14; // Matrix third row (4 components)
+	float m3, m7, m11, m15; // Matrix fourth row (4 components)
+} Matrix;
+
+Matrix MatrixTranslate(float x, float y, float z)
+{
+	Matrix result = { 1.0f, 0.0f, 0.0f, x,
+					  0.0f, 1.0f, 0.0f, y,
+					  0.0f, 0.0f, 1.0f, z,
+					  0.0f, 0.0f, 0.0f, 1.0f };
+
+	return result;
+}
+
+
+struct matrix4
+{
+	Vector4 a, b, c, d;
+
+	void settranslation(float x, float y, float z) { d.x = x; d.y = y; d.z = z; }
+};
 
 void ExampleInit()
 {
 	Matrix4 t1;
-	t1.SetTranslation({ 2.0f, 3.0f, 4.0f });
+	t1.SetTranslation({ 2.0f, 3.0f, 4.0f }); // мой
+	/*
+	1 0 0 t
+	0 1 0 t
+	0 0 1 t
+	0 0 0 1
+	*/
 
 	Matrix4x4f t2;
 	t2 = t2.SetIdentity();
-	t2.SetPosition({ 2.0f, 3.0f, 4.0f });
+	t2.SetPosition({ 2.0f, 3.0f, 4.0f }); // юнити
+	/*
+1 0 0 0
+0 1 0 0
+0 0 1 0
+t t t 1
+*/
 
 	DirectX::XMMATRIX t3 = DirectX::XMMatrixTranslation(2.0f, 3.0f, 4.0f);
+	/*
+1 0 0 0
+0 1 0 0
+0 0 1 0
+t t t 1
+*/
+	Matrix t4 = MatrixTranslate(2.0f, 3.0f, 4.0f); // рейлиб
+	float matMVPfloat[16] = {
+				t4.m0, t4.m1, t4.m2, t4.m3,
+				t4.m4, t4.m5, t4.m6, t4.m7,
+				t4.m8, t4.m9, t4.m10, t4.m11,
+				t4.m12, t4.m13, t4.m14, t4.m15
+	};
+	/*
+	1 0 0 0
+	0 1 0 0
+	0 0 1 0
+	t t t 1
+	*/
+
+	matrix4 t5;
+	t5.settranslation(2.0f, 3.0f, 4.0f); // куб
+	/*
+1 0 0 0
+0 1 0 0
+0 0 1 0
+t t t 1
+*/
+
+
+
+
+
+
 
 
 

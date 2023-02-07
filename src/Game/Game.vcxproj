@@ -183,24 +183,6 @@
     <ClCompile Include="MicroGraphics.cpp" />
     <ClCompile Include="MicroOpenGLLoader.cpp" />
     <ClCompile Include="MicroRender.cpp" />
-    <ClCompile Include="temp.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="temp\SHMath\DirectXSH.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="temp\Stereo3D\Stereo3DMatrixHelper.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -216,34 +198,12 @@
     <ClInclude Include="MicroMath.h" />
     <ClInclude Include="MicroOpenGLLoader.h" />
     <ClInclude Include="MicroRender.h" />
-    <ClInclude Include="temp\DirectXCollision.h" />
-    <ClInclude Include="temp\DirectXColors.h" />
-    <ClInclude Include="temp\DirectXMath.h" />
-    <ClInclude Include="temp\DirectXPackedVector.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathAVX.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathAVX2.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathBE.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathF16C.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathFMA3.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathFMA4.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathSSE3.h" />
-    <ClInclude Include="temp\Extensions\DirectXMathSSE4.h" />
-    <ClInclude Include="temp\MatrixStack\DirectXMatrixStack.h" />
-    <ClInclude Include="temp\SHMath\DirectXSH.h" />
-    <ClInclude Include="temp\Stereo3D\Stereo3DMatrixHelper.h" />
-    <ClInclude Include="temp\XDSP\XDSP.h" />
     <ClInclude Include="X_CurrentTest.h" />
     <ClInclude Include="X_Debug.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MicroGeometry.inl" />
     <None Include="MicroMath.inl" />
-    <None Include="temp\DirectXCollision.inl" />
-    <None Include="temp\DirectXMathConvert.inl" />
-    <None Include="temp\DirectXMathMatrix.inl" />
-    <None Include="temp\DirectXMathMisc.inl" />
-    <None Include="temp\DirectXMathVector.inl" />
-    <None Include="temp\DirectXPackedVector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
