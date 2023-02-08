@@ -117,7 +117,7 @@ void ExampleFrame()
 	if (IsKeyDown(0x10/*VK_SHIFT*/)) Keys |= CAMERA_KEY_SHIFT;
 	if (IsKeyDown(0x11/*VK_CONTROL*/)) Keys |= CAMERA_KEY_CONTROL;
 
-	Vector3Old Movement;
+	Vector3 Movement;
 	bool MoveCamera = cam.OnKeys(Keys, 0.01f, Movement);
 	if (MoveCamera) cam.Move(Movement);
 

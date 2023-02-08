@@ -31,8 +31,8 @@ void main()
 
 struct testVertex
 {
-	Vector3Old pos;
-	Vector3Old color;
+	Vector3 pos;
+	Vector3 color;
 };
 
 testVertex vert[] =

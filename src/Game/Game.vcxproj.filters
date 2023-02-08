@@ -18,6 +18,9 @@
     <ClCompile Include="MicroOpenGLLoader.cpp">
       <Filter>MicroEngine\utils</Filter>
     </ClCompile>
+    <ClCompile Include="mathc.c">
+      <Filter>MicroEngine\temp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
@@ -63,6 +66,9 @@
     </ClInclude>
     <ClInclude Include="UnitTestMath.h">
       <Filter>MicroEngine\UnitTest</Filter>
+    </ClInclude>
+    <ClInclude Include="mathc.h">
+      <Filter>MicroEngine\temp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

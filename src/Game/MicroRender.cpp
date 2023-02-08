@@ -234,7 +234,7 @@ void ShaderProgram::SetUniform(int uniformId, const Vector2& v) const
 	glUniform2fv(uniformId, 1, &(v.x));
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Vector3Old& v) const
+void ShaderProgram::SetUniform(int uniformId, const Vector3& v) const
 {
 	assert(state::CurrentShaderProgram == m_id);
 	glUniform3fv(uniformId, 1, &(v.x));
@@ -867,7 +867,7 @@ void FrameBuffer::Destroy()
 	glDeleteFramebuffers(1, &m_id);
 }
 //-----------------------------------------------------------------------------
-void FrameBuffer::Bind(const Vector3Old& color)
+void FrameBuffer::Bind(const Vector3& color)
 {
 	if( state::CurrentFrameBuffer != this )
 	{

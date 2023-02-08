@@ -178,6 +178,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mathc.c" />
     <ClCompile Include="MicroAdvance.cpp" />
     <ClCompile Include="MicroEngine.cpp" />
     <ClCompile Include="MicroGraphics.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="03_ObjModel.h" />
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="ExampleDemo.h" />
+    <ClInclude Include="mathc.h" />
     <ClInclude Include="MicroAdvance.h" />
     <ClInclude Include="MicroGeometry.h" />
     <ClInclude Include="MicroEngine.h" />

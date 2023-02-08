@@ -4,112 +4,9 @@
 // Vector3 Impl
 //=============================================================================
 
-inline const Vector3Old Vector3Old::Zero    = { 0.0f };
-inline const Vector3Old Vector3Old::One     = { 1.0f };
-inline const Vector3Old Vector3Old::Left    = { -1.0f, 0.0f, 0.0f };
-inline const Vector3Old Vector3Old::Right   = { 1.0f, 0.0f, 0.0f };
-inline const Vector3Old Vector3Old::Up      = { 0.0f, 1.0f, 0.0f };
-inline const Vector3Old Vector3Old::Down    = { 0.0f,-1.0f, 0.0f };
-inline const Vector3Old Vector3Old::Forward = { 0.0f, 0.0f, 1.0f };
-inline const Vector3Old Vector3Old::Back    = { 0.0f, 0.0f, -1.0f };
-
-inline float Vector3Old::GetLength() const
+inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v)
 {
-	return sqrtf(x * x + y * y + z * z);
-}
-
-inline float Vector3Old::GetLengthSquared() const
-{
-	return x * x + y * y + z * z;
-}
-
-inline Vector3Old Vector3Old::GetNormalize() const
-{
-	const float invLen = 1.0f / sqrtf(x * x + y * y + z * z);
-	return { x * invLen, y * invLen, z * invLen };
-}
-
-inline float Distance(const Vector3Old& v1, const Vector3Old& v2)
-{
-	return (v1 - v2).GetLength();
-}
-
-inline float DotProduct(const Vector3Old& v1, const Vector3Old& v2)
-{
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
-
-inline Vector3Old CrossProduct(const Vector3Old& v1, const Vector3Old& v2)
-{
-	return {
-		v1.y * v2.z - v1.z * v2.y,
-		v1.z * v2.x - v1.x * v2.z,
-		v1.x * v2.y - v1.y * v2.x
-	};
-}
-
-inline Vector3Old Min(const Vector3Old& v1, const Vector3Old& v2)
-{
-	return {
-		Min(v1.x, v2.x),
-		Min(v1.y, v2.y),
-		Min(v1.z, v2.z),
-	};
-}
-
-inline Vector3Old Max(const Vector3Old& v1, const Vector3Old& v2)
-{
-	return {
-		Max(v1.x, v2.x),
-		Max(v1.y, v2.y),
-		Max(v1.z, v2.z),
-	};
-}
-
-inline Vector3Old Lerp(const Vector3Old& a, const Vector3Old& b, float x)
-{
-	return a + (b - a) * x;
-}
-
-inline Vector3Old Mix(const Vector3Old& u, const Vector3Old& v, float t)
-{
-	return u * (1.0f - t) + v * t;
-}
-
-inline Vector3Old Rotate(const Vector3Old& u, float angle, const Vector3Old& v)
-{
-	return *(Vector3Old*)&(Matrix4Old::Rotate(v, angle) * Vector4Old(u.x, u.y, u.z, 1.0f));
-}
-
-inline float Angle(const Vector3Old& v1, const Vector3Old& v2)
-{
-	return ::Acos(DotProduct(v1, v2) / (v1.GetLength() * v2.GetLength()));
-}
-
-
-//=============================================================================
-// Vector4 Impl
-//=============================================================================
-
-inline float Vector4Old::GetLength() const
-{
-	return sqrtf(x * x + y * y + z * z + w * w);
-}
-
-inline float Vector4Old::GetLengthSquared() const
-{
-	return x * x + y * y + z * z + w * w;
-}
-
-inline Vector4Old Vector4Old::GetNormalize() const
-{
-	const float invLen = 1.0f / sqrtf(x * x + y * y + z * z + w * w);
-	return { x * invLen, y * invLen, z * invLen, w * invLen };
-}
-
-inline float DotProduct(const Vector4Old& v1, const Vector4Old& v2)
-{
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+	return *(Vector3*)&(Matrix4Old::Rotate(v, angle) * Vector4(u.x, u.y, u.z, 1.0f));
 }
 
 //=============================================================================
@@ -118,7 +15,7 @@ inline float DotProduct(const Vector4Old& v1, const Vector4Old& v2)
 
 const QuaternionOld Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-inline QuaternionOld::QuaternionOld(float angle, const Vector3Old& axis)
+inline QuaternionOld::QuaternionOld(float angle, const Vector3& axis)
 {
 	FromAngleAxis(angle, axis);
 }
@@ -128,12 +25,12 @@ inline QuaternionOld::QuaternionOld(float ax, float ay, float az)
 	FromEulerAngles(x, y, z);
 }
 
-inline QuaternionOld::QuaternionOld(const Vector3Old& start, const Vector3Old& end)
+inline QuaternionOld::QuaternionOld(const Vector3& start, const Vector3& end)
 {
 	FromRotationTo(start, end);
 }
 
-inline QuaternionOld::QuaternionOld(const Vector3Old& xAxis, const Vector3Old& yAxis, const Vector3Old& zAxis)
+inline QuaternionOld::QuaternionOld(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
 {
 	FromAxes(xAxis, yAxis, zAxis);
 }
@@ -153,17 +50,17 @@ inline QuaternionOld operator*(const QuaternionOld& u, const QuaternionOld& v)
 	};
 }
 
-inline Vector3Old QuaternionOld::operator*(const Vector3Old& v) const
+inline Vector3 QuaternionOld::operator*(const Vector3& v) const
 {
-	const Vector3Old qvec(x, y, z);
-	Vector3Old uv = CrossProduct(qvec, v);
-	Vector3Old uuv = CrossProduct(qvec, uv);
+	const Vector3 qvec(x, y, z);
+	Vector3 uv = CrossProduct(qvec, v);
+	Vector3 uuv = CrossProduct(qvec, uv);
 	return v + 2.0f * (uv * w + uuv);
 }
 
-inline void QuaternionOld::FromAngleAxis(float angle, const Vector3Old& axis)
+inline void QuaternionOld::FromAngleAxis(float angle, const Vector3& axis)
 {
-	Vector3Old normAxis = axis.GetNormalize();
+	Vector3 normAxis = axis.GetNormalize();
 	angle *= DEG2RAD_2;
 	const float sinAngle = sinf(angle);
 	const float cosAngle = cosf(angle);
@@ -193,15 +90,15 @@ inline void QuaternionOld::FromEulerAngles(float x_, float y_, float z_)
 	w = cosY * cosX * cosZ + sinY * sinX * sinZ;
 }
 
-inline void QuaternionOld::FromRotationTo(const Vector3Old& start, const Vector3Old& end)
+inline void QuaternionOld::FromRotationTo(const Vector3& start, const Vector3& end)
 {
-	const Vector3Old normStart = start.GetNormalize();
-	const Vector3Old normEnd = end.GetNormalize();
+	const Vector3 normStart = start.GetNormalize();
+	const Vector3 normEnd = end.GetNormalize();
 	const float d = DotProduct(normStart, normEnd);
 
 	if( d > -1.0f + EPSILON )
 	{
-		const Vector3Old c = CrossProduct(normStart, normEnd);
+		const Vector3 c = CrossProduct(normStart, normEnd);
 		const float s = sqrtf((1.0f + d) * 2.0f);
 		const float invS = 1.0f / s;
 
@@ -212,15 +109,15 @@ inline void QuaternionOld::FromRotationTo(const Vector3Old& start, const Vector3
 	}
 	else
 	{
-		Vector3Old axis = CrossProduct(Vector3Old::Right, normStart);
+		Vector3 axis = CrossProduct(Vector3::Right, normStart);
 		if( axis.GetLength() < EPSILON )
-			axis = CrossProduct(Vector3Old::Up, normStart);
+			axis = CrossProduct(Vector3::Up, normStart);
 
 		FromAngleAxis(180.0f, axis);
 	}
 }
 
-inline void QuaternionOld::FromAxes(const Vector3Old& xAxis, const Vector3Old& yAxis, const Vector3Old& zAxis)
+inline void QuaternionOld::FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
 {
 	Matrix3Old matrix(
 		xAxis.x, yAxis.x, zAxis.x,
@@ -276,22 +173,22 @@ inline void QuaternionOld::FromRotationMatrix(const Matrix3Old& matrix)
 	}
 }
 
-inline bool QuaternionOld::FromLookRotation(const Vector3Old& direction, const Vector3Old& upDirection)
+inline bool QuaternionOld::FromLookRotation(const Vector3& direction, const Vector3& upDirection)
 {
 	QuaternionOld ret;
-	Vector3Old forward = direction.GetNormalize();
+	Vector3 forward = direction.GetNormalize();
 
-	Vector3Old v = CrossProduct(forward, upDirection);
+	Vector3 v = CrossProduct(forward, upDirection);
 	// If direction & upDirection are parallel and crossproduct becomes zero, use FromRotationTo() fallback
 	if( v.GetLengthSquared() >= EPSILON )
 	{
 		v = v.GetNormalize();
-		Vector3Old up = CrossProduct(v, forward);
-		Vector3Old right = CrossProduct(up, forward);
+		Vector3 up = CrossProduct(v, forward);
+		Vector3 right = CrossProduct(up, forward);
 		ret.FromAxes(right, up, forward);
 	}
 	else
-		ret.FromRotationTo(Vector3Old::Forward, forward);
+		ret.FromRotationTo(Vector3::Forward, forward);
 
 	if( !ret.IsNaN() )
 	{
@@ -330,7 +227,7 @@ inline QuaternionOld QuaternionOld::Inverse() const
 		return Identity;
 }
 
-inline Vector3Old QuaternionOld::EulerAngles() const
+inline Vector3 QuaternionOld::EulerAngles() const
 {
 	// Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
 	// Order of rotations: Z first, then X, then Y
@@ -338,7 +235,7 @@ inline Vector3Old QuaternionOld::EulerAngles() const
 
 	if( check < -0.995f )
 	{
-		return Vector3Old(
+		return Vector3(
 			-90.0f,
 			0.0f,
 			-atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z)) * RAD2DEG
@@ -346,7 +243,7 @@ inline Vector3Old QuaternionOld::EulerAngles() const
 	}
 	else if( check > 0.995f )
 	{
-		return Vector3Old(
+		return Vector3(
 			90.0f,
 			0.0f,
 			atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z)) * RAD2DEG
@@ -354,7 +251,7 @@ inline Vector3Old QuaternionOld::EulerAngles() const
 	}
 	else
 	{
-		return Vector3Old(
+		return Vector3(
 			asinf(check) * RAD2DEG,
 			atan2f(2.0f * (x * z + w * y), 1.0f - 2.0f * (x * x + y * y)) * RAD2DEG,
 			atan2f(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z)) * RAD2DEG
@@ -504,7 +401,7 @@ inline Matrix3Old operator*(const Matrix3Old& m, float f)
 	};
 }
 
-inline Vector3Old operator*(const Matrix3Old& m, const Vector3Old& u)
+inline Vector3 operator*(const Matrix3Old& m, const Vector3& u)
 {
 	return {
 		m[0] * u.x + m[1] * u.y + m[2] * u.z,
@@ -553,7 +450,7 @@ inline constexpr void Matrix3Old::Set(const Matrix3Old& M)
 	m[6] = M[6]; m[7] = M[7]; m[8] = M[8];
 }
 
-inline void Matrix3Old::SetScale(const Vector3Old& scale)
+inline void Matrix3Old::SetScale(const Vector3& scale)
 {
 	m[0] = scale.x;
 	m[4] = scale.y;
@@ -567,7 +464,7 @@ inline void Matrix3Old::SetScale(float scale)
 	m[8] = scale;
 }
 
-inline Vector3Old Matrix3Old::GetScale() const
+inline Vector3 Matrix3Old::GetScale() const
 {
 	return {
 		sqrtf(m[0] * m[0] + m[3] * m[3] + m[6] * m[6]),
@@ -576,7 +473,7 @@ inline Vector3Old Matrix3Old::GetScale() const
 	};
 }
 
-inline Matrix3Old Matrix3Old::Scaled(const Vector3Old & scale) const
+inline Matrix3Old Matrix3Old::Scaled(const Vector3 & scale) const
 {
 	return {
 		m[0] * scale.x, m[1] * scale.y, m[2] * scale.z,
@@ -653,13 +550,13 @@ inline Matrix3x4Old::Matrix3x4Old(
 	m[8] = v20; m[9] = v21; m[10] = v22; m[11] = v23;
 }
 
-inline Matrix3x4Old::Matrix3x4Old(const Vector3Old& translation, const QuaternionOld& rotation, float scale)
+inline Matrix3x4Old::Matrix3x4Old(const Vector3& translation, const QuaternionOld& rotation, float scale)
 {
 	SetRotation(rotation.RotationMatrix() * scale);
 	SetTranslation(translation);
 }
 
-inline Matrix3x4Old::Matrix3x4Old(const Vector3Old& translation, const QuaternionOld& rotation, const Vector3Old& scale)
+inline Matrix3x4Old::Matrix3x4Old(const Vector3& translation, const QuaternionOld& rotation, const Vector3& scale)
 {
 	SetRotation(rotation.RotationMatrix().Scaled(scale));
 	SetTranslation(translation);
@@ -713,7 +610,7 @@ inline Matrix3x4Old operator*(const Matrix3x4Old& m, float f)
 	};
 }
 
-inline Vector3Old operator*(const Matrix3x4Old& m, const Vector3Old& v)
+inline Vector3 operator*(const Matrix3x4Old& m, const Vector3& v)
 {
 	return {
 		(m[0] * v.x + m[1] * v.y + m[ 2] * v.z + m[ 3]),
@@ -722,7 +619,7 @@ inline Vector3Old operator*(const Matrix3x4Old& m, const Vector3Old& v)
 	};
 }
 
-inline Vector3Old operator*(const Matrix3x4Old& m, const Vector4Old& v)
+inline Vector3 operator*(const Matrix3x4Old& m, const Vector4& v)
 {
 	return {
 		(m[0] * v.x + m[1] * v.y + m[ 2] * v.z + m[ 3] * v.w),
@@ -798,7 +695,7 @@ inline Matrix4Old operator*(const Matrix4Old& lhs, const Matrix3x4Old& rhs)
 	};
 }
 
-inline void Matrix3x4Old::SetTranslation(const Vector3Old& translation)
+inline void Matrix3x4Old::SetTranslation(const Vector3& translation)
 {
 	m[ 3] = translation.x;
 	m[ 7] = translation.y;
@@ -812,7 +709,7 @@ inline void Matrix3x4Old::SetRotation(const Matrix3Old& rotation)
 	m[8] = rotation[6]; m[9] = rotation[7]; m[10] = rotation[8];
 }
 
-inline void Matrix3x4Old::SetScale(const Vector3Old& scale)
+inline void Matrix3x4Old::SetScale(const Vector3& scale)
 {
 	m[ 0] = scale.x;
 	m[ 5] = scale.y;
@@ -847,7 +744,7 @@ inline Matrix4Old Matrix3x4Old::ToMatrix4() const
 
 inline Matrix3Old Matrix3x4Old::RotationMatrix() const
 {
-	Vector3Old invScale(
+	Vector3 invScale(
 		1.0f / sqrtf(m[0] * m[0] + m[4] * m[4] + m[ 8] * m[ 8]),
 		1.0f / sqrtf(m[1] * m[1] + m[5] * m[5] + m[ 9] * m[ 9]),
 		1.0f / sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
@@ -856,12 +753,12 @@ inline Matrix3Old Matrix3x4Old::RotationMatrix() const
 	return ToMatrix3().Scaled(invScale);
 }
 
-inline Vector3Old Matrix3x4Old::GetTranslation() const
+inline Vector3 Matrix3x4Old::GetTranslation() const
 {
 	return { m[3], m[7], m[11] };
 }
 
-inline Vector3Old Matrix3x4Old::GetScale() const
+inline Vector3 Matrix3x4Old::GetScale() const
 {
 	return {
 		sqrtf(m[0] * m[0] + m[4] * m[4] + m[ 8] * m[ 8]),
@@ -870,7 +767,7 @@ inline Vector3Old Matrix3x4Old::GetScale() const
 	};
 }
 
-inline void Matrix3x4Old::Decompose(Vector3Old & translation, QuaternionOld & rotation, Vector3Old & scale) const
+inline void Matrix3x4Old::Decompose(Vector3 & translation, QuaternionOld & rotation, Vector3 & scale) const
 {
 	translation.x = m[ 3];
 	translation.y = m[ 7];
@@ -880,7 +777,7 @@ inline void Matrix3x4Old::Decompose(Vector3Old & translation, QuaternionOld & ro
 	scale.y = sqrtf(m[1] * m[1] + m[5] * m[5] + m[ 9] * m[ 9]);
 	scale.z = sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10]);
 
-	Vector3Old invScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
+	Vector3 invScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
 	rotation = QuaternionOld(ToMatrix3().Scaled(invScale));
 }
 
@@ -995,7 +892,7 @@ inline Matrix4Old operator*(float f, const Matrix4Old& m)
 	return m * f;
 }
 
-inline Vector3Old operator*(const Matrix4Old& m, const Vector3Old& rhs)
+inline Vector3 operator*(const Matrix4Old& m, const Vector3& rhs)
 {
 	float invW = 1.0f / (m[12] * rhs.x + m[13] * rhs.y + m[14] * rhs.z + m[15]);
 
@@ -1006,7 +903,7 @@ inline Vector3Old operator*(const Matrix4Old& m, const Vector3Old& rhs)
 	};
 }
 
-inline Vector4Old operator*(const Matrix4Old& m, const Vector4Old& rhs)
+inline Vector4 operator*(const Matrix4Old& m, const Vector4& rhs)
 {
 	return {
 		m[0] * rhs.x + m[1] * rhs.y + m[2] * rhs.z + m[3] * rhs.w,
@@ -1066,7 +963,7 @@ inline constexpr void Matrix4Old::Set(const Matrix4Old& M)
 	m[12] = M[12]; m[13] = M[13]; m[14] = M[14]; m[15] = M[15];
 }
 
-inline void Matrix4Old::SetTranslation(const Vector3Old & translation)
+inline void Matrix4Old::SetTranslation(const Vector3 & translation)
 {
 	m[3] = translation.x;
 	m[7] = translation.y;
@@ -1080,7 +977,7 @@ inline void Matrix4Old::SetRotation(const Matrix3Old& rotation)
 	m[8] = rotation[6]; m[9] = rotation[7]; m[10] = rotation[8];
 }
 
-inline void Matrix4Old::SetScale(const Vector3Old& scale)
+inline void Matrix4Old::SetScale(const Vector3& scale)
 {
 	m[0] = scale.x;
 	m[5] = scale.y;
@@ -1105,7 +1002,7 @@ inline Matrix3Old Matrix4Old::ToMatrix3() const
 
 inline Matrix3Old Matrix4Old::RotationMatrix() const
 {
-	Vector3Old invScale(
+	Vector3 invScale(
 		1.0f / sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
 		1.0f / sqrtf(m[1] * m[1] + m[5] * m[5] + m[9] * m[9]),
 		1.0f / sqrtf(m[2] * m[2] + m[6] * m[6] + m[10] * m[10])
@@ -1113,7 +1010,7 @@ inline Matrix3Old Matrix4Old::RotationMatrix() const
 	return ToMatrix3().Scaled(invScale);
 }
 
-inline Vector3Old Matrix4Old::GetTranslation() const
+inline Vector3 Matrix4Old::GetTranslation() const
 {
 	return { m[3], m[7], m[11] };
 }
@@ -1123,7 +1020,7 @@ inline QuaternionOld Matrix4Old::GetRotation() const
 	return QuaternionOld(RotationMatrix());
 }
 
-inline Vector3Old Matrix4Old::GetScale() const
+inline Vector3 Matrix4Old::GetScale() const
 {
 	return {
 		sqrtf(m[0] * m[0] + m[4] * m[4] + m[8] * m[8]),
@@ -1200,12 +1097,12 @@ inline Matrix4Old Matrix4Old::Transpose() const
 	};
 }
 
-inline void Matrix4Old::Decompose(Vector3Old& translation, QuaternionOld& rotation, Vector3Old& scale) const
+inline void Matrix4Old::Decompose(Vector3& translation, QuaternionOld& rotation, Vector3& scale) const
 {
 	translation = GetTranslation();
 	scale = GetScale();
 
-	Vector3Old invScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
+	Vector3 invScale(1.0f / scale.x, 1.0f / scale.y, 1.0f / scale.z);
 	rotation = QuaternionOld(ToMatrix3().Scaled(invScale));
 }
 
@@ -1224,11 +1121,11 @@ inline void Matrix4Old::Decompose(Vector3Old& translation, QuaternionOld& rotati
 
 
 
-inline Matrix4Old Matrix4Old::Rotate(const Vector3Old& axis, float angle)
+inline Matrix4Old Matrix4Old::Rotate(const Vector3& axis, float angle)
 {
 	const float s = sinf(angle);
 	const float c = 1.0f - cosf(angle);
-	Vector3Old v = axis.GetNormalize();
+	Vector3 v = axis.GetNormalize();
 	const float xx = v.x * v.x;
 	const float xy = v.x * v.y;
 	const float xz = v.z * v.x;
@@ -1285,7 +1182,7 @@ inline Matrix4Old Matrix4Old::RotateZ(float angle)
 	return mat;
 }
 
-inline Matrix4Old Matrix4Old::Scale(const Vector3Old& v)
+inline Matrix4Old Matrix4Old::Scale(const Vector3& v)
 {
 	Matrix4Old mat;
 	mat[0] = v.x;  mat[4] = 0.0f; mat[8] = 0.0f; mat[12] = 0.0f;
@@ -1295,7 +1192,7 @@ inline Matrix4Old Matrix4Old::Scale(const Vector3Old& v)
 	return mat;
 }
 
-inline Matrix4Old Matrix4Old::Translate(const Vector3Old& v)
+inline Matrix4Old Matrix4Old::Translate(const Vector3& v)
 {
 	Matrix4Old mat;
 	mat[0] = 1.0f; mat[4] = 0.0f; mat[8] = 0.0f; mat[12] = v.x;
@@ -1327,12 +1224,12 @@ inline Matrix4Old Matrix4Old::Perspective(float fieldOfView, float aspectRatio, 
 	return mat;
 }
 
-inline Matrix4Old Matrix4Old::LookAt(const Vector3Old& eye, const Vector3Old& dir, const Vector3Old& up)
+inline Matrix4Old Matrix4Old::LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 {
-	const Vector3Old z = (eye - dir).GetNormalize();
-	const Vector3Old x = CrossProduct(up, z).GetNormalize();
+	const Vector3 z = (eye - dir).GetNormalize();
+	const Vector3 x = CrossProduct(up, z).GetNormalize();
 	//const Vector3 y = CrossProduct(z, x).GetNormalize(); // TODO: удалить?
-	const Vector3Old y = CrossProduct(z, x);
+	const Vector3 y = CrossProduct(z, x);
 
 	Matrix4Old m0;
 	m0[0] = x.x; m0[4] = x.y; m0[8] = x.z; m0[12] = -DotProduct(x, eye);

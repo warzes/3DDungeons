@@ -53,7 +53,7 @@ namespace ResourceCacheSystem
 #define PINK    RGB3(  255,48,144 )
 #define AQUA    RGB3(  48,255,144 )
 
-inline constexpr Vector3Old RGBToVec(unsigned rgb)
+inline constexpr Vector3 RGBToVec(unsigned rgb)
 {
 	return { ((rgb >> 16) & 255) / 255.f, ((rgb >> 8) & 255) / 255.f, ((rgb >> 0) & 255) / 255.f };
 }
@@ -71,40 +71,40 @@ namespace DebugDraw
 	// [ ] bone (pyramid? two boids?), ring,
 	// [ ] camera, light bulb, light probe,
 
-	void DrawPoint(const Vector3Old& from, unsigned rgb);
-	void DrawLine(const Vector3Old& from, const Vector3Old& to, unsigned rgb);
-	void DrawLineDashed(Vector3Old from, Vector3Old to, unsigned rgb);
+	void DrawPoint(const Vector3& from, unsigned rgb);
+	void DrawLine(const Vector3& from, const Vector3& to, unsigned rgb);
+	void DrawLineDashed(Vector3 from, Vector3 to, unsigned rgb);
 
 	void DrawAxis(float units);
 	void DrawGround(float scale);
 	void DrawGrid(float scale);
 
-	void DrawTriangle(const Vector3Old& p1, const Vector3Old& p2, const Vector3Old& p3, unsigned rgb);
+	void DrawTriangle(const Vector3& p1, const Vector3& p2, const Vector3& p3, unsigned rgb);
 
-	void DrawArrow(const Vector3Old& begin, const Vector3Old& end, unsigned rgb);
-	void DrawBounds(const Vector3Old points[8], unsigned rgb); // TODO: передавать points по ссылке, сейчас оно копируется
-	void DrawBox(const Vector3Old& c, const Vector3Old& extents, unsigned rgb);
-	void DrawCube(const Vector3Old& center, float radius, unsigned rgb);
-	void DrawPlane(const Vector3Old& p, const Vector3Old& n, float scale, unsigned rgb);
-	void DrawSphere(const Vector3Old& pos, float radius, unsigned rgb);
-	void DrawCapsule(const Vector3Old& from, const Vector3Old& to, float radius, unsigned rgb);
+	void DrawArrow(const Vector3& begin, const Vector3& end, unsigned rgb);
+	void DrawBounds(const Vector3 points[8], unsigned rgb); // TODO: передавать points по ссылке, сейчас оно копируется
+	void DrawBox(const Vector3& c, const Vector3& extents, unsigned rgb);
+	void DrawCube(const Vector3& center, float radius, unsigned rgb);
+	void DrawPlane(const Vector3& p, const Vector3& n, float scale, unsigned rgb);
+	void DrawSphere(const Vector3& pos, float radius, unsigned rgb);
+	void DrawCapsule(const Vector3& from, const Vector3& to, float radius, unsigned rgb);
 
-	void DrawDiamond(const Vector3Old& from, const Vector3Old& to, float size, unsigned rgb);
-	void DrawPyramid(const Vector3Old& center, float height, int segments, unsigned rgb);
-	void DrawPrism(const Vector3Old& center, float radius, float height, const Vector3Old& normal, int segments, unsigned rgb);
-	void DrawSquare(const Vector3Old& pos, float radius, unsigned rgb);
-	void DrawCylinder(const Vector3Old& center, float height, int segments, unsigned rgb);
-	void DrawPentagon(const Vector3Old& pos, float radius, unsigned rgb);
-	void DrawHexagon(const Vector3Old& pos, float radius, unsigned rgb);
-	void DrawCone(const Vector3Old& center, const Vector3Old& top, float radius, unsigned rgb);
-	void DrawCircle(const Vector3Old& pos, const Vector3Old& n, float radius, unsigned rgb);
-	void DrawAABB(const Vector3Old& minbb, const Vector3Old& maxbb, unsigned rgb);
+	void DrawDiamond(const Vector3& from, const Vector3& to, float size, unsigned rgb);
+	void DrawPyramid(const Vector3& center, float height, int segments, unsigned rgb);
+	void DrawPrism(const Vector3& center, float radius, float height, const Vector3& normal, int segments, unsigned rgb);
+	void DrawSquare(const Vector3& pos, float radius, unsigned rgb);
+	void DrawCylinder(const Vector3& center, float height, int segments, unsigned rgb);
+	void DrawPentagon(const Vector3& pos, float radius, unsigned rgb);
+	void DrawHexagon(const Vector3& pos, float radius, unsigned rgb);
+	void DrawCone(const Vector3& center, const Vector3& top, float radius, unsigned rgb);
+	void DrawCircle(const Vector3& pos, const Vector3& n, float radius, unsigned rgb);
+	void DrawAABB(const Vector3& minbb, const Vector3& maxbb, unsigned rgb);
 
-	void DrawPosition(const Vector3Old& pos, float radius);
-	void DrawPositionDir(const Vector3Old& pos, const Vector3Old& dir, float radius);
-	void DrawNormal(const Vector3Old& pos, const Vector3Old& n);
-	void DrawBone(const Vector3Old& center, const Vector3Old& end, unsigned rgb);
-	void DrawBoid(const Vector3Old& pos, Vector3Old dir);
+	void DrawPosition(const Vector3& pos, float radius);
+	void DrawPositionDir(const Vector3& pos, const Vector3& dir, float radius);
+	void DrawNormal(const Vector3& pos, const Vector3& n);
+	void DrawBone(const Vector3& center, const Vector3& end, unsigned rgb);
+	void DrawBoid(const Vector3& pos, Vector3 dir);
 
 	void Flush(const Matrix4Old& ViewProj);
 

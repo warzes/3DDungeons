@@ -25,6 +25,8 @@ Left handed
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/normal.hpp>
 
+#include <glm/detail/type_vec2.hpp>
+
 FlyingCamera cam;
 //============================================================================
 class Matrix4x4f
@@ -33,7 +35,7 @@ public:
 	float m_Data[16];
 
 	Matrix4x4f& SetIdentity();
-	void SetPosition(const Vector3Old& v);
+	void SetPosition(const Vector3& v);
 
 	float& Get(int row, int column) { return m_Data[row + (column * 4)]; }
 	const float& Get(int row, int column)const { return m_Data[row + (column * 4)]; }
@@ -46,7 +48,7 @@ Matrix4x4f& Matrix4x4f::SetIdentity()
 	Get(3, 0) = 0.0;	Get(3, 1) = 0.0;	Get(3, 2) = 0.0;	Get(3, 3) = 1.0;
 	return *this;
 }
-inline void Matrix4x4f::SetPosition(const Vector3Old& v)
+inline void Matrix4x4f::SetPosition(const Vector3& v)
 {
 	Get(0, 3) = v.x; Get(1, 3) = v.y; Get(2, 3) = v.z;
 }
@@ -72,14 +74,14 @@ Matrix MatrixTranslate(float x, float y, float z)
 //============================================================================
 struct matrix4
 {
-	Vector4Old a, b, c, d;
+	Vector4 a, b, c, d;
 
 	void settranslation(float x, float y, float z) { d.x = x; d.y = y; d.z = z; }
 };
 
 //============================================================================
-typedef Vector4Old mat4x4[4];
-typedef Vector3Old mat3x4[4];
+typedef Vector4 mat4x4[4];
+typedef Vector3 mat3x4[4];
 static inline void mat4x4_identity(mat4x4 M)
 {
 	int i, j;
@@ -87,13 +89,16 @@ static inline void mat4x4_identity(mat4x4 M)
 		for( j = 0; j < 4; ++j )
 			M[i][j] = i == j ? 1.f : 0.f;
 }
-static inline void mat4x4_translate(mat4x4 T, Vector3Old t)
+static inline void mat4x4_translate(mat4x4 T, Vector3 t)
 {
 	mat4x4_identity(T);
 	T[0][3] = t[0];
 	T[1][3] = t[1];
 	T[2][3] = t[2];
 }
+
+//============================================================================
+
 
 void ExampleInit()
 {
@@ -163,7 +168,7 @@ t t t 1
 	t7 = glm::translate(t7, glm::vec3(2.0f, 3.0f, 4.0f));
 
 	glm::vec2 vvvv;
-
+	glm::length(vvvv);
 
 
 	if( t7 == t72 )
@@ -176,6 +181,9 @@ t t t 1
 	mfloat_t t8[MAT4_SIZE]; // mathc.c
 	mat4_identity(t8);
 	mat4_translation(t8, t8, vec3(position, 2.0f, 3.0f, 4.0f));
+
+
+
 
 
 	Matrix3x4Old m1(
@@ -228,15 +236,15 @@ void ExampleFrame()
 	if( IsKeyDown(0x10/*VK_SHIFT*/) ) Keys |= CAMERA_KEY_SHIFT;
 	if( IsKeyDown(0x11/*VK_CONTROL*/) ) Keys |= CAMERA_KEY_CONTROL;
 
-	Vector3Old Movement;
+	Vector3 Movement;
 	bool MoveCamera = cam.OnKeys(Keys, 0.01f, Movement);
 	if( MoveCamera ) cam.Move(Movement);
 
 	Matrix4Old view = cam.GetViewMatrix();
 	Matrix4Old perpective = Matrix4Old::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
 
-	Vector3Old t1 = { -10.0f, 0.0f, 0.0f };
-	Vector3Old t2 = { -5.0f, 5.0f, 0.0f };
+	Vector3 t1 = { -10.0f, 0.0f, 0.0f };
+	Vector3 t2 = { -5.0f, 5.0f, 0.0f };
 
 	DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, t1, RED);
 	DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, t2, GREEN);

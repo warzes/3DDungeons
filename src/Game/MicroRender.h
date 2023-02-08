@@ -18,7 +18,7 @@
 #include "MicroOpenGLLoader.h"
 
 class Vector2;
-class Vector3Old;
+class Vector3;
 class Matrix3Old;
 class Matrix4Old;
 
@@ -161,7 +161,7 @@ public:
 	[[nodiscard]] int GetUniformLocation(const char* name) const;
 	void SetUniform(int uniformId, float value) const;
 	void SetUniform(int uniformId, const Vector2& v) const;
-	void SetUniform(int uniformId, const Vector3Old& v) const;
+	void SetUniform(int uniformId, const Vector3& v) const;
 	void SetUniform(int uniformId, const Matrix3Old& m) const;
 	void SetUniform(int uniformId, const Matrix4Old& m) const;
 
@@ -413,7 +413,7 @@ public:
 	bool Create(int width, int height);
 	void Destroy();
 
-	void Bind(const Vector3Old& color);
+	void Bind(const Vector3& color);
 
 	void BindTextureBuffer();
 

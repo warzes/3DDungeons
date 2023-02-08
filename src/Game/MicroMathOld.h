@@ -90,135 +90,7 @@ inline float Atan(float x) noexcept { return RAD2DEG * atanf(x); }
 inline float Atan2(float y, float x) noexcept { return RAD2DEG * atan2f(y, x); }
 // ==== Может не нужно?
 
-//=============================================================================
-// Vector3
-//=============================================================================
-class Vector3Old
-{
-public:
-	static const Vector3Old Zero;
-	static const Vector3Old One;
-	static const Vector3Old Left;
-	static const Vector3Old Right;
-	static const Vector3Old Up;
-	static const Vector3Old Down;
-	static const Vector3Old Forward;
-	static const Vector3Old Back;
 
-	constexpr Vector3Old() = default;
-	constexpr Vector3Old(Vector3Old&&) = default;
-	constexpr Vector3Old(const Vector3Old&) = default;
-	constexpr Vector3Old(float n) : x(n), y(n), z(n) {}
-	constexpr Vector3Old(float nx, float ny, float nz) : x(nx), y(ny), z(nz) {}
-
-	constexpr Vector3Old& operator=(Vector3Old&&) = default;
-	constexpr Vector3Old& operator=(const Vector3Old&) = default;
-
-	bool operator==(const Vector3Old& v) const { return Equals(x, v.x) && Equals(y, v.y) && Equals(z, v.z); }
-
-	Vector3Old operator-() const noexcept { return { -x, -y, -z }; }
-	friend Vector3Old operator-(const Vector3Old& u, float num) noexcept        { return { u.x - num, u.y - num, u.z - num }; }
-	friend Vector3Old operator-(float num, const Vector3Old& u) noexcept        { return { num - u.x, num - u.y, num - u.z }; }
-	friend Vector3Old operator-(const Vector3Old& u, const Vector3Old& v) noexcept { return { u.x - v.x, u.y - v.y, u.z - v.z }; }
-	friend Vector3Old operator+(const Vector3Old& u, float num) noexcept        { return { u.x + num, u.y + num, u.z + num }; }
-	friend Vector3Old operator+(float num, const Vector3Old& u) noexcept        { return { num + u.x, num + u.y, num + u.z }; }
-	friend Vector3Old operator+(const Vector3Old& u, const Vector3Old& v) noexcept { return { u.x + v.x, u.y + v.y, u.z + v.z }; }
-	friend Vector3Old operator*(const Vector3Old& u, float num) noexcept        { return { u.x * num, u.y * num, u.z * num }; }
-	friend Vector3Old operator*(float num, const Vector3Old& u) noexcept        { return { num * u.x, num * u.y, num * u.z }; }
-	friend Vector3Old operator*(const Vector3Old& u, const Vector3Old& v) noexcept { return { u.x * v.x, u.y * v.y, u.z * v.z }; }
-	friend Vector3Old operator/(const Vector3Old& u, float num) noexcept        { return { u.x / num, u.y / num, u.z / num }; }
-	friend Vector3Old operator/(float num, const Vector3Old& u) noexcept        { return { num / u.x, num / u.y, num / u.z }; }
-	friend Vector3Old operator/(const Vector3Old& u, const Vector3Old& v) noexcept { return { u.x / v.x, u.y / v.y, u.z / v.z }; }
-
-	Vector3Old& operator-=(float num) noexcept        { x -= num; y -= num; z -= num; return *this; }
-	Vector3Old& operator-=(const Vector3Old& u) noexcept { x -= u.x; y -= u.y; z -= u.z; return *this; }
-	Vector3Old& operator+=(float num) noexcept        { x += num; y += num; z += num; return *this; }
-	Vector3Old& operator+=(const Vector3Old& u) noexcept { x += u.x; y += u.y; z += u.z; return *this; }
-	Vector3Old& operator*=(float num) noexcept        { x *= num; y *= num; z *= num; return *this; }
-	Vector3Old& operator*=(const Vector3Old& u) noexcept { x *= u.x; y *= u.y; z *= u.z; return *this; }
-	Vector3Old& operator/=(float num) noexcept        { x /= num; y /= num; z /= num; return *this; }
-	Vector3Old& operator/=(const Vector3Old& u) noexcept { x /= u.x; y /= u.y; z /= u.z; return *this; }
-
-	float& operator[](size_t i) noexcept { return (&x)[i]; }
-	const float operator[](size_t i) const noexcept { return (&x)[i]; }
-
-	float GetLength() const;
-	float GetLengthSquared() const;
-	Vector3Old GetNormalize() const;
-
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
-};
-
-inline float Distance(const Vector3Old& v1, const Vector3Old& v2);
-inline float DotProduct(const Vector3Old& v1, const Vector3Old& v2);
-inline Vector3Old CrossProduct(const Vector3Old& v1, const Vector3Old& v2);
-inline Vector3Old Min(const Vector3Old& v1, const Vector3Old& v2);
-inline Vector3Old Max(const Vector3Old& v1, const Vector3Old& v2);
-inline Vector3Old Lerp(const Vector3Old& a, const Vector3Old& b, float x);
-inline Vector3Old Mix(const Vector3Old& u, const Vector3Old& v, float t);
-inline Vector3Old Rotate(const Vector3Old& u, float angle, const Vector3Old& v);
-// Return the angle between this vector and another vector in degrees.
-inline float Angle(const Vector3Old& v1, const Vector3Old& v2);
-
-//=============================================================================
-// Vector4
-//=============================================================================
-class Vector4Old
-{
-public:
-	constexpr Vector4Old() = default;
-	constexpr Vector4Old(Vector4Old&&) = default;
-	constexpr Vector4Old(const Vector4Old&) = default;
-	constexpr Vector4Old(float n) : x(n), y(n), z(n), w(n) {}
-	constexpr Vector4Old(float nx, float ny, float nz, float nw) : x(nx), y(ny), z(nz), w(nw) {}
-	constexpr Vector4Old(const Vector3Old& v, float nw) : x(v.x), y(v.y), z(v.z), w(nw) {}
-
-	constexpr Vector4Old& operator=(Vector4Old&&) = default;
-	constexpr Vector4Old& operator=(const Vector4Old&) = default;
-
-	bool operator==(const Vector4Old& v) const { return Equals(x, v.x) && Equals(y, v.y) && Equals(z, v.z) && Equals(w, v.w); }
-
-	Vector4Old operator-() const noexcept { return { -x, -y, -z, -w }; }
-	friend Vector4Old operator-(const Vector4Old& u, float num) noexcept        { return { u.x - num, u.y - num, u.z - num, u.w - num }; }
-	friend Vector4Old operator-(float num, const Vector4Old& u) noexcept        { return { num - u.x, num - u.y, num - u.z, num - u.w }; }
-	friend Vector4Old operator-(const Vector4Old& u, const Vector4Old& v) noexcept { return { u.x - v.x, u.y - v.y, u.z - v.z, u.w - v.w }; }
-	friend Vector4Old operator+(const Vector4Old& u, float num) noexcept        { return { u.x + num, u.y + num, u.z + num, u.w + num }; }
-	friend Vector4Old operator+(float num, const Vector4Old& u) noexcept        { return { num + u.x, num + u.y, num + u.z, num + u.w }; }
-	friend Vector4Old operator+(const Vector4Old& u, const Vector4Old& v) noexcept { return { u.x + v.x, u.y + v.y, u.z + v.z, u.w + v.w }; }
-	friend Vector4Old operator*(const Vector4Old& u, float num) noexcept        { return { u.x * num, u.y * num, u.z * num, u.w * num }; }
-	friend Vector4Old operator*(float num, const Vector4Old& u) noexcept        { return { num * u.x, num * u.y, num * u.z, num * u.w }; }
-	friend Vector4Old operator*(const Vector4Old& u, const Vector4Old& v) noexcept { return { u.x * v.x, u.y * v.y, u.z * v.z, u.w * v.w }; }
-	friend Vector4Old operator/(const Vector4Old& u, float num) noexcept        { return { u.x / num, u.y / num, u.z / num, u.w / num }; }
-	friend Vector4Old operator/(float num, const Vector4Old& u) noexcept        { return { num / u.x, num / u.y, num / u.z, num / u.w }; }
-	friend Vector4Old operator/(const Vector4Old& u, const Vector4Old& v) noexcept { return { u.x / v.x, u.y / v.y, u.z / v.z, u.w / v.w }; }
-
-	Vector4Old& operator-=(float num) noexcept        { x -= num; y -= num; z -= num; w -= num; return *this; }
-	Vector4Old& operator-=(const Vector4Old& u) noexcept { x -= u.x; y -= u.y; z -= u.z; w -= u.w; return *this; }
-	Vector4Old& operator+=(float num) noexcept        { x += num; y += num; z += num; w += num; return *this; }
-	Vector4Old& operator+=(const Vector4Old& u) noexcept { x += u.x; y += u.y; z += u.z; w += u.w; return *this; }
-	Vector4Old& operator*=(float num) noexcept        { x *= num; y *= num; z *= num; w *= num; return *this; }
-	Vector4Old& operator*=(const Vector4Old& u) noexcept { x *= u.x; y *= u.y; z *= u.z; w *= u.w; return *this; }
-	Vector4Old& operator/=(float num) noexcept        { x /= num; y /= num; z /= num; w /= num; return *this; }
-	Vector4Old& operator/=(const Vector4Old& u) noexcept { x /= u.x; y /= u.y; z /= u.z; w /= u.w; return *this; }
-
-	float& operator[](size_t i) noexcept { return (&x)[i]; }
-	const float operator[](size_t i) const noexcept { return (&x)[i]; }
-
-	float* operator&() { return (float*)this; }
-
-	float GetLength() const;
-	float GetLengthSquared() const;
-	Vector4Old GetNormalize() const;
-
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
-	float w = 0.0f;
-};
-
-inline float DotProduct(const Vector4Old& v1, const Vector4Old& v2);
 
 //=============================================================================
 // Quaternion
@@ -234,10 +106,10 @@ public:
 	constexpr QuaternionOld(QuaternionOld&&) = default;
 	constexpr QuaternionOld(const QuaternionOld&) = default;
 	constexpr QuaternionOld(float nx, float ny, float nz, float nw) : x(nx), y(ny), z(nz), w(nw) {}
-	QuaternionOld(float angle, const Vector3Old& axis);         // Construct from an angle (in degrees) and axis.
+	QuaternionOld(float angle, const Vector3& axis);         // Construct from an angle (in degrees) and axis.
 	QuaternionOld(float ax, float ay, float az);             // Construct from Euler angles (in degrees.)
-	QuaternionOld(const Vector3Old& start, const Vector3Old& end); // Construct from the rotation difference between two direction vectors.
-	QuaternionOld(const Vector3Old& xAxis, const Vector3Old& yAxis, const Vector3Old& zAxis); // Construct from orthonormal axes.
+	QuaternionOld(const Vector3& start, const Vector3& end); // Construct from the rotation difference between two direction vectors.
+	QuaternionOld(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis); // Construct from orthonormal axes.
 	QuaternionOld(const Matrix3Old& matrix);                    // Construct from a rotation matrix.
 
 	constexpr QuaternionOld& operator=(QuaternionOld&&) = default;
@@ -251,7 +123,7 @@ public:
 	friend QuaternionOld operator*(const QuaternionOld& u, float num) noexcept { return { u.x * num, u.y * num, u.z * num, u.w * num }; }
 	friend QuaternionOld operator*(float num, const QuaternionOld& u) noexcept { return { num * u.x, num * u.y, num * u.z, num * u.w }; }
 	friend QuaternionOld operator*(const QuaternionOld& u, const QuaternionOld& v);
-	Vector3Old operator*(const Vector3Old& q) const;
+	Vector3 operator*(const Vector3& q) const;
 
 	QuaternionOld& operator*=(float num) noexcept { x *= num; y *= num; z *= num; w *= num; return *this; }
 	QuaternionOld& operator+=(const QuaternionOld& u) noexcept { x += u.x; y += u.y; z += u.z; w += u.w; return *this; }
@@ -259,17 +131,17 @@ public:
 	constexpr void Set(float nx, float ny, float nz, float nw) { x = nx; y = ny; z = nz; w = nw; }
 	
 	// Define from an angle (in degrees) and axis.
-	void FromAngleAxis(float angle, const Vector3Old& axis);
+	void FromAngleAxis(float angle, const Vector3& axis);
 	// Define from Euler angles (in degrees.)
 	void FromEulerAngles(float x, float y, float z);
 	// Define from the rotation difference between two direction vectors.
-	void FromRotationTo(const Vector3Old& start, const Vector3Old& end);
+	void FromRotationTo(const Vector3& start, const Vector3& end);
 	// Define from orthonormal axes.
-	void FromAxes(const Vector3Old& xAxis, const Vector3Old& yAxis, const Vector3Old& zAxis);
+	void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
 	// Define from a rotation matrix.
 	void FromRotationMatrix(const Matrix3Old& matrix);
 	// Define from a direction to look in and an up direction. Return true on success, or false if would result in a NaN, in which case the current value remains.
-	bool FromLookRotation(const Vector3Old& direction, const Vector3Old& up = Vector3Old::Up);
+	bool FromLookRotation(const Vector3& direction, const Vector3& up = Vector3::Up);
 		
 	/// Return whether is NaN.
 	bool IsNaN() const { return ::IsNaN(x) || ::IsNaN(y) || ::IsNaN(z) || ::IsNaN(w); }
@@ -281,7 +153,7 @@ public:
 	QuaternionOld Conjugate() const { return QuaternionOld(-x, -y, -z, w); }
 
 	// Return Euler angles in degrees.
-	Vector3Old EulerAngles() const;
+	Vector3 EulerAngles() const;
 	// Return yaw angle in degrees.
 	float YawAngle() const;
 	// Return pitch angle in degrees.
@@ -332,7 +204,7 @@ public:
 	friend Matrix3Old operator-(const Matrix3Old &m1, const Matrix3Old &m2);
 	friend Matrix3Old operator*(float f, const Matrix3Old &m);
 	friend Matrix3Old operator*(const Matrix3Old &m, float f);
-	friend Vector3Old operator*(const Matrix3Old &m, const Vector3Old &u);
+	friend Vector3 operator*(const Matrix3Old &m, const Vector3 &u);
 	friend Matrix3Old operator*(const Matrix3Old &m1, const Matrix3Old &m2);
 
 	constexpr void Set(const float* f);
@@ -342,11 +214,11 @@ public:
 		float m6, float m7, float m8);
 	constexpr void Set(const Matrix3Old& M);
 
-	void SetScale(const Vector3Old& scale);
+	void SetScale(const Vector3& scale);
 	void SetScale(float scale);
 
-	[[nodiscard]] Vector3Old GetScale() const;
-	[[nodiscard]] Matrix3Old Scaled(const Vector3Old& scale) const;
+	[[nodiscard]] Vector3 GetScale() const;
+	[[nodiscard]] Matrix3Old Scaled(const Vector3& scale) const;
 
 	[[nodiscard]] Matrix3Old Inverse() const;
 	[[nodiscard]] Matrix3Old Transpose() const;
@@ -374,8 +246,8 @@ public:
 	Matrix3x4Old(float v00, float v01, float v02, float v03,
 		float v10, float v11, float v12, float v13,
 		float v20, float v21, float v22, float v23);
-	Matrix3x4Old(const Vector3Old& translation, const QuaternionOld& rotation, float scale);
-	Matrix3x4Old(const Vector3Old& translation, const QuaternionOld& rotation, const Vector3Old& scale);
+	Matrix3x4Old(const Vector3& translation, const QuaternionOld& rotation, float scale);
+	Matrix3x4Old(const Vector3& translation, const QuaternionOld& rotation, const Vector3& scale);
 
 	constexpr Matrix3x4Old& operator=(Matrix3x4Old&&) = default;
 	constexpr Matrix3x4Old& operator=(const Matrix3x4Old&) = default;
@@ -386,8 +258,8 @@ public:
 	friend Matrix3x4Old operator-(const Matrix3x4Old &m1, const Matrix3x4Old &m2);
 	friend Matrix3x4Old operator*(float f, const Matrix3x4Old &m);
 	friend Matrix3x4Old operator*(const Matrix3x4Old &m, float f);
-	friend Vector3Old operator*(const Matrix3x4Old &m, const Vector3Old &u);
-	friend Vector3Old operator*(const Matrix3x4Old &m, const Vector4Old &u);
+	friend Vector3 operator*(const Matrix3x4Old &m, const Vector3 &u);
+	friend Vector3 operator*(const Matrix3x4Old &m, const Vector4 &u);
 	friend Matrix3x4Old operator*(const Matrix3x4Old &m1, const Matrix3x4Old &m2);
 	friend Matrix4Old operator*(const Matrix3x4Old &m1, const Matrix4Old &m2);
 	friend Matrix4Old operator*(const Matrix4Old &m1, const Matrix3x4Old &m2);
@@ -395,20 +267,20 @@ public:
 	constexpr float& operator[](size_t i) { return m[i]; }
 	constexpr const float operator[](size_t i) const { return m[i]; }
 
-	void SetTranslation(const Vector3Old& translation);
+	void SetTranslation(const Vector3& translation);
 	void SetRotation(const Matrix3Old& rotation);
-	void SetScale(const Vector3Old& scale);
+	void SetScale(const Vector3& scale);
 	void SetScale(float scale);
 
 	[[nodiscard]] Matrix3Old ToMatrix3() const;
 	[[nodiscard]] Matrix4Old ToMatrix4() const;
 
 	[[nodiscard]] Matrix3Old RotationMatrix() const;
-	[[nodiscard]] Vector3Old GetTranslation() const;
+	[[nodiscard]] Vector3 GetTranslation() const;
 	[[nodiscard]] QuaternionOld GetRotation() const { return QuaternionOld(RotationMatrix()); }
-	[[nodiscard]] Vector3Old GetScale() const;
+	[[nodiscard]] Vector3 GetScale() const;
 
-	void Decompose(Vector3Old& translation, QuaternionOld& rotation, Vector3Old& scale) const;
+	void Decompose(Vector3& translation, QuaternionOld& rotation, Vector3& scale) const;
 	Matrix3x4Old Inverse() const;
 
 	float m[12] = {
@@ -448,8 +320,8 @@ public:
 	friend Matrix4Old operator-(const Matrix4Old &m1, const Matrix4Old &m2);
 	friend Matrix4Old operator*(const Matrix4Old &m, float f);
 	friend Matrix4Old operator*(float f, const Matrix4Old &m);
-	friend Vector3Old operator*(const Matrix4Old &m, const Vector3Old &u);
-	friend Vector4Old operator*(const Matrix4Old &m, const Vector4Old &u);
+	friend Vector3 operator*(const Matrix4Old &m, const Vector3 &u);
+	friend Vector4 operator*(const Matrix4Old &m, const Vector4 &u);
 	friend Matrix4Old operator*(const Matrix4Old &m1, const Matrix4Old &m2);
 
 	constexpr void Set(const float* f);
@@ -460,9 +332,9 @@ public:
 		float m12, float m13, float m14, float m15);
 	constexpr void Set(const Matrix4Old& M);
 
-	void SetTranslation(const Vector3Old& translation);
+	void SetTranslation(const Vector3& translation);
 	void SetRotation(const Matrix3Old& rotation);
-	void SetScale(const Vector3Old& scale);
+	void SetScale(const Vector3& scale);
 	void SetScale(float scale);
 
 	[[nodiscard]] Matrix3Old ToMatrix3() const;
@@ -470,28 +342,28 @@ public:
 	// Return the rotation matrix with scaling removed.
 	[[nodiscard]] Matrix3Old RotationMatrix() const;
 
-	[[nodiscard]] Vector3Old GetTranslation() const;
+	[[nodiscard]] Vector3 GetTranslation() const;
 	[[nodiscard]] QuaternionOld GetRotation() const;
-	[[nodiscard]] Vector3Old GetScale() const;
+	[[nodiscard]] Vector3 GetScale() const;
 
 	[[nodiscard]] Matrix4Old Inverse() const;
 	[[nodiscard]] Matrix4Old Transpose() const;
 
-	void Decompose(Vector3Old& translation, QuaternionOld& rotation, Vector3Old& scale) const;
+	void Decompose(Vector3& translation, QuaternionOld& rotation, Vector3& scale) const;
 
 
 	// эти функции расчитаны на строки, а я переделал под столбцы
 	// или все таки эти функции оставить, тогда надо переделать умножения
-	[[nodiscard]] static Matrix4Old Rotate(const Vector3Old& axis, float angle);
+	[[nodiscard]] static Matrix4Old Rotate(const Vector3& axis, float angle);
 	[[nodiscard]] static Matrix4Old RotateX(float angle);
 	[[nodiscard]] static Matrix4Old RotateY(float angle);
 	[[nodiscard]] static Matrix4Old RotateZ(float angle);
-	[[nodiscard]] static Matrix4Old Scale(const Vector3Old& v);
-	[[nodiscard]] static Matrix4Old Translate(const Vector3Old& v);
+	[[nodiscard]] static Matrix4Old Scale(const Vector3& v);
+	[[nodiscard]] static Matrix4Old Translate(const Vector3& v);
 
 	[[nodiscard]] static Matrix4Old Ortho(float left, float right, float bottom, float top, float n, float f);
 	[[nodiscard]] static Matrix4Old Perspective(float fieldOfView, float aspectRatio, float znear, float zfar);
-	[[nodiscard]] static Matrix4Old LookAt(const Vector3Old& eye, const Vector3Old& dir, const Vector3Old& up);
+	[[nodiscard]] static Matrix4Old LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up);
 
 	float m[16] = { 1.0f, 0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f, 0.0f,

@@ -78,7 +78,7 @@ void MemoryBuffer::setDefaults()
 class CTriangle
 {
 public:
-	Vector3Old Vertex[3], Edge[3], Normal[4];
+	Vector3 Vertex[3], Edge[3], Normal[4];
 	float EdgeLength[3], D[4];
 	bool Close;
 };
@@ -93,7 +93,7 @@ public:
 	GLuint VBO;
 	int VertexOffset, Stride, VerticesCount, TrianglesCount;
 	CTriangle* Triangles;
-	Vector3Old Min, Max;
+	Vector3 Min, Max;
 	bool Close;
 
 public:
@@ -163,7 +163,7 @@ void CObject::PrepareTriangles()
 	{
 		for (int v = 0; v < 3; v++)
 		{
-			Vector3Old* Vertex = (Vector3Old*)(Vertices + Stride * v);
+			Vector3* Vertex = (Vector3*)(Vertices + Stride * v);
 
 			Triangle->Vertex[v].x = ModelMatrix[0] * Vertex->x + ModelMatrix[4] * Vertex->y + ModelMatrix[8] * Vertex->z + ModelMatrix[12];
 			Triangle->Vertex[v].y = ModelMatrix[1] * Vertex->x + ModelMatrix[5] * Vertex->y + ModelMatrix[9] * Vertex->z + ModelMatrix[13];
@@ -258,7 +258,7 @@ TextureCube SkyBoxTexture;
 VertexBuffer skyBoxVBO;
 VertexArrayBuffer skyBoxVAO;
 
-constexpr Vector3Old SkyBoxVertices[] =
+constexpr Vector3 SkyBoxVertices[] =
 {
 	{1.0f, -1.0f, -1.0f},
 	{1.0f, -1.0f,  1.0f},
@@ -331,10 +331,10 @@ void main()
 )";
 
 extern Vector2 GrassTexCoords[6];
-extern Vector3Old GrassVertices[6];
+extern Vector3 GrassVertices[6];
 extern Vector2 CubeTexCoords[6];
-extern Vector3Old CubeNormals[6];
-extern Vector3Old CubeVertices[36];
+extern Vector3 CubeNormals[6];
+extern Vector3 CubeVertices[36];
 
 int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubDivAround, int SubDivTube, const Matrix4Old& ModelMatrix);
 
@@ -386,11 +386,11 @@ void main()
 }
 )";
 
-bool CheckCollisions(ICamera* cam, CObject* Objects, int ObjectsCount, Vector3Old& Movement, int Depth)
+bool CheckCollisions(ICamera* cam, CObject* Objects, int ObjectsCount, Vector3& Movement, int Depth)
 {
 	if (Depth < 4)
 	{
-		Vector3Old Position = cam->position + Movement;
+		Vector3 Position = cam->position + Movement;
 
 		// check the distance of the camera position from each triangle plane
 
@@ -451,13 +451,13 @@ bool CheckCollisions(ICamera* cam, CObject* Objects, int ObjectsCount, Vector3Ol
 				{
 					for (int e = 0; e < 3; e++)
 					{
-						Vector3Old VCP = Position - Triangle->Vertex[e];
+						Vector3 VCP = Position - Triangle->Vertex[e];
 
 						float EdotVCP = DotProduct(Triangle->Edge[e], VCP);
 
 						if (EdotVCP > 0.0f && EdotVCP < Triangle->EdgeLength[e])
 						{
-							Vector3Old Normal = VCP - Triangle->Edge[e] * EdotVCP;
+							Vector3 Normal = VCP - Triangle->Edge[e] * EdotVCP;
 
 							float Distance = Normal.GetLength();
 
@@ -491,7 +491,7 @@ bool CheckCollisions(ICamera* cam, CObject* Objects, int ObjectsCount, Vector3Ol
 				{
 					for (int v = 0; v < 3; v++)
 					{
-						Vector3Old Normal = Position - Triangle->Vertex[v];
+						Vector3 Normal = Position - Triangle->Vertex[v];
 
 						float Distance = Normal.GetLength();
 
@@ -532,7 +532,7 @@ void ExampleInit()
 		"../data/textures/sky/emerald_lf.jpg"
 		);
 
-	skyBoxVBO.Create(RenderResourceUsage::Static, 36, sizeof(Vector3Old), SkyBoxVertices);
+	skyBoxVBO.Create(RenderResourceUsage::Static, 36, sizeof(Vector3), SkyBoxVertices);
 	skyBoxVAO.Create(&skyBoxVBO, nullptr, &SkyBox);
 
 
@@ -554,11 +554,11 @@ void ExampleInit()
 	Lighting.Bind();
 	Lighting.SetUniform(Lighting.GetUniformLocation("Light.Ambient"), 0.333333f);
 	Lighting.SetUniform(Lighting.GetUniformLocation("Light.Diffuse"), 0.666666f);
-	Vector3Old LightDirection = Vector3Old(0.467757f, 0.424200f, -0.775409f);
+	Vector3 LightDirection = Vector3(0.467757f, 0.424200f, -0.775409f);
 	Lighting.SetUniform(Lighting.GetUniformLocation("Light.Direction"), LightDirection);
 
 	// init terrain 
-	Vector3Old GrassNormal = Vector3Old(0.0f, 1.0f, 0.0f);
+	Vector3 GrassNormal = Vector3(0.0f, 1.0f, 0.0f);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -575,13 +575,13 @@ void ExampleInit()
 	{
 		for (int x = 0; x < 8 - y; x++)
 		{
-			Vector3Old offset = Vector3Old(-5.5f + x * 1.5f + 0.75f * y, 0.5f + y, -5.0f);
+			Vector3 offset = Vector3(-5.5f + x * 1.5f + 0.75f * y, 0.5f + y, -5.0f);
 
 			for (int i = 0; i < 36; i++)
 			{
 				Objects[1].Buffer.AddData(&CubeTexCoords[i % 6], 8);
 				Objects[1].Buffer.AddData(&CubeNormals[i / 6], 12);
-				Vector3Old Vertex = CubeVertices[i] + offset;
+				Vector3 Vertex = CubeVertices[i] + offset;
 				Objects[1].Buffer.AddData(&Vertex, 12);
 			}
 		}
@@ -592,15 +592,15 @@ void ExampleInit()
 	// init tori --------------------------------------------------------------------------------------------------------------
 
 	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4Old());
-	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4Old::Rotate(Vector3Old(0.0f, 1.0f, 0.0f), 90.0f));
-	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4Old::Rotate(Vector3Old(1.0f, 0.0f, 0.0f), 90.0f));
+	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4Old::Rotate(Vector3(0.0f, 1.0f, 0.0f), 90.0f));
+	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4Old::Rotate(Vector3(1.0f, 0.0f, 0.0f), 90.0f));
 
 	Objects[2].InitVBO(20, 32);
 
 	// generate VAO 
 	glGenVertexArrays(1, &VAO);
 
-	cam->Look(Vector3Old(0.0f, 1.75f, 0.0f), Vector3Old(0.0f, 1.75f, -1.0f));
+	cam->Look(Vector3(0.0f, 1.75f, 0.0f), Vector3(0.0f, 1.75f, -1.0f));
 }
 
 void ExampleClose()
@@ -636,7 +636,7 @@ void ExampleFrame()
 	if (IsKeyDown(0x10/*VK_SHIFT*/)) Keys |= CAMERA_KEY_SHIFT;
 	if (IsKeyDown(0x11/*VK_CONTROL*/)) Keys |= CAMERA_KEY_CONTROL;
 
-	Vector3Old Movement;
+	Vector3 Movement;
 	bool MoveCamera = cam->OnKeys(Keys, 0.01f, Movement);
 	//Movement.y -= 0.01f;
 	if (MoveCamera)
@@ -674,10 +674,10 @@ void ExampleFrame()
 
 	static float Angle = 0.0f;
 	Angle += 22.5f * 0.001f;
-	Objects[2].SetModelMatrix(Matrix4Old::Translate({ 0.0f, 1.75f, 5.0f }) * Matrix4Old::Rotate(Vector3Old(0.0f, 1.0f, 0.0f), Angle * DEG2RAD));
+	Objects[2].SetModelMatrix(Matrix4Old::Translate({ 0.0f, 1.75f, 5.0f }) * Matrix4Old::Rotate(Vector3(0.0f, 1.0f, 0.0f), Angle * DEG2RAD));
 
 
-	Objects[0].SetModelMatrix(Matrix4Old::Rotate(Vector3Old(0.0f, 1.0f, 0.1f), 47*DEG2RAD));
+	Objects[0].SetModelMatrix(Matrix4Old::Rotate(Vector3(0.0f, 1.0f, 0.1f), 47*DEG2RAD));
 
 	for (int i = 0; i < ObjectsCount; i++)
 	{
@@ -716,14 +716,14 @@ Vector2 GrassTexCoords[6] =
 	Vector2(0.0f,  0.0f)
 };
 
-Vector3Old GrassVertices[6] =
+Vector3 GrassVertices[6] =
 {
-	Vector3Old(-10.0f, 0.0f,  10.0f),
-	Vector3Old(10.0f, 0.0f,  10.0f),
-	Vector3Old(10.0f, 0.0f, -10.0f),
-	Vector3Old(10.0f, 0.0f, -10.0f),
-	Vector3Old(-10.0f, 0.0f, -10.0f),
-	Vector3Old(-10.0f, 0.0f,  10.0f)
+	Vector3(-10.0f, 0.0f,  10.0f),
+	Vector3(10.0f, 0.0f,  10.0f),
+	Vector3(10.0f, 0.0f, -10.0f),
+	Vector3(10.0f, 0.0f, -10.0f),
+	Vector3(-10.0f, 0.0f, -10.0f),
+	Vector3(-10.0f, 0.0f,  10.0f)
 };
 
 Vector2 CubeTexCoords[6] =
@@ -736,24 +736,24 @@ Vector2 CubeTexCoords[6] =
 	Vector2(0.0f, 0.0f)
 };
 
-Vector3Old CubeNormals[6] =
+Vector3 CubeNormals[6] =
 {
-	Vector3Old(1.0f,  0.0f,  0.0f),
-	Vector3Old(-1.0f,  0.0f,  0.0f),
-	Vector3Old(0.0f,  1.0f,  0.0f),
-	Vector3Old(0.0f, -1.0f,  0.0f),
-	Vector3Old(0.0f,  0.0f,  1.0f),
-	Vector3Old(0.0f,  0.0f, -1.0f)
+	Vector3(1.0f,  0.0f,  0.0f),
+	Vector3(-1.0f,  0.0f,  0.0f),
+	Vector3(0.0f,  1.0f,  0.0f),
+	Vector3(0.0f, -1.0f,  0.0f),
+	Vector3(0.0f,  0.0f,  1.0f),
+	Vector3(0.0f,  0.0f, -1.0f)
 };
 
-Vector3Old CubeVertices[36] =
+Vector3 CubeVertices[36] =
 {
-	Vector3Old(0.5f, -0.5f,  0.5f), Vector3Old(0.5f, -0.5f, -0.5f), Vector3Old(0.5f,  0.5f, -0.5f), Vector3Old(0.5f,  0.5f, -0.5f), Vector3Old(0.5f,  0.5f,  0.5f), Vector3Old(0.5f, -0.5f,  0.5f),
-	Vector3Old(-0.5f, -0.5f, -0.5f), Vector3Old(-0.5f, -0.5f,  0.5f), Vector3Old(-0.5f,  0.5f,  0.5f), Vector3Old(-0.5f,  0.5f,  0.5f), Vector3Old(-0.5f,  0.5f, -0.5f), Vector3Old(-0.5f, -0.5f, -0.5f),
-	Vector3Old(-0.5f,  0.5f,  0.5f), Vector3Old(0.5f,  0.5f,  0.5f), Vector3Old(0.5f,  0.5f, -0.5f), Vector3Old(0.5f,  0.5f, -0.5f), Vector3Old(-0.5f,  0.5f, -0.5f), Vector3Old(-0.5f,  0.5f,  0.5f),
-	Vector3Old(-0.5f, -0.5f, -0.5f), Vector3Old(0.5f, -0.5f, -0.5f), Vector3Old(0.5f, -0.5f,  0.5f), Vector3Old(0.5f, -0.5f,  0.5f), Vector3Old(-0.5f, -0.5f,  0.5f), Vector3Old(-0.5f, -0.5f, -0.5f),
-	Vector3Old(-0.5f, -0.5f,  0.5f), Vector3Old(0.5f, -0.5f,  0.5f), Vector3Old(0.5f,  0.5f,  0.5f), Vector3Old(0.5f,  0.5f,  0.5f), Vector3Old(-0.5f,  0.5f,  0.5f), Vector3Old(-0.5f, -0.5f,  0.5f),
-	Vector3Old(0.5f, -0.5f, -0.5f), Vector3Old(-0.5f, -0.5f, -0.5f), Vector3Old(-0.5f,  0.5f, -0.5f), Vector3Old(-0.5f,  0.5f, -0.5f), Vector3Old(0.5f,  0.5f, -0.5f), Vector3Old(0.5f, -0.5f, -0.5f)
+	Vector3(0.5f, -0.5f,  0.5f), Vector3(0.5f, -0.5f, -0.5f), Vector3(0.5f,  0.5f, -0.5f), Vector3(0.5f,  0.5f, -0.5f), Vector3(0.5f,  0.5f,  0.5f), Vector3(0.5f, -0.5f,  0.5f),
+	Vector3(-0.5f, -0.5f, -0.5f), Vector3(-0.5f, -0.5f,  0.5f), Vector3(-0.5f,  0.5f,  0.5f), Vector3(-0.5f,  0.5f,  0.5f), Vector3(-0.5f,  0.5f, -0.5f), Vector3(-0.5f, -0.5f, -0.5f),
+	Vector3(-0.5f,  0.5f,  0.5f), Vector3(0.5f,  0.5f,  0.5f), Vector3(0.5f,  0.5f, -0.5f), Vector3(0.5f,  0.5f, -0.5f), Vector3(-0.5f,  0.5f, -0.5f), Vector3(-0.5f,  0.5f,  0.5f),
+	Vector3(-0.5f, -0.5f, -0.5f), Vector3(0.5f, -0.5f, -0.5f), Vector3(0.5f, -0.5f,  0.5f), Vector3(0.5f, -0.5f,  0.5f), Vector3(-0.5f, -0.5f,  0.5f), Vector3(-0.5f, -0.5f, -0.5f),
+	Vector3(-0.5f, -0.5f,  0.5f), Vector3(0.5f, -0.5f,  0.5f), Vector3(0.5f,  0.5f,  0.5f), Vector3(0.5f,  0.5f,  0.5f), Vector3(-0.5f,  0.5f,  0.5f), Vector3(-0.5f, -0.5f,  0.5f),
+	Vector3(0.5f, -0.5f, -0.5f), Vector3(-0.5f, -0.5f, -0.5f), Vector3(-0.5f,  0.5f, -0.5f), Vector3(-0.5f,  0.5f, -0.5f), Vector3(0.5f,  0.5f, -0.5f), Vector3(0.5f, -0.5f, -0.5f)
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -765,8 +765,8 @@ int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubD
 	int VerticesCount = 0;
 
 	Vector2* TexCoords = new Vector2[4];
-	Vector3Old* Normals = new Vector3Old[4];
-	Vector3Old* Vertices = new Vector3Old[4];
+	Vector3* Normals = new Vector3[4];
+	Vector3* Vertices = new Vector3[4];
 
 	int Indices[] = { 0, 1, 2, 2, 3, 0 };
 
@@ -782,8 +782,8 @@ int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubD
 	{
 		float NextAngleAround = CurAngleAround + AddAngleAround;
 
-		Vector3Old Dir1(sin(CurAngleAround), cos(CurAngleAround), 0.0f);
-		Vector3Old Dir2(sin(NextAngleAround), cos(NextAngleAround), 0.0f);
+		Vector3 Dir1(sin(CurAngleAround), cos(CurAngleAround), 0.0f);
+		Vector3 Dir2(sin(NextAngleAround), cos(NextAngleAround), 0.0f);
 
 		float CurAngleTube = 0.0f;
 		int StepsTube = 0;
@@ -798,31 +798,31 @@ int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubD
 			float NextSineTube = sin(NextAngleTube);
 			float NextCosineTube = cos(NextAngleTube);
 
-			Vector3Old Mid1 = Dir1 * (Radius - TubeRadius / 2.0f), Mid2 = Dir2 * (Radius - TubeRadius / 2.0f);
+			Vector3 Mid1 = Dir1 * (Radius - TubeRadius / 2.0f), Mid2 = Dir2 * (Radius - TubeRadius / 2.0f);
 
 			TexCoords[0] = Vector2(CurAngleAround / pim2, NextAngleTube / pim2);
 			TexCoords[1] = Vector2(CurAngleAround / pim2, CurAngleTube / pim2);
 			TexCoords[2] = Vector2(NextAngleAround / pim2, CurAngleTube / pim2);
 			TexCoords[3] = Vector2(NextAngleAround / pim2, NextAngleTube / pim2);
 
-			Normals[0] = Vector3Old(0.0f, 0.0f, -NextSineTube) + Dir1 * NextCosineTube;
-			Normals[1] = Vector3Old(0.0f, 0.0f, -SineTube) + Dir1 * CosineTube;
-			Normals[2] = Vector3Old(0.0f, 0.0f, -SineTube) + Dir2 * CosineTube;
-			Normals[3] = Vector3Old(0.0f, 0.0f, -NextSineTube) + Dir2 * NextCosineTube;
+			Normals[0] = Vector3(0.0f, 0.0f, -NextSineTube) + Dir1 * NextCosineTube;
+			Normals[1] = Vector3(0.0f, 0.0f, -SineTube) + Dir1 * CosineTube;
+			Normals[2] = Vector3(0.0f, 0.0f, -SineTube) + Dir2 * CosineTube;
+			Normals[3] = Vector3(0.0f, 0.0f, -NextSineTube) + Dir2 * NextCosineTube;
 
-			Vertices[0] = Mid1 + Vector3Old(0.0f, 0.0f, -NextSineTube * TubeRadius) + Dir1 * NextCosineTube * TubeRadius;
-			Vertices[1] = Mid1 + Vector3Old(0.0f, 0.0f, -SineTube * TubeRadius) + Dir1 * CosineTube * TubeRadius;
-			Vertices[2] = Mid2 + Vector3Old(0.0f, 0.0f, -SineTube * TubeRadius) + Dir2 * CosineTube * TubeRadius;
-			Vertices[3] = Mid2 + Vector3Old(0.0f, 0.0f, -NextSineTube * TubeRadius) + Dir2 * NextCosineTube * TubeRadius;
+			Vertices[0] = Mid1 + Vector3(0.0f, 0.0f, -NextSineTube * TubeRadius) + Dir1 * NextCosineTube * TubeRadius;
+			Vertices[1] = Mid1 + Vector3(0.0f, 0.0f, -SineTube * TubeRadius) + Dir1 * CosineTube * TubeRadius;
+			Vertices[2] = Mid2 + Vector3(0.0f, 0.0f, -SineTube * TubeRadius) + Dir2 * CosineTube * TubeRadius;
+			Vertices[3] = Mid2 + Vector3(0.0f, 0.0f, -NextSineTube * TubeRadius) + Dir2 * NextCosineTube * TubeRadius;
 
 			for (int i = 0; i < 6; i++)
 			{
 				int Index = Indices[i];
 
 				Buffer.AddData(&TexCoords[Index], 8);
-				Vector3Old Normal = (NormalMatrix * Normals[Index]).GetNormalize();
+				Vector3 Normal = (NormalMatrix * Normals[Index]).GetNormalize();
 				Buffer.AddData(&Normal, 12);
-				Vector4Old Vertex = ModelMatrix * Vector4Old(Vertices[Index].x, Vertices[Index].y, Vertices[Index].z, 1.0f);
+				Vector4 Vertex = ModelMatrix * Vector4(Vertices[Index].x, Vertices[Index].y, Vertices[Index].z, 1.0f);
 				Buffer.AddData(&Vertex, 12);
 
 				VerticesCount++;

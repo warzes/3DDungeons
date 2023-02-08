@@ -49,9 +49,9 @@ namespace std
 	};
 
 	template<>
-	struct hash<Vector3Old>
+	struct hash<Vector3>
 	{
-		size_t operator()(const Vector3Old& v) const
+		size_t operator()(const Vector3& v) const
 		{
 			size_t seed = 0;
 			hash<float> hasher;
@@ -67,7 +67,7 @@ namespace std
 	{
 		size_t operator()(const VertexMesh& vertex) const
 		{
-			return ((hash<Vector3Old>()(vertex.position) ^ (hash<Vector2>()(vertex.texCoord) << 1)) >> 1);
+			return ((hash<Vector3>()(vertex.position) ^ (hash<Vector2>()(vertex.texCoord) << 1)) >> 1);
 		}
 	};
 } // namespace std
@@ -305,17 +305,17 @@ bool Model::createBuffer()
 // Camera
 //=============================================================================
 //-----------------------------------------------------------------------------
-void ICamera::Look(const Vector3Old& Position, const Vector3Old& Reference)
+void ICamera::Look(const Vector3& Position, const Vector3& Reference)
 {
 	position = Position;
 	z = (Position - Reference).GetNormalize();
-	x = CrossProduct(Vector3Old::Up, z).GetNormalize();
+	x = CrossProduct(Vector3::Up, z).GetNormalize();
 	y = CrossProduct(z, x);
 
 	calculateViewMatrix();
 }
 //-----------------------------------------------------------------------------
-void ICamera::Move(const Vector3Old& Movement)
+void ICamera::Move(const Vector3& Movement)
 {
 	position += Movement;
 	calculateViewMatrix();
@@ -330,7 +330,7 @@ void ICamera::calculateViewMatrix()
 		-DotProduct(x, position), -DotProduct(y, position), -DotProduct(z, position), 1.0f };
 }
 //-----------------------------------------------------------------------------
-bool FlyingCamera::OnKeys(short Keys, float FrameTime, Vector3Old& Movement)
+bool FlyingCamera::OnKeys(short Keys, float FrameTime, Vector3& Movement)
 {
 	float Speed = m_speed;
 	if (Keys & CAMERA_KEY_SHIFT) Speed *= 2.0f;
@@ -338,9 +338,9 @@ bool FlyingCamera::OnKeys(short Keys, float FrameTime, Vector3Old& Movement)
 
 	const float Distance = Speed * FrameTime;
 
-	Vector3Old Up = y * Distance;
-	Vector3Old Right = x * Distance;
-	Vector3Old Forward = -z * Distance;
+	Vector3 Up = y * Distance;
+	Vector3 Right = x * Distance;
+	Vector3 Forward = -z * Distance;
 
 	if (Keys & CAMERA_KEY_W) Movement += Forward;
 	if (Keys & CAMERA_KEY_S) Movement -= Forward;
@@ -358,9 +358,9 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 	{
 		const float DeltaX = (float)dx * m_sensitivity;
 
-		x = Rotate(x, DeltaX, Vector3Old::Up);
-		y = Rotate(y, DeltaX, Vector3Old::Up);
-		z = Rotate(z, DeltaX, Vector3Old::Up);
+		x = Rotate(x, DeltaX, Vector3::Up);
+		y = Rotate(y, DeltaX, Vector3::Up);
+		z = Rotate(z, DeltaX, Vector3::Up);
 	}
 
 	if (dy != 0)
@@ -372,7 +372,7 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 
 		if (y.y < 0.0f)
 		{
-			z = Vector3Old(0.0f, z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
+			z = Vector3(0.0f, z.y > 0.0f ? 1.0f : -1.0f, 0.0f);
 			y = CrossProduct(z, x);
 		}
 	}
