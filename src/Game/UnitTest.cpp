@@ -1,4 +1,5 @@
 #include <string>
+#include "UnitTestMath.h"
 
 void consoleOkLog(const std::string& msg)
 {
@@ -15,4 +16,5 @@ void consoleErrorLog(const std::string& msg)
 void RunTest()
 {
 	consoleOkLog("UNIT TEST Enable");
+	RunUnitTestMath();
 }

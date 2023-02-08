@@ -117,14 +117,14 @@ void ExampleFrame()
 	if (IsKeyDown(0x10/*VK_SHIFT*/)) Keys |= CAMERA_KEY_SHIFT;
 	if (IsKeyDown(0x11/*VK_CONTROL*/)) Keys |= CAMERA_KEY_CONTROL;
 
-	Vector3 Movement;
+	Vector3Old Movement;
 	bool MoveCamera = cam.OnKeys(Keys, 0.01f, Movement);
 	if (MoveCamera) cam.Move(Movement);
 
-	Matrix4 view = cam.GetViewMatrix();
-	Matrix4 perpective = Matrix4::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
-	Matrix4 world1;
-	Matrix4 world2 = Matrix4::Translate({ 3.0f, 0.0f, 0.0f });
+	Matrix4Old view = cam.GetViewMatrix();
+	Matrix4Old perpective = Matrix4Old::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4Old world1;
+	Matrix4Old world2 = Matrix4Old::Translate({ 3.0f, 0.0f, 0.0f });
 
 	shader.Bind();
 	shader.SetUniform(uniformViewMatrix, view);

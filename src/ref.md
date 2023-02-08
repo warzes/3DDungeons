@@ -12,6 +12,7 @@
 	https://github.com/xoorath/xo-math - оптим математика
 
 Физика и коллизии
+	https://github.com/gszauer/GamePhysicsCookbook
 	софт-пиксель-эндж - организация менеджера коллайдеров
 	https://github.com/frabbani/polysoup - https://www.youtube.com/watch?v=6R4RItlo--U
 	https://github.com/SirJonthe/retro3d - физика

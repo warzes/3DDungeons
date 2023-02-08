@@ -29,7 +29,7 @@ public:
 	Rect(const Rect&) = default;
 	Rect(const Vector2& min_, const Vector2& max_) : min(min_), max(max_) {}
 	Rect(float left, float top, float right, float bottom) : min(left, top), max(right, bottom) {}
-	Rect(const Vector4& vector) : min(vector.x, vector.y), max(vector.z, vector.w) {}
+	Rect(const Vector4Old& vector) : min(vector.x, vector.y), max(vector.z, vector.w) {}
 
 	Rect& operator=(Rect&&) = default;
 	Rect& operator=(const Rect&) = default;
@@ -48,7 +48,7 @@ public:
 
 	void Clip(const Rect& rect);
 
-	Vector4 ToVector4() const { return { min.x, min.y, max.x, max.y }; }
+	Vector4Old ToVector4() const { return { min.x, min.y, max.x, max.y }; }
 	bool IsDefined() const { return (min.x <= max.x); }
 	Vector2 Center() const { return (max + min) * 0.5f; }
 	Vector2 Size() const { return max - min; }
@@ -69,10 +69,10 @@ public:
 //=============================================================================
 
 // finds the closest point to the source point on the given line segment
-inline constexpr Vector3 ClosestPointOnLineSegment(
-	const Vector3& a,     // point one of line segment
-	const Vector3& b,     // point two of line segment
-	const Vector3& point  // source point
+inline constexpr Vector3Old ClosestPointOnLineSegment(
+	const Vector3Old& a,     // point one of line segment
+	const Vector3Old& b,     // point two of line segment
+	const Vector3Old& point  // source point
 );
 
 #include "MicroGeometry.inl"

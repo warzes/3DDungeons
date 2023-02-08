@@ -152,8 +152,8 @@ namespace render
 	float PerspectiveFOV = 45.0f;
 	float PerspectiveNear = 0.01f;
 	float PerspectiveFar = 1000.0f;
-	Matrix4 ProjectionMatrix;
-	Matrix4 OrthoMatrix;
+	Matrix4Old ProjectionMatrix;
+	Matrix4Old OrthoMatrix;
 }
 //-----------------------------------------------------------------------------
 namespace app

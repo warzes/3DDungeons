@@ -196,14 +196,17 @@
     <ClInclude Include="MicroEngine.h" />
     <ClInclude Include="MicroGraphics.h" />
     <ClInclude Include="MicroMath.h" />
+    <ClInclude Include="MicroMathOld.h" />
     <ClInclude Include="MicroOpenGLLoader.h" />
     <ClInclude Include="MicroRender.h" />
+    <ClInclude Include="UnitTestMath.h" />
     <ClInclude Include="X_CurrentTest.h" />
     <ClInclude Include="X_Debug.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MicroGeometry.inl" />
     <None Include="MicroMath.inl" />
+    <None Include="MicroMathOld.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

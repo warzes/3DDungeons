@@ -38,8 +38,8 @@ void main()
 
 struct testVertex
 {
-	Vector3 pos;
-	Vector3 color;
+	Vector3Old pos;
+	Vector3Old color;
 	Vector2 texCoord;
 };
 
@@ -88,7 +88,7 @@ void ExampleFrame()
 {
 	texture.Bind();
 	shader.Bind();
-	Matrix4 mat = Matrix4::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4Old mat = Matrix4Old::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
 	shader.SetUniform(uniformProjectionMatrix, mat);
 	vao.Draw();
 }

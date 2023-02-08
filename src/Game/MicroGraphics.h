@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "MicroMath.h"
+#include "MicroMathOld.h"
 #include "MicroRender.h"
 
 class Texture2D;
@@ -19,9 +20,9 @@ class Material
 public:
 	Texture2D* diffuseTexture = nullptr;
 
-	Vector3 ambientColor = { 1.0f };
-	Vector3 diffuseColor = { 1.0f };
-	Vector3 specularColor = { 1.0f };
+	Vector3Old ambientColor = { 1.0f };
+	Vector3Old diffuseColor = { 1.0f };
+	Vector3Old specularColor = { 1.0f };
 	float shininess = 1.0f;
 };
 
@@ -32,9 +33,9 @@ struct VertexMesh
 {
 	bool operator==(const VertexMesh& v) const { return position == v.position && normal == v.normal && color == v.color && texCoord == v.texCoord; }
 
-	Vector3 position;
-	Vector3 normal;
-	Vector3 color;
+	Vector3Old position;
+	Vector3Old normal;
+	Vector3Old color;
 	Vector2 texCoord;
 };
 
@@ -98,22 +99,22 @@ class ICamera
 public:
 	virtual ~ICamera() = default;
 
-	virtual void Look(const Vector3& Position, const Vector3& Reference);
-	virtual void Move(const Vector3& Movement);
-	virtual bool OnKeys(short Keys, float FrameTime, Vector3& Movement) = 0;
+	virtual void Look(const Vector3Old& Position, const Vector3Old& Reference);
+	virtual void Move(const Vector3Old& Movement);
+	virtual bool OnKeys(short Keys, float FrameTime, Vector3Old& Movement) = 0;
 	virtual void OnMouseMove(int dx, int dy) = 0;
 
-	const Matrix4& GetViewMatrix() const { return m_viewMatrix; }
+	const Matrix4Old& GetViewMatrix() const { return m_viewMatrix; }
 
-	Vector3 x = Vector3::Right;
-	Vector3 y = Vector3::Up;
-	Vector3 z = Vector3::Forward;
-	Vector3 position = { 0.0f };
+	Vector3Old x = Vector3Old::Right;
+	Vector3Old y = Vector3Old::Up;
+	Vector3Old z = Vector3Old::Forward;
+	Vector3Old position = { 0.0f };
 
 protected:
 	virtual void calculateViewMatrix();
 
-	Matrix4 m_viewMatrix;
+	Matrix4Old m_viewMatrix;
 
 	float m_speed = 2.5f;
 	float m_sensitivity = 0.025f;
@@ -122,6 +123,6 @@ protected:
 class FlyingCamera : public ICamera
 {
 public:
-	bool OnKeys(short Keys, float FrameTime, Vector3& Movement);
+	bool OnKeys(short Keys, float FrameTime, Vector3Old& Movement);
 	void OnMouseMove(int dx, int dy);
 };

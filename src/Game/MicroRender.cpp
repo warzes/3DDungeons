@@ -16,6 +16,7 @@
 
 #include "MicroRender.h"
 #include "MicroMath.h"
+#include "MicroMathOld.h"
 
 #if defined(_MSC_VER)
 #	pragma warning(pop)
@@ -233,19 +234,19 @@ void ShaderProgram::SetUniform(int uniformId, const Vector2& v) const
 	glUniform2fv(uniformId, 1, &(v.x));
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Vector3& v) const
+void ShaderProgram::SetUniform(int uniformId, const Vector3Old& v) const
 {
 	assert(state::CurrentShaderProgram == m_id);
 	glUniform3fv(uniformId, 1, &(v.x));
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Matrix3& m) const
+void ShaderProgram::SetUniform(int uniformId, const Matrix3Old& m) const
 {
 	assert(state::CurrentShaderProgram == m_id);
 	glUniformMatrix3fv(uniformId, 1, GL_FALSE, m.m);
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Matrix4& m) const
+void ShaderProgram::SetUniform(int uniformId, const Matrix4Old& m) const
 {
 	assert(state::CurrentShaderProgram == m_id);
 	glUniformMatrix4fv(uniformId, 1, GL_FALSE, m.m);
@@ -866,7 +867,7 @@ void FrameBuffer::Destroy()
 	glDeleteFramebuffers(1, &m_id);
 }
 //-----------------------------------------------------------------------------
-void FrameBuffer::Bind(const Vector3& color)
+void FrameBuffer::Bind(const Vector3Old& color)
 {
 	if( state::CurrentFrameBuffer != this )
 	{
