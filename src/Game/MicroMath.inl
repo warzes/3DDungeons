@@ -460,12 +460,187 @@ inline Vector4& operator/=(Vector4& Left, const Vector4& Right) noexcept { retur
 // Quaternion Impl
 //=============================================================================
 
+const inline Quaternion Quaternion::Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+inline Quaternion::Quaternion(float angle, const Vector3& axis)
+{
+	FromAngleAxis(angle, axis);
+}
+
+inline Quaternion::Quaternion(float ax, float ay, float az)
+{
+	FromEulerAngles(x, y, z);
+}
+
+inline Quaternion::Quaternion(const Vector3& start, const Vector3& end)
+{
+	FromRotationTo(start, end);
+}
+
+inline Quaternion::Quaternion(const Matrix4& m)
+{
+	FromMatrix(m);
+}
+
+inline void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
+{
+	Vector3 normAxis = axis.GetNormalize();
+	const float half = angle * 0.5f;
+	const float sinAngle = sinf(half);
+	const float cosAngle = cosf(half);
+	x = normAxis.x * sinAngle;
+	y = normAxis.y * sinAngle;
+	z = normAxis.z * sinAngle;
+	w = cosAngle;
+}
+
+inline void Quaternion::FromEulerAngles(float x_, float y_, float z_)
+{
+	// Order of rotations: Z first, then X, then Y (mimics typical FPS camera with gimbal lock at top/bottom)
+	x_ *= 0.5f;
+	y_ *= 0.5f;
+	z_ *= 0.5f;
+	const float sinX = sinf(x_);
+	const float cosX = cosf(x_);
+	const float sinY = sinf(y_);
+	const float cosY = cosf(y_);
+	const float sinZ = sinf(z_);
+	const float cosZ = cosf(z_);
+
+	x = cosY * sinX * cosZ + sinY * cosX * sinZ;
+	y = sinY * cosX * cosZ - cosY * sinX * sinZ;
+	z = cosY * cosX * sinZ - sinY * sinX * cosZ;
+	w = cosY * cosX * cosZ + sinY * sinX * sinZ;
+}
+
+inline void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
+{
+	const Vector3 normStart = start.GetNormalize();
+	const Vector3 normEnd = end.GetNormalize();
+	const float d = DotProduct(normStart, normEnd);
+
+	if( d > -1.0f + EPSILON )
+	{
+		const Vector3 c = CrossProduct(normStart, normEnd);
+		const float s = sqrtf((1.0f + d) * 2.0f);
+		const float invS = 1.0f / s;
+
+		x = c.x * invS;
+		y = c.y * invS;
+		z = c.z * invS;
+		w = 0.5f * s;
+	}
+	else
+	{
+		Vector3 axis = CrossProduct(Vector3::Right, normStart);
+		if( axis.GetLength() < EPSILON )
+			axis = CrossProduct(Vector3::Up, normStart);
+		FromAngleAxis(180.0f*DEG2RAD, axis);
+	}
+}
+
+inline void Quaternion::FromMatrix(const Matrix4& m0)
+{
+	float scale = m0[0] + m0[5] + m0[10];
+	if( scale > 0.0f )
+	{
+		float sr = sqrtf(scale + 1.0f);
+		w = sr * 0.5f;
+		sr = 0.5f / sr;
+		x = (m0[9] - m0[6]) * sr;
+		y = (m0[2] - m0[8]) * sr;
+		z = (m0[4] - m0[1]) * sr;
+	}
+	else if( (m0[0] >= m0[5]) && (m0[0] >= m0[10]) )
+	{
+		float sr = sqrtf(1.0f + m0[0] - m0[5] - m0[10]);
+		float half = 0.5f / sr;
+		x = 0.5f * sr;
+		y = (m0[4] + m0[1]) * half;
+		z = (m0[8] + m0[2]) * half;
+		w = (m0[9] - m0[6]) * half;
+	}
+	else if( m0[5] > m0[10] )
+	{
+		float sr = sqrtf(1.0f + m0[5] - m0[0] - m0[10]);
+		float half = 0.5f / sr;
+		x = (m0[1] + m0[4]) * half;
+		y = 0.5f * sr;
+		z = (m0[6] + m0[9]) * half;
+		w = (m0[2] - m0[8]) * half;
+	}
+	else
+	{
+		float sr = sqrtf(1.0f + m0[10] - m0[0] - m0[5]);
+		float half = 0.5f / sr;
+		x = (m0[2] + m0[8]) * half;
+		y = (m0[6] + m0[9]) * half;
+		z = 0.5f * sr;
+		w = (m0[4] - m0[1]) * half;
+	}
+}
+
 inline float Quaternion::GetLength() const { return sqrtf(x * x + y * y + z * z + w * w); }
 inline float Quaternion::GetLengthSquared() const { return x * x + y * y + z * z + w * w; }
 inline Quaternion Quaternion::GetNormalize() const
 {
 	const float invLen = 1.0f / GetLength();
 	return { x * invLen, y * invLen, z * invLen, w * invLen };
+}
+
+inline Quaternion Quaternion::Inverse() const
+{
+	const float lenSquared = GetLengthSquared();
+	if( lenSquared == 1.0f ) return Conjugate();
+	else if( lenSquared >= EPSILON ) return Conjugate() * (1.0f / lenSquared);
+	else return Identity;
+}
+
+inline Vector3 Quaternion::EulerAngles() const
+{
+	// Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	// Order of rotations: Z first, then X, then Y
+	const float check = 2.0f * (w * x - y * z);
+
+	if( check < -0.995f )
+	{
+		return Vector3(
+			-90.0f*DEG2RAD,
+			0.0f,
+			-atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z))
+		);
+	}
+	else if( check > 0.995f )
+	{
+		return Vector3(
+			90.0f * DEG2RAD,
+			0.0f,
+			atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z))
+		);
+	}
+	else
+	{
+		return Vector3(
+			asinf(check),
+			atan2f(2.0f * (x * z + w * y), 1.0f - 2.0f * (x * x + y * y)),
+			atan2f(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z))
+		);
+	}
+}
+
+inline float Quaternion::YawAngle() const
+{
+	return EulerAngles().y;
+}
+
+inline float Quaternion::PitchAngle() const
+{
+	return EulerAngles().x;
+}
+
+inline float Quaternion::RollAngle() const
+{
+	return EulerAngles().z;
 }
 
 inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) noexcept
@@ -476,7 +651,58 @@ inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) no
 		&& Equals(v1.z, v2.z, epsilon) 
 		&& Equals(v1.w, v2.w, epsilon);
 }
+
+inline Quaternion Lerp(const Quaternion& a, const Quaternion& b, float x)
+{
+	return a + (b - a) * x;
+}
+
+inline Quaternion SLerp(const Quaternion& q0, const Quaternion& q1, float f)
+{
+	float d = DotProduct(q0, q1);
+	Quaternion tmp1 = q1;
+	float f0;
+	float f1;
+	if( d < 0.0f )
+	{
+		tmp1 = -tmp1;
+		d = -d;
+	}
+
+	if( d > 0.9995f )
+	{
+		f0 = 1.0f - f;
+		f1 = f;
+	}
+	else
+	{
+		float theta = acosf(d);
+		float sin_theta = sinf(theta);
+		f0 = sinf((1.0f - f) * theta) / sin_theta;
+		f1 = sinf(f * theta) / sin_theta;
+	}
+	return {
+		q0[0] * f0 + tmp1[0] * f1,
+		q0[1] * f0 + tmp1[1] * f1,
+		q0[2] * f0 + tmp1[2] * f1,
+		q0[3] * f0 + tmp1[3] * f1
+	};
+}
+
 inline float DotProduct(const Quaternion& v1, const Quaternion& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w; }
+
+inline Quaternion QuatPower(const Quaternion& in, const Quaternion& q0, float exponent)
+{
+	if( fabsf(q0[3]) < 1.0f - EPSILON )
+	{
+		const float alpha = acosf(q0[3]);
+		const float new_alpha = alpha * exponent;
+		const float s = sinf(new_alpha) / sinf(alpha);
+		return { in.x * s, in.y * s, in.z * s, cosf(new_alpha) };
+	}
+	else
+		return q0;
+}
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }
 
@@ -485,15 +711,30 @@ inline Quaternion operator-(const Quaternion& Left, const Quaternion& Right) noe
 inline Quaternion operator+(const Quaternion& Left, const Quaternion& Right) noexcept { return { Left.x + Right.x, Left.y + Right.y, Left.z + Right.z, Left.w + Right.w }; }
 inline Quaternion operator*(float Left, const Quaternion& Right) noexcept             { return {   Left * Right.x,   Left * Right.y,   Left * Right.z,   Left * Right.w }; }
 inline Quaternion operator*(const Quaternion& Left, float Right) noexcept             { return { Left.x * Right,   Left.y * Right,   Left.z * Right,   Left.w * Right   }; }
-//inline Quaternion operator*(const Quaternion& Left, const Quaternion& Right) noexcept 
-//{ 
-//
-//	//кватернионы умножаются по своему
-//}
-//inline Quaternion operator/(const Quaternion& Left, const Quaternion& Right) noexcept
-//{
-//	//кватернионы делятся по своему
-//}
+inline Quaternion operator*(const Quaternion& Left, const Quaternion& Right) noexcept 
+{ 
+	return {
+		Left.w * Right.x + Left.x * Right.w + Left.y * Right.z - Left.z * Right.y,
+		Left.w * Right.y + Left.y * Right.w + Left.z * Right.x - Left.x * Right.z,
+		Left.w * Right.z + Left.z * Right.w + Left.x * Right.y - Left.y * Right.x,
+		Left.w * Right.w - Left.x * Right.x - Left.y * Right.y - Left.z * Right.z
+	};
+}
+inline Quaternion operator/(const Quaternion& Left, float Right) noexcept { return { Left.x / Right,   Left.y / Right,   Left.z / Right,   Left.w / Right }; }
+inline Quaternion operator/(const Quaternion& Left, const Quaternion& Right) noexcept
+{
+	const float ls = Right[0] * Right[0] + Right[1] * Right[1] + Right[2] * Right[2] + Right[3] * Right[3];
+	const float normalized_x = -Right[0] / ls;
+	const float normalized_y = -Right[1] / ls;
+	const float normalized_z = -Right[2] / ls;
+	const float normalized_w =  Right[3] / ls;
+	return {
+		Left.x * normalized_w + normalized_x * Left.w + (Left.y * normalized_z - Left.z * normalized_y),
+		Left.y * normalized_w + normalized_y * Left.w + (Left.z * normalized_x - Left.x * normalized_z),
+		Left.z * normalized_w + normalized_z * Left.w + (Left.x * normalized_y - Left.y * normalized_x),
+		Left.w * normalized_w - (Left.x * normalized_x + Left.y * normalized_y + Left.z * normalized_z)
+	};
+}
 
 inline Quaternion& operator-=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left - Right; }
 inline Quaternion& operator+=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left + Right; }

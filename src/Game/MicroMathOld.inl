@@ -13,7 +13,7 @@ inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v)
 // Quaternion Impl
 //=============================================================================
 
-const QuaternionOld Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
+const inline QuaternionOld QuaternionOld::Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 inline QuaternionOld::QuaternionOld(float angle, const Vector3& axis)
 {

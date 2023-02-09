@@ -372,10 +372,17 @@ inline Vector4& operator/=(Vector4& Left, const Vector4& Right) noexcept;
 class Quaternion
 {
 public:
+	static const Quaternion Identity;
+
 	constexpr Quaternion() = default;
 	constexpr Quaternion(Quaternion&&) = default;
 	constexpr Quaternion(const Quaternion&) = default;
 	constexpr Quaternion(float nx, float ny, float nz, float nw) : x(nx), y(ny), z(nz), w(nw) {}
+
+	Quaternion(float angle, const Vector3& axis); // Construct from an angle and axis.
+	Quaternion(float ax, float ay, float az); // Construct from Euler angles
+	Quaternion(const Vector3& start, const Vector3& end); // Construct from the rotation difference between two direction vectors.
+	Quaternion(const Matrix4& m);
 
 	constexpr Quaternion& operator=(Quaternion&&) = default;
 	constexpr Quaternion& operator=(const Quaternion&) = default;
@@ -383,9 +390,30 @@ public:
 	float& operator[](size_t i) noexcept { return (&x)[i]; }
 	const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
+	constexpr void Set(float nx, float ny, float nz, float nw) { x = nx; y = ny; z = nz; w = nw; }
+
+	// Define from an angle and axis.
+	void FromAngleAxis(float angle, const Vector3& axis);
+	// Define from Euler angles
+	void FromEulerAngles(float x, float y, float z);
+	// Define from the rotation difference between two direction vectors.
+	void FromRotationTo(const Vector3& start, const Vector3& end);
+	void FromMatrix(const Matrix4& m0);
+
+	Quaternion Conjugate() const { return { -x, -y, -z, w }; }
 	float GetLength() const;
 	float GetLengthSquared() const;
 	Quaternion GetNormalize() const;
+	Quaternion Inverse() const;
+
+	// Return Euler angles in degrees.
+	Vector3 EulerAngles() const;
+	// Return yaw angle in degrees.
+	float YawAngle() const;
+	// Return pitch angle in degrees.
+	float PitchAngle() const;
+	// Return roll angle in degrees.
+	float RollAngle() const;
 
 	float x = 0.0f;
 	float y = 0.0f;
@@ -393,7 +421,11 @@ public:
 	float w = 1.0f;
 };
 
+inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon = EPSILON) noexcept;
+inline Quaternion Lerp(const Quaternion& a, const Quaternion& b, float x);
+inline Quaternion SLerp(const Quaternion& a, const Quaternion& b, float x);
 inline float DotProduct(const Quaternion& v1, const Quaternion& v2);
+inline Quaternion QuatPower(const Quaternion& in, const Quaternion& q0, float exponent);
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept;
 
@@ -403,6 +435,7 @@ inline Quaternion operator+(const Quaternion& Left, const Quaternion& Right) noe
 inline Quaternion operator*(float Left, const Quaternion& Right) noexcept;
 inline Quaternion operator*(const Quaternion& Left, float Right) noexcept;
 inline Quaternion operator*(const Quaternion& Left, const Quaternion& Right) noexcept;
+inline Quaternion operator/(const Quaternion& Left, float Right) noexcept;
 inline Quaternion operator/(const Quaternion& Left, const Quaternion& Right) noexcept;
 
 inline Quaternion& operator-=(Quaternion& Left, const Quaternion& Right) noexcept;
