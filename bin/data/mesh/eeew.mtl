@@ -1,0 +1,104 @@
+# mtl file of Cube 2 level
+
+newmtl slot959
+map_Kd packages\textures\nieb\garden\sand1.jpg
+
+newmtl slot982
+map_Kd packages\textures\medieval_soc\floor_steptop1.jpg
+
+newmtl slot994
+map_Kd packages\textures\medieval_soc\woodplank_1b.jpg
+
+newmtl slot996
+map_Kd packages\textures\medieval_soc\wood_browndark.jpg
+
+newmtl slot997
+map_Kd packages\textures\medieval_soc\wood_brownlight.jpg
+
+newmtl slot998
+map_Kd packages\textures\medieval_soc\wood_grey.jpg
+
+newmtl slot1000
+map_Kd packages\textures\medieval_soc\wood_trim1d.jpg
+
+newmtl slot1005
+map_Kd packages\textures\terrain_soc\rock_brown3.jpg
+
+newmtl slot1006
+map_Kd packages\textures\terrain_soc\rock_grey2.jpg
+
+newmtl slot1007
+map_Kd packages\textures\terrain_soc\rock_grey2vine.jpg
+
+newmtl slot1008
+map_Kd packages\textures\terrain_soc\rock_grey3.jpg
+
+newmtl slot1009
+map_Kd packages\textures\terrain_soc\ter_dirt1.jpg
+
+newmtl slot1013
+map_Kd packages\textures\nieb\autumn\face0a.jpg
+
+newmtl slot1014
+map_Kd packages\textures\nieb\autumn\face0b.jpg
+
+newmtl slot1015
+map_Kd packages\textures\nieb\autumn\face0c.jpg
+
+newmtl slot1017
+map_Kd packages\textures\nieb\autumn\face2.jpg
+
+newmtl slot1018
+map_Kd packages\textures\nieb\autumn\face3.jpg
+
+newmtl slot1019
+map_Kd packages\textures\nieb\autumn\face4.jpg
+
+newmtl slot1024
+map_Kd packages\textures\nieb\autumn\stone_rough.jpg
+
+newmtl slot1028
+map_Kd packages\textures\terrain_soc\ter_moss1.jpg
+
+newmtl slot1029
+map_Kd packages\textures\terrain_soc\ter_moss1.jpg
+
+newmtl slot1030
+map_Kd packages\textures\nieb\garden\sand1.jpg
+
+newmtl slot1031
+map_Kd packages\textures\terrain_soc\ter_moss1.jpg
+
+newmtl slot1032
+map_Kd packages\textures\terrain_soc\rock_brown2.jpg
+
+newmtl slot1033
+map_Kd packages\textures\medieval_soc\wood_brownlight.jpg
+
+newmtl slot1034
+map_Kd packages\textures\nieb\autumn\face0b.jpg
+
+newmtl slot1036
+map_Kd packages\textures\medieval_soc\woodplank_1b.jpg
+
+newmtl slot1037
+map_Kd packages\textures\medieval_soc\wood_trim1d.jpg
+
+newmtl slot1038
+map_Kd packages\textures\terrain_soc\ter_moss1.jpg
+
+newmtl slot1040
+map_Kd packages\textures\nieb\autumn\face0a.jpg
+
+newmtl slot1041
+map_Kd packages\textures\nieb\autumn\face0b.jpg
+
+newmtl slot1042
+map_Kd packages\textures\nieb\autumn\face0b.jpg
+
+newmtl slot1044
+map_Kd packages\textures\medieval_soc\floor_steptop1.jpg
+
+newmtl slot1045
+map_Kd packages\textures\terrain_soc\rock_grey2.jpg
+

@@ -72,6 +72,8 @@ public:
 		return false;
 	}
 
+	std::vector<Mesh>& GetSubMesh() { return m_subMeshes; }
+
 private:
 	bool loadObjFile(const char* fileName, const char* pathMaterialFiles = "./");
 	bool createBuffer();

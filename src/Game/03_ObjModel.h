@@ -17,6 +17,8 @@
 
 #include <glm/detail/type_vec2.hpp>
 
+#include <glm/gtx/intersect.hpp>
+
 /*
 - загрузка меша с файла
 - создание меша с заданием вершин

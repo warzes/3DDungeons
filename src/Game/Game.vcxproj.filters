@@ -21,6 +21,9 @@
     <ClCompile Include="mathc.c">
       <Filter>MicroEngine\temp</Filter>
     </ClCompile>
+    <ClCompile Include="LiliCollision.cpp">
+      <Filter>MicroEngine\TempCollide</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
@@ -73,6 +76,12 @@
     <ClInclude Include="HandmadeMath.h">
       <Filter>MicroEngine\temp</Filter>
     </ClInclude>
+    <ClInclude Include="LiliCollision.h">
+      <Filter>MicroEngine\TempCollide</Filter>
+    </ClInclude>
+    <ClInclude Include="X_TestFPS.h">
+      <Filter>ExampleDemo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">
@@ -95,6 +104,9 @@
     </Filter>
     <Filter Include="MicroEngine\UnitTest">
       <UniqueIdentifier>{7efbbe1e-7004-4640-a200-ce9cfc8aea12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\TempCollide">
+      <UniqueIdentifier>{3c3467f3-56b3-4049-a29b-237e68305e6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

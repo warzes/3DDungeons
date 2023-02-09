@@ -177,6 +177,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="LiliCollision.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mathc.c" />
     <ClCompile Include="MicroAdvance.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="ExampleDemo.h" />
     <ClInclude Include="HandmadeMath.h" />
+    <ClInclude Include="LiliCollision.h" />
     <ClInclude Include="mathc.h" />
     <ClInclude Include="MicroAdvance.h" />
     <ClInclude Include="MicroGeometry.h" />
@@ -205,6 +207,7 @@
     <ClInclude Include="UnitTestMath.h" />
     <ClInclude Include="X_CurrentTest.h" />
     <ClInclude Include="X_Debug.h" />
+    <ClInclude Include="X_TestFPS.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MicroGeometry.inl" />

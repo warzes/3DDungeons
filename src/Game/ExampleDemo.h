@@ -21,3 +21,7 @@
 #if EXAMPLE_X_DEBUG
 #	include "X_Debug.h"
 #endif
+
+#if EXAMPLE_X_TESTFPS
+#	include "X_TestFPS.h"
+#endif
