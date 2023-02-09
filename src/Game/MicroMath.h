@@ -37,6 +37,15 @@ constexpr const float    HALF_PI = PI * 0.5f;
 constexpr const float    DEG2RAD = PI / 180.0f;
 constexpr const float    RAD2DEG = 180.0f / PI;
 
+class Color;
+class Point2;
+class Vector2;
+class Vector3;
+class Vector4;
+class Quaternion;
+class Matrix3;
+class Matrix4;
+
 //=============================================================================
 // Core functions
 //=============================================================================
@@ -246,11 +255,17 @@ inline Vector3 Mix(const Vector3& u, const Vector3& v, float t);
 inline float Distance(const Vector3& v1, const Vector3& v2);
 inline float DotProduct(const Vector3& v1, const Vector3& v2);
 inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2);
-inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v);
+inline Vector3 Project(const Vector3& v1, const Vector3& v2);
+
+inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v); // TODO: удалить?
 // Return the angle between this vector and another vector in degrees.
 inline float Angle(const Vector3& v1, const Vector3& v2);
 // Returns this vector slide along a plane defined by the given normal.
 inline Vector3 Slide(const Vector3& v, const Vector3& normal);
+inline Vector3 Reflect(const Vector3& v, const Vector3& normal);
+inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle);
+inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f);
+inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3, float f);
 
 inline void Abs(Vector3& v);
 inline void Floor(Vector3& v);
@@ -269,6 +284,7 @@ inline Vector3 operator+(const Vector3& Left, const Vector3& Right) noexcept;
 inline Vector3 operator*(float Left, const Vector3& Right) noexcept;
 inline Vector3 operator*(const Vector3& Left, float Right) noexcept;
 inline Vector3 operator*(const Vector3& Left, const Vector3& Right) noexcept;
+inline Vector3 operator*(const Matrix3& m, const Vector3& v) noexcept;
 inline Vector3 operator/(float Left, const Vector3& Right) noexcept;
 inline Vector3 operator/(const Vector3& Left, float Right) noexcept;
 inline Vector3 operator/(const Vector3& Left, const Vector3& Right) noexcept;
@@ -314,7 +330,15 @@ public:
 };
 
 inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon = EPSILON) noexcept;
+inline Vector4 Min(const Vector4& v1, const Vector4& v2);
+inline Vector4 Max(const Vector4& v1, const Vector4& v2);
+inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x);
 inline float DotProduct(const Vector4& v1, const Vector4& v2);
+
+inline void Abs(Vector4& v);
+inline void Floor(Vector4& v);
+inline void Ceil(Vector4& v);
+inline void Round(Vector4& v);
 
 inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept;
 
@@ -328,6 +352,7 @@ inline Vector4 operator+(const Vector4& Left, const Vector4& Right) noexcept;
 inline Vector4 operator*(float Left, const Vector4& Right) noexcept;
 inline Vector4 operator*(const Vector4& Left, float Right) noexcept;
 inline Vector4 operator*(const Vector4& Left, const Vector4& Right) noexcept;
+inline Vector4 operator*(const Matrix4& m, const Vector4& v) noexcept;
 inline Vector4 operator/(float Left, const Vector4& Right) noexcept;
 inline Vector4 operator/(const Vector4& Left, float Right) noexcept;
 inline Vector4 operator/(const Vector4& Left, const Vector4& Right) noexcept;
@@ -368,7 +393,6 @@ public:
 	float w = 1.0f;
 };
 
-inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon = EPSILON) noexcept;
 inline float DotProduct(const Quaternion& v1, const Quaternion& v2);
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept;

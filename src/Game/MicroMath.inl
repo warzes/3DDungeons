@@ -149,7 +149,7 @@ inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, 
 	return Lerp(tmp0, tmp1, f);
 }
 
-inline Vector2 Bezier4(const Vector2 & v0, const Vector2 & v1, const Vector2 & v2, const Vector2 & v3, float f)
+inline Vector2 Bezier4(const Vector2& v0, const Vector2& v1, const Vector2& v2, const Vector2& v3, float f)
 {
 	Vector2 tmp0 = Lerp(v0, v1, f);
 	Vector2 tmp1 = Lerp(v1, v2, f);
@@ -250,6 +250,12 @@ inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2)
 		v1.x * v2.y - v1.y * v2.x
 	};
 }
+inline Vector3 Project(const Vector3& v0, const Vector3& v1)
+{
+	const float d = DotProduct(v1, v1);
+	const float s = DotProduct(v0, v1) / d;
+	return { v1.x * s, v1.y * s, v1.z * s };
+}
 
 inline float Angle(const Vector3& v1, const Vector3& v2)
 {
@@ -261,6 +267,41 @@ inline Vector3 Slide(const Vector3& v, const Vector3& normal)
 {
 	const float d = DotProduct(v, normal);
 	return v - normal * d; //проверить что так { v.x - normal.x * d, v.y - normal.y * d, v.z - normal.z * d };
+}
+
+inline Vector3 Reflect(const Vector3& v, const Vector3& normal)
+{
+	const float d = 2.0f * DotProduct(v, normal);
+	return normal * d - v; // проверить что так  { normal.x * d - v.x, normal.y * d - v.y, normal.z * d - v.z };
+}
+
+inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle)
+{
+	const float cs = cosf(angle);
+	const float sn = sinf(angle);
+	ra = ra.GetNormalize();
+	return {
+		v0.x * (cs + ra.x * ra.x * (1.0f - cs)) + v0.y * (ra.x * ra.y * (1.0f - cs) - ra.z * sn) + v0.z * (ra.x * ra.z * (1.0f - cs) + ra.y * sn),
+		v0.x * (ra.y * ra.x * (1.0f - cs) + ra.z * sn) + v0.y * (cs + ra.y * ra.y * (1.0f - cs)) + v0.z * (ra.y * ra.z * (1.0f - cs) - ra.x * sn),
+		v0.x * (ra.z * ra.x * (1.0f - cs) - ra.y * sn) + v0.y * (ra.z * ra.y * (1.0f - cs) + ra.x * sn) + v0.z * (cs + ra.z * ra.z * (1.0f - cs))
+	};
+}
+
+inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f)
+{
+	Vector3 tmp0 = Lerp(v0, v1, f);
+	Vector3 tmp1 = Lerp(v1, v2, f);
+	return Lerp(tmp0, tmp1, f);
+}
+
+inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3, float f)
+{
+	Vector3 tmp0 = Lerp(v0, v1, f);
+	Vector3 tmp1 = Lerp(v1, v2, f);
+	Vector3 tmp2 = Lerp(v2, v3, f);
+	Vector3 tmp3 = Lerp(tmp0, tmp1, f);
+	Vector3 tmp4 = Lerp(tmp1, tmp2, f);
+	return Lerp(tmp3, tmp4, f);
 }
 
 inline void Abs(Vector3& v)
@@ -303,6 +344,15 @@ inline Vector3 operator+(const Vector3& Left, const Vector3& Right) noexcept { r
 inline Vector3 operator*(float Left, const Vector3& Right) noexcept          { return {   Left * Right.x,   Left * Right.y,   Left * Right.z }; }
 inline Vector3 operator*(const Vector3& Left, float Right) noexcept          { return { Left.x * Right,   Left.y * Right,   Left.z * Right   }; }
 inline Vector3 operator*(const Vector3& Left, const Vector3& Right) noexcept { return { Left.x * Right.x, Left.y * Right.y, Left.z * Right.z }; }
+inline Vector3 operator*(const Matrix3& m, const Vector3& v) noexcept
+{
+	return {
+		m[0] * v.x + m[3] * v.y + m[6] * v.z,
+		m[1] * v.x + m[4] * v.y + m[7] * v.z,
+		m[2] * v.x + m[5] * v.y + m[8] * v.z
+	};
+}
+
 inline Vector3 operator/(float Left, const Vector3& Right) noexcept          { return {   Left / Right.x,   Left / Right.y,   Left / Right.z }; }
 inline Vector3 operator/(const Vector3& Left, float Right) noexcept          { return { Left.x / Right,   Left.y / Right,   Left.z / Right   }; }
 inline Vector3 operator/(const Vector3& Left, const Vector3& Right) noexcept { return { Left.x / Right.x, Left.y / Right.y, Left.z / Right.z }; }
@@ -335,7 +385,42 @@ inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon) noexcept
 		&& Equals(v1.z, v2.z, epsilon)
 		&& Equals(v1.w, v2.w, epsilon);
 }
+inline Vector4 Min(const Vector4& v1, const Vector4& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z), Min(v1.w, v2.w) }; }
+inline Vector4 Max(const Vector4& v1, const Vector4& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z), Max(v1.w, v2.w) }; }
+inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x) { return a + (b - a) * x; }
 inline float DotProduct(const Vector4& v1, const Vector4& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w; }
+
+inline void Abs(Vector4& v)
+{
+	v.x = fabsf(v.x);
+	v.y = fabsf(v.y);
+	v.z = fabsf(v.z);
+	v.w = fabsf(v.w);
+}
+
+inline void Floor(Vector4& v)
+{
+	v.x = floorf(v.x);
+	v.y = floorf(v.y);
+	v.z = floorf(v.z);
+	v.w = floorf(v.w);
+}
+
+inline void Ceil(Vector4& v)
+{
+	v.x = ceilf(v.x);
+	v.y = ceilf(v.y);
+	v.z = ceilf(v.z);
+	v.w = ceilf(v.w);
+}
+
+inline void Round(Vector4& v)
+{
+	v.x = roundf(v.x);
+	v.y = roundf(v.y);
+	v.z = roundf(v.z);
+	v.w = roundf(v.w);
+}
 
 inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }
 
@@ -349,6 +434,15 @@ inline Vector4 operator+(const Vector4& Left, const Vector4& Right) noexcept { r
 inline Vector4 operator*(float Left, const Vector4& Right) noexcept          { return {   Left * Right.x,   Left * Right.y,   Left * Right.z,   Left * Right.w }; }
 inline Vector4 operator*(const Vector4& Left, float Right) noexcept          { return { Left.x * Right,   Left.y * Right,   Left.z * Right,   Left.w * Right   }; }
 inline Vector4 operator*(const Vector4& Left, const Vector4& Right) noexcept { return { Left.x * Right.x, Left.y * Right.y, Left.z * Right.z, Left.w * Right.w }; }
+inline Vector4 operator*(const Matrix4& m, const Vector4& v) noexcept
+{
+	return {
+		m[0] * v.x + m[4] * v.y + m[ 8] * v.z + m[12] * v.w,
+		m[1] * v.x + m[5] * v.y + m[ 9] * v.z + m[13] * v.w,
+		m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w,
+		m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w
+	};
+}
 inline Vector4 operator/(float Left, const Vector4& Right) noexcept          { return {   Left / Right.x,   Left / Right.y,   Left / Right.z,   Left / Right.w }; }
 inline Vector4 operator/(const Vector4& Left, float Right) noexcept          { return { Left.x / Right,   Left.y / Right,   Left.z / Right,   Left.w / Right   }; }
 inline Vector4 operator/(const Vector4& Left, const Vector4& Right) noexcept { return { Left.x / Right.x, Left.y / Right.y, Left.z / Right.z, Left.w / Right.w }; }
