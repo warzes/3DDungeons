@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-https://github.com/felselva/mathc
-проверить Vector3::Slide
-exengine\math
+//https://github.com/felselva/mathc
+//проверить Vector3::Slide
+//exengine\math
 
 
 
@@ -81,9 +81,9 @@ inline bool operator==(const Color& Left, const Color& Right) noexcept;
 inline Color operator-(const Color& Left, const Color& Right) noexcept;
 inline Color operator+(const Color& Left, const Color& Right) noexcept;
 inline Color operator*(const Color& Left, const Color& Right) noexcept;
-inline Color& operator-=(Color &Left, const Color& Right) noexcept;
-inline Color& operator+=(Color &Left, const Color& Right) noexcept;
-inline Color& operator*=(Color &Left, const Color& Right) noexcept;
+inline Color& operator-=(Color& Left, const Color& Right) noexcept;
+inline Color& operator+=(Color& Left, const Color& Right) noexcept;
+inline Color& operator*=(Color& Left, const Color& Right) noexcept;
 
 //=============================================================================
 // Point2
@@ -120,14 +120,14 @@ inline Point2 operator/(int Left, const Point2& Right) noexcept;
 inline Point2 operator/(const Point2& Left, int Right) noexcept;
 inline Point2 operator/(const Point2& Left, const Point2& Right) noexcept;
 
-inline Point2& operator-=(Point2 &Left, int Right) noexcept;
-inline Point2& operator-=(Point2 &Left, const Point2& Right) noexcept;
-inline Point2& operator+=(Point2 &Left, int Right) noexcept;
-inline Point2& operator+=(Point2 &Left, const Point2& Right) noexcept;
-inline Point2& operator*=(Point2 &Left, int Right) noexcept;
-inline Point2& operator*=(Point2 &Left, const Point2& Right) noexcept;
-inline Point2& operator/=(Point2 &Left, int Right) noexcept;
-inline Point2& operator/=(Point2 &Left, const Point2& Right) noexcept;
+inline Point2& operator-=(Point2& Left, int Right) noexcept;
+inline Point2& operator-=(Point2& Left, const Point2& Right) noexcept;
+inline Point2& operator+=(Point2& Left, int Right) noexcept;
+inline Point2& operator+=(Point2& Left, const Point2& Right) noexcept;
+inline Point2& operator*=(Point2& Left, int Right) noexcept;
+inline Point2& operator*=(Point2& Left, const Point2& Right) noexcept;
+inline Point2& operator/=(Point2& Left, int Right) noexcept;
+inline Point2& operator/=(Point2& Left, const Point2& Right) noexcept;
 
 //=============================================================================
 // Vector2
@@ -147,6 +147,7 @@ public:
 	float& operator[](size_t i) noexcept { return (&x)[i]; }
 	const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
+	float GetAngle() const;
 	float GetLength() const;
 	float GetLengthSquared() const;
 	Vector2 GetNormalize() const;
@@ -155,12 +156,25 @@ public:
 	float y = 0.0f;
 };
 
-inline float Distance(const Vector2& v1, const Vector2& v2);
-inline float DotProduct(const Vector2& v1, const Vector2& v2);
+inline bool Equals(const Vector2& v1, const Vector2& v2, float epsilon = EPSILON) noexcept;
 inline Vector2 Min(const Vector2& v1, const Vector2& v2);
 inline Vector2 Max(const Vector2& v1, const Vector2& v2);
 inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x);
 inline Vector2 Mix(const Vector2& u, const Vector2& v, float a);
+inline float Distance(const Vector2& v1, const Vector2& v2);
+inline float DotProduct(const Vector2& v1, const Vector2& v2);
+inline Vector2 Project(const Vector2& v1, const Vector2& v2);
+inline Vector2 Slide(const Vector2& v, const Vector2& normal);
+inline Vector2 Reflect(const Vector2& v, const Vector2& normal);
+inline Vector2 Tangent(const Vector2& v);
+inline Vector2 Rotate(const Vector2& v, float angle);
+inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, float f);
+inline Vector2 Bezier4(const Vector2& v0, const Vector2& v1, const Vector2& v2, const Vector2& v3, float f);
+
+inline void Abs(Vector2& v);
+inline void Floor(Vector2& v);
+inline void Ceil(Vector2& v);
+inline void Round(Vector2& v);
 
 inline bool operator==(const Vector2& Left, const Vector2& Right) noexcept;
 
@@ -178,14 +192,14 @@ inline Vector2 operator/(float Left, const Vector2& Right) noexcept;
 inline Vector2 operator/(const Vector2& Left, float Right) noexcept;
 inline Vector2 operator/(const Vector2& Left, const Vector2& Right) noexcept;
 
-inline Vector2& operator-=(Vector2 &Left, float Right) noexcept;
-inline Vector2& operator-=(Vector2 &Left, const Vector2& Right) noexcept;
-inline Vector2& operator+=(Vector2 &Left, float Right) noexcept;
-inline Vector2& operator+=(Vector2 &Left, const Vector2& Right) noexcept;
-inline Vector2& operator*=(Vector2 &Left, float Right) noexcept;
-inline Vector2& operator*=(Vector2 &Left, const Vector2& Right) noexcept;
-inline Vector2& operator/=(Vector2 &Left, float Right) noexcept;
-inline Vector2& operator/=(Vector2 &Left, const Vector2& Right) noexcept;
+inline Vector2& operator-=(Vector2& Left, float Right) noexcept;
+inline Vector2& operator-=(Vector2& Left, const Vector2& Right) noexcept;
+inline Vector2& operator+=(Vector2& Left, float Right) noexcept;
+inline Vector2& operator+=(Vector2& Left, const Vector2& Right) noexcept;
+inline Vector2& operator*=(Vector2& Left, float Right) noexcept;
+inline Vector2& operator*=(Vector2& Left, const Vector2& Right) noexcept;
+inline Vector2& operator/=(Vector2& Left, float Right) noexcept;
+inline Vector2& operator/=(Vector2& Left, const Vector2& Right) noexcept;
 
 //=============================================================================
 // Vector3
@@ -223,18 +237,25 @@ public:
 	float z = 0.0f;
 };
 
-inline float Distance(const Vector3& v1, const Vector3& v2);
-inline float DotProduct(const Vector3& v1, const Vector3& v2);
-inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2);
+inline bool Equals(const Vector3& v1, const Vector3& v2, float epsilon = EPSILON) noexcept;
 inline Vector3 Min(const Vector3& v1, const Vector3& v2);
 inline Vector3 Max(const Vector3& v1, const Vector3& v2);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
 inline Vector3 Mix(const Vector3& u, const Vector3& v, float t);
+
+inline float Distance(const Vector3& v1, const Vector3& v2);
+inline float DotProduct(const Vector3& v1, const Vector3& v2);
+inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2);
 inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v);
 // Return the angle between this vector and another vector in degrees.
 inline float Angle(const Vector3& v1, const Vector3& v2);
 // Returns this vector slide along a plane defined by the given normal.
 inline Vector3 Slide(const Vector3& v, const Vector3& normal);
+
+inline void Abs(Vector3& v);
+inline void Floor(Vector3& v);
+inline void Ceil(Vector3& v);
+inline void Round(Vector3& v);
 
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept;
 
@@ -292,6 +313,7 @@ public:
 	float w = 0.0f;
 };
 
+inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon = EPSILON) noexcept;
 inline float DotProduct(const Vector4& v1, const Vector4& v2);
 
 inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept;
@@ -346,6 +368,7 @@ public:
 	float w = 1.0f;
 };
 
+inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon = EPSILON) noexcept;
 inline float DotProduct(const Quaternion& v1, const Quaternion& v2);
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept;

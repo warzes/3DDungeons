@@ -97,7 +97,6 @@ static inline void mat4x4_translate(mat4x4 T, Vector3 t)
 	T[2][3] = t[2];
 }
 
-//============================================================================
 
 
 void ExampleInit()
@@ -177,8 +176,8 @@ t t t 1
 	}
 
 
-	mfloat_t position[VEC3_SIZE];
-	mfloat_t t8[MAT4_SIZE]; // mathc.c
+	float position[VEC3_SIZE];
+	float t8[MAT4_SIZE]; // mathc.c
 	mat4_identity(t8);
 	mat4_translation(t8, t8, vec3(position, 2.0f, 3.0f, 4.0f));
 

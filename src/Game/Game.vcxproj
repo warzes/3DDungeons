@@ -192,6 +192,7 @@
     <ClInclude Include="03_ObjModel.h" />
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="ExampleDemo.h" />
+    <ClInclude Include="HandmadeMath.h" />
     <ClInclude Include="mathc.h" />
     <ClInclude Include="MicroAdvance.h" />
     <ClInclude Include="MicroGeometry.h" />
