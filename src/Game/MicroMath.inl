@@ -1495,13 +1495,14 @@ inline Matrix4 Matrix4Translate(const Vector3 & v)
 inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 {
 	Vector3 tmp_forward = (dir - eye).GetNormalize();
-	Vector3 tmp_side = CrossProduct(tmp_forward, up).GetNormalize();
-	Vector3 tmp_up = CrossProduct(tmp_side, tmp_forward);
+	Vector3 tmp_side = CrossProduct(up, tmp_forward).GetNormalize();
+	Vector3 tmp_up = CrossProduct(tmp_forward, tmp_side);
 	Matrix4 m0;
-	m0[0] = tmp_side.x;     m0[4] = tmp_side.y;     m0[ 8] = tmp_side.z;     m0[12] = -DotProduct(tmp_side, eye);
-	m0[1] = tmp_up.x;       m0[5] = tmp_up.y;       m0[ 9] = tmp_up.z;       m0[13] = -DotProduct(tmp_up, eye);
-	m0[2] = -tmp_forward.x; m0[6] = -tmp_forward.y; m0[10] = -tmp_forward.z; m0[14] = -DotProduct(tmp_forward, eye);
-	m0[3] = 0.0f;           m0[7] = 0.0f;           m0[11] = 0.0f;           m0[15] = 1.0f;
+	m0[0] = tmp_side.x;    m0[4] = tmp_side.y;    m0[ 8] = tmp_side.z;    m0[12] = -DotProduct(tmp_side, eye);
+	m0[1] = tmp_up.x;      m0[5] = tmp_up.y;      m0[ 9] = tmp_up.z;      m0[13] = -DotProduct(tmp_up, eye);
+	m0[2] = tmp_forward.x; m0[6] = tmp_forward.y; m0[10] = tmp_forward.z; m0[14] = -DotProduct(tmp_forward, eye);
+	m0[3] = 0.0f;          m0[7] = 0.0f;          m0[11] = 0.0f;          m0[15] = 1.0f;
+	return m0;
 }
 
 inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, float f)
@@ -1526,25 +1527,25 @@ inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, 
 	return result;
 }
 
-inline Matrix4 Perspective(float fov_y, float aspect, float n, float f)
+inline Matrix4 Perspective(float fov_y, float aspect, float zNear, float zFar)
 {
-	const float tan_half_fov_y = 1.0f / tanf(fov_y * 0.5f);
+	const float tanHalfFovY = tanf(fov_y * 0.5f);
 	Matrix4 mat;
-	mat[ 0] = 1.0f / aspect * tan_half_fov_y;
+	mat[ 0] = 1.0f / (aspect * tanHalfFovY);
 	mat[ 1] = 0.0f;
 	mat[ 2] = 0.0f;
 	mat[ 3] = 0.0f;
 	mat[ 4] = 0.0f;
-	mat[ 5] = 1.0f / tan_half_fov_y;
+	mat[ 5] = 1.0f / tanHalfFovY;
 	mat[ 6] = 0.0f;
 	mat[ 7] = 0.0f;
 	mat[ 8] = 0.0f;
 	mat[ 9] = 0.0f;
-	mat[10] = f / (n - f);
-	mat[11] = -1.0f;
+	mat[10] = (zFar + zNear) / (zFar - zNear);
+	mat[11] = 1.0f;
 	mat[12] = 0.0f;
 	mat[13] = 0.0f;
-	mat[14] = -(f * n) / (f - n);
+	mat[14] = -(2.0f * zFar * zNear) / (zFar - zNear);
 	mat[15] = 0.0f;
 	return mat;
 }

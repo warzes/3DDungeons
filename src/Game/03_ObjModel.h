@@ -1,5 +1,22 @@
 ﻿#pragma once
 
+#define GLM_FORCE_LEFT_HANDED
+#define GLM_FORCE_INLINE
+#define GLM_ENABLE_EXPERIMENTAL
+#define GLM_FORCE_XYZW_ONLY
+#define GLM_FORCE_SILENT_WARNINGS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/hash.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/normal.hpp>
+
+#include <glm/detail/type_vec2.hpp>
+
 /*
 - загрузка меша с файла
 - создание меша с заданием вершин
@@ -80,7 +97,7 @@ void ExampleInit()
 		customModel.Create(std::move(meshData));
 	}
 
-	cam.Look({ 0.0f, 3.0f, 6.0f }, { 0.0f, 0.0f, 0.0f });
+	cam.Look({ 0.0f, 3.0f, -6.0f }, { 0.0f, 0.0f, 0.0f });
 
 	//SetMouseVisible(false);
 }
@@ -122,9 +139,18 @@ void ExampleFrame()
 	if (MoveCamera) cam.Move(Movement);
 
 	Matrix4 view = cam.GetViewMatrix();
-	Matrix4 perpective = Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4 perpective = Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 1000.f);
 	Matrix4 world1;
-	Matrix4 world2 = Matrix4Translate({ 3.0f, 0.0f, 0.0f });
+	Matrix4 world2 = Matrix4Translate({ 3.0f, 0.2f, 0.4f });
+	Matrix4 PV = perpective * view;
+
+	Matrix4 lk2 = LookAt(Vector3(0.0f, 3.0f, -6.0f), Vector3(0.0f), Vector3(0.0f, 1.0f, 0.0f));
+
+	glm::mat4 lk = glm::lookAt(glm::vec3(0.0f, 3.0f, -6.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 perpective2 = glm::perspective(45.0f, GetWindowAspectRatio(), 0.01f, 1000.f);
+	glm::mat4 posm = glm::translate(glm::mat4(1.0f), { 3.0f, 0.2f, 0.4f });
+	glm::mat4 PV2 = perpective2 * lk;
+
 
 	shader.Bind();
 	shader.SetUniform(uniformViewMatrix, view);

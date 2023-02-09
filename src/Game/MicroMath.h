@@ -558,9 +558,9 @@ inline Matrix4 Matrix4Rotation(const Vector3& axis, float angle);
 inline Matrix4 Matrix4Rotation(const Quaternion& q);
 inline Matrix4 Matrix4Translate(const Vector3& v);
 
-inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up);
+inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up); // левосторонее
 inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, float f);
-inline Matrix4 Perspective(float fov_y, float aspect, float n, float f);
+inline Matrix4 Perspective(float fov_y, float aspect, float zNear, float zFar); // левосторонее
 
 inline Matrix4 operator*(float f, const Matrix4 &m) noexcept;
 inline Matrix4 operator*(const Matrix4 &m, float f) noexcept;

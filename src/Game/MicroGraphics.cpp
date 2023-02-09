@@ -308,7 +308,7 @@ bool Model::createBuffer()
 void ICamera::Look(const Vector3& Position, const Vector3& Reference)
 {
 	position = Position;
-	z = (Position - Reference).GetNormalize();
+	z = (Reference - Position).GetNormalize();
 	x = CrossProduct(Vector3::Up, z).GetNormalize();
 	y = CrossProduct(z, x);
 
@@ -323,11 +323,10 @@ void ICamera::Move(const Vector3& Movement)
 //-----------------------------------------------------------------------------
 void ICamera::calculateViewMatrix()
 {
-	m_viewMatrix = { 
-		x.x,                             y.x,                             z.x,                            0.0f, 
-		x.y,                             y.y,                             z.y,                            0.0f, 
-		x.z,                             y.z,                             z.z,                            0.0f, 
-		-DotProduct(x, position), -DotProduct(y, position), -DotProduct(z, position), 1.0f };
+	m_viewMatrix[0] = x.x;  m_viewMatrix[4] = x.y;  m_viewMatrix[8] = x.z;   m_viewMatrix[12] = -DotProduct(x, position);
+	m_viewMatrix[1] = y.x;  m_viewMatrix[5] = y.y;  m_viewMatrix[9] = y.z;   m_viewMatrix[13] = -DotProduct(y, position);
+	m_viewMatrix[2] = z.x;  m_viewMatrix[6] = z.y;  m_viewMatrix[10] = z.z;  m_viewMatrix[14] = -DotProduct(z, position);
+	m_viewMatrix[3] = 0.0f; m_viewMatrix[7] = 0.0f; m_viewMatrix[11] = 0.0f; m_viewMatrix[15] = 1.0f;
 }
 //-----------------------------------------------------------------------------
 bool FlyingCamera::OnKeys(short Keys, float FrameTime, Vector3& Movement)
@@ -340,7 +339,7 @@ bool FlyingCamera::OnKeys(short Keys, float FrameTime, Vector3& Movement)
 
 	Vector3 Up = y * Distance;
 	Vector3 Right = x * Distance;
-	Vector3 Forward = -z * Distance;
+	Vector3 Forward = z * Distance;
 
 	if (Keys & CAMERA_KEY_W) Movement += Forward;
 	if (Keys & CAMERA_KEY_S) Movement -= Forward;
@@ -356,7 +355,7 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 {
 	if (dx != 0)
 	{
-		const float DeltaX = (float)dx * m_sensitivity;
+		const float DeltaX = (float)dx * m_sensitivity * -1;
 
 		x = Rotate(x, DeltaX, Vector3::Up);
 		y = Rotate(y, DeltaX, Vector3::Up);
@@ -365,7 +364,7 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 
 	if (dy != 0)
 	{
-		const float DeltaY = (float)dy * m_sensitivity;
+		const float DeltaY = (float)dy * m_sensitivity * -1;
 
 		y = Rotate(y, DeltaY, x);
 		z = Rotate(z, DeltaY, x);
