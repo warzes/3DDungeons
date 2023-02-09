@@ -446,6 +446,12 @@ inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcep
 //=============================================================================
 // Matrix3
 //=============================================================================
+/*
+Matrix 3×3 representation:
+0/m11 3/m12 6/m13
+1/m21 4/m22 7/m23
+2/m31 5/m32 8/m33
+*/
 class Matrix3
 {
 public:
@@ -454,9 +460,9 @@ public:
 	constexpr Matrix3(const Matrix3&) = default;
 	constexpr Matrix3(const float* f);
 	constexpr Matrix3(
-		float m0, float m1, float m2,
-		float m3, float m4, float m5,
-		float m6, float m7, float m8);
+		float m11, float m12, float m13, 
+		float m21, float m22, float m23, 
+		float m31, float m32, float m33);
 
 	constexpr Matrix3& operator=(Matrix3&&) = default;
 	constexpr Matrix3& operator=(const Matrix3&) = default;
@@ -466,19 +472,42 @@ public:
 
 	constexpr void Set(const float* f);
 	constexpr void Set(
-		float m0, float m1, float m2,
-		float m3, float m4, float m5,
-		float m6, float m7, float m8);
+		float m11, float m12, float m13,
+		float m21, float m22, float m23,
+		float m31, float m32, float m33);
 	constexpr void Set(const Matrix3& M);
+
+	float GetDeterminant() const;
+
+	Matrix3 Transpose() const;
+
+	void Scale(const Vector3& scale);
 
 	float m[9] = {  1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
 };
 
+inline Matrix3 Matrix3Scale(const Vector3& scale);
+inline Matrix3 Matrix3RotationX(float angle);
+inline Matrix3 Matrix3RotationY(float angle);
+inline Matrix3 Matrix3RotationZ(float angle);
+inline Matrix3 Matrix3Rotation(const Quaternion& q);
+
+inline Matrix3 operator*(float f, const Matrix3 &m) noexcept;
+inline Matrix3 operator*(const Matrix3 &m, float f) noexcept;
+inline Matrix3 operator*(const Matrix3& Left, const Matrix3& Right) noexcept;
+
 //=============================================================================
 // Matrix4
 //=============================================================================
+/*
+Matrix 4×4 representation:
+0/m11 4/m12  8/m13 12/m14
+1/m21 5/m22  9/m23 13/m24
+2/m31 6/m32 10/m33 14/m34
+3/m41 7/m42 11/m43 15/m44
+*/
 class Matrix4
 {
 public:
@@ -487,10 +516,10 @@ public:
 	constexpr Matrix4(const Matrix4&) = default;
 	constexpr Matrix4(const float* f);
 	constexpr Matrix4(
-		float  m0, float  m1, float  m2, float  m3,
-		float  m4, float  m5, float  m6, float  m7,
-		float  m8, float  m9, float m10, float m11,
-		float m12, float m13, float m14, float m15);
+		float m11, float m12, float m13, float m14, 
+		float m21, float m22, float m23, float m24, 
+		float m31, float m32, float m33, float m34, 
+		float m41, float m42, float m43, float m44);
 
 	constexpr Matrix4& operator=(Matrix4&&) = default;
 	constexpr Matrix4& operator=(const Matrix4&) = default;
@@ -500,17 +529,42 @@ public:
 
 	constexpr void Set(const float* f);
 	constexpr void Set(
-		float  m0, float  m1, float  m2, float  m3,
-		float  m4, float  m5, float  m6, float  m7,
-		float  m8, float  m9, float m10, float m11,
-		float m12, float m13, float m14, float m15);
+		float m11, float m12, float m13, float m14,
+		float m21, float m22, float m23, float m24,
+		float m31, float m32, float m33, float m34,
+		float m41, float m42, float m43, float m44);
 	constexpr void Set(const Matrix4& M);
+
+	void Scale(const Vector3& scale);
+	void Translate(const Vector3& pos);
+
+	float GetDeterminant() const;
+
+	Matrix4 Transpose() const;
+	Matrix4 Inverse() const;
 
 	float m[16] = { 1.0f, 0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f, 1.0f };
 };
+
+inline Matrix4 Cofactor(const Matrix3&m);
+inline Matrix4 Matrix4Scale(const Vector3& scale);
+inline Matrix4 Matrix4RotationX(float angle);
+inline Matrix4 Matrix4RotationY(float angle);
+inline Matrix4 Matrix4RotationZ(float angle);
+inline Matrix4 Matrix4Rotation(const Vector3& axis, float angle);
+inline Matrix4 Matrix4Rotation(const Quaternion& q);
+inline Matrix4 Matrix4Translate(const Vector3& v);
+
+inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up);
+inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, float f);
+inline Matrix4 Perspective(float fov_y, float aspect, float n, float f);
+
+inline Matrix4 operator*(float f, const Matrix4 &m) noexcept;
+inline Matrix4 operator*(const Matrix4 &m, float f) noexcept;
+inline Matrix4 operator*(const Matrix4& Left, const Matrix4& Right) noexcept;
 
 //=============================================================================
 // Impl

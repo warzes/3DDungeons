@@ -86,8 +86,8 @@ public:
 class CObject
 {
 public:
-	Matrix3Old NormalMatrix;
-	Matrix4Old ModelMatrix;
+	Matrix3 NormalMatrix;
+	Matrix4 ModelMatrix;
 	Texture2D Texture;
 	MemoryBuffer Buffer;
 	GLuint VBO;
@@ -103,7 +103,7 @@ public:
 	void Destroy();
 	void InitVBO(int VertexOffset, int Stride);
 	void PrepareTriangles();
-	void SetModelMatrix(const Matrix4Old& ModelMatrix);
+	void SetModelMatrix(const Matrix4& ModelMatrix);
 
 private:
 	void SetDefaults();
@@ -210,11 +210,11 @@ void CObject::PrepareTriangles()
 	Max += RADIUS;
 }
 
-void CObject::SetModelMatrix(const Matrix4Old& ModelMatrix)
+void CObject::SetModelMatrix(const Matrix4& ModelMatrix)
 {
 	this->ModelMatrix = ModelMatrix;
 
-	NormalMatrix = Matrix3Old(ModelMatrix).Inverse().Transpose();
+	NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
 
 	PrepareTriangles();
 }
@@ -613,7 +613,7 @@ void ExampleFrame()
 	auto npos = GetCursorPosition();
 	if (npos.x != LastX || npos.y != LastY)
 	{
-		if (IsMouseButtonDown(1))
+		if (IsMouseButtonDown(MouseButton::Right))
 		{
 			cam->OnMouseMove(LastX - npos.x, LastY - npos.y);
 		}

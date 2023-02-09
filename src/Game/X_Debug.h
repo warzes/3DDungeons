@@ -181,7 +181,15 @@ t t t 1
 	mat4_identity(t8);
 	mat4_translation(t8, t8, vec3(position, 2.0f, 3.0f, 4.0f));
 
+	float t9[MAT3_SIZE];
+	mat3(t9,
+		11.0f, 12.0f, 13.0f,
+		21.0f, 22.0f, 23.0f,
+		31.0f, 32.0f, 33.0f);
 
+	Matrix3 mt9(11.0f, 12.0f, 13.0f,
+		21.0f, 22.0f, 23.0f,
+		31.0f, 32.0f, 33.0f);
 
 
 
@@ -239,8 +247,8 @@ void ExampleFrame()
 	bool MoveCamera = cam.OnKeys(Keys, 0.01f, Movement);
 	if( MoveCamera ) cam.Move(Movement);
 
-	Matrix4Old view = cam.GetViewMatrix();
-	Matrix4Old perpective = Matrix4Old::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4 view = cam.GetViewMatrix();
+	Matrix4 perpective = Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
 
 	Vector3 t1 = { -10.0f, 0.0f, 0.0f };
 	Vector3 t2 = { -5.0f, 5.0f, 0.0f };
@@ -250,7 +258,7 @@ void ExampleFrame()
 
 	//DebugDraw::DrawGrid(10.0f);
 
-	DebugDraw::Flush(view * perpective); // TODO: пофиксить порядок
+	//DebugDraw::Flush(view * perpective); // TODO: пофиксить порядок
 
 	puts(std::to_string(Angle(t1, t2)).c_str());
 

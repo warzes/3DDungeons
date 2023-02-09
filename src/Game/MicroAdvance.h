@@ -106,7 +106,7 @@ namespace DebugDraw
 	void DrawBone(const Vector3& center, const Vector3& end, unsigned rgb);
 	void DrawBoid(const Vector3& pos, Vector3 dir);
 
-	void Flush(const Matrix4Old& ViewProj);
+	void Flush(const Matrix4& ViewProj);
 
 	bool Init();
 	void Close();

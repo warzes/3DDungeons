@@ -747,36 +747,44 @@ inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcep
 
 inline constexpr Matrix3::Matrix3(const float* f)
 {
-	m[0] = f[0]; m[1] = f[1]; m[2] = f[2];
-	m[3] = f[3]; m[4] = f[4]; m[5] = f[5];
-	m[6] = f[6]; m[7] = f[7]; m[8] = f[8];
+	Set(f);
 }
 
 inline constexpr Matrix3::Matrix3(
-	float m0, float m1, float m2,
-	float m3, float m4, float m5,
-	float m6, float m7, float m8)
+	float m11, float m12, float m13,
+	float m21, float m22, float m23,
+	float m31, float m32, float m33)
 {
-	m[0] = m0; m[1] = m1; m[2] = m2;
-	m[3] = m3; m[4] = m4; m[5] = m5;
-	m[6] = m6; m[7] = m7; m[8] = m8;
+	Set(m11, m12, m13, m21, m22, m23, m31, m32, m33);
 }
 
 inline constexpr void Matrix3::Set(const float* f)
 {
-	m[0] = f[0]; m[1] = f[1]; m[2] = f[2];
-	m[3] = f[3]; m[4] = f[4]; m[5] = f[5];
-	m[6] = f[6]; m[7] = f[7]; m[8] = f[8];
+	m[0] = f[0];
+	m[1] = f[1];
+	m[2] = f[2];
+	m[3] = f[3];
+	m[4] = f[4];
+	m[5] = f[5];
+	m[6] = f[6];
+	m[7] = f[7];
+	m[8] = f[8];
 }
 
 inline constexpr void Matrix3::Set(
-	float m0, float m1, float m2,
-	float m3, float m4, float m5,
-	float m6, float m7, float m8)
+	float m11, float m12, float m13, 
+	float m21, float m22, float m23, 
+	float m31, float m32, float m33)
 {
-	m[0] = m0; m[1] = m1; m[2] = m2;
-	m[3] = m3; m[4] = m4; m[5] = m5;
-	m[6] = m6; m[7] = m7; m[8] = m8;
+	m[0] = m11;
+	m[1] = m21;
+	m[2] = m31;
+	m[3] = m12;
+	m[4] = m22;
+	m[5] = m32;
+	m[6] = m13;
+	m[7] = m23;
+	m[8] = m33;
 }
 
 inline constexpr void Matrix3::Set(const Matrix3& M)
@@ -786,28 +794,163 @@ inline constexpr void Matrix3::Set(const Matrix3& M)
 	m[6] = M[6]; m[7] = M[7]; m[8] = M[8];
 }
 
+inline float Matrix3::GetDeterminant() const
+{
+	return
+		  m[0] * m[4] * m[8]
+		+ m[3] * m[7] * m[2]
+		+ m[6] * m[1] * m[5]
+		- m[0] * m[7] * m[5]
+		- m[3] * m[1] * m[8]
+		- m[6] * m[4] * m[2];
+}
+
+inline Matrix3 Matrix3::Transpose() const
+{
+	Matrix3 transposed;
+	transposed[0] = m[0];
+	transposed[1] = m[3];
+	transposed[2] = m[6];
+	transposed[3] = m[1];
+	transposed[4] = m[4];
+	transposed[5] = m[7];
+	transposed[6] = m[2];
+	transposed[7] = m[5];
+	transposed[8] = m[8];
+	return transposed;
+}
+
+inline void Matrix3::Scale(const Vector3& scale)
+{
+	m[0] *= scale.x;
+	m[4] *= scale.y;
+	m[8] *= scale.z;
+}
+
+inline Matrix3 Matrix3Scale(const Vector3& scale)
+{
+	Matrix3 ret;
+	ret[0] = scale.x; ret[3] = 0.0f;    ret[6] = 0.0f;
+	ret[1] = 0.0f;    ret[4] = scale.y; ret[7] = 0.0f;
+	ret[2] = 0.0f;    ret[5] = 0.0f;    ret[8] = scale.z;
+	return ret;
+}
+
+inline Matrix3 Matrix3RotationX(float angle)
+{
+	const float c = cosf(angle);
+	const float s = sinf(angle);
+
+	Matrix3 ret;
+	ret[0] = 1.0f; ret[3] = 0.0f; ret[6] = 0.0f;
+	ret[1] = 0.0f; ret[4] = c;    ret[7] = -s;
+	ret[2] = 0.0f; ret[5] = s;    ret[8] = c;
+	return ret;
+}
+
+inline Matrix3 Matrix3RotationY(float angle)
+{
+	const float c = cosf(angle);
+	const float s = sinf(angle);
+
+	Matrix3 ret;
+	ret[0] = c;    ret[3] = 0.0f; ret[6] = s;
+	ret[1] = 0.0f; ret[4] = 1.0f; ret[7] = 0.0f;
+	ret[2] = -s;   ret[5] = 0.0f; ret[8] = c;
+	return ret;
+}
+
+inline Matrix3 Matrix3RotationZ(float angle)
+{
+	const float c = cosf(angle);
+	const float s = sinf(angle);
+
+	Matrix3 ret;
+	ret[0] = c;    ret[3] = -s;   ret[6] = 0.0f;
+	ret[1] = s;    ret[4] = c;    ret[7] = 0.0f;
+	ret[2] = 0.0f; ret[5] = 0.0f; ret[8] = 1.0f;
+	return ret;
+}
+
+inline Matrix3 Matrix3Rotation(const Quaternion& q)
+{
+	const float xx = q[0] * q[0];
+	const float yy = q[1] * q[1];
+	const float zz = q[2] * q[2];
+	const float xy = q[0] * q[1];
+	const float zw = q[2] * q[3];
+	const float xz = q[8] * q[0];
+	const float yw = q[1] * q[3];
+	const float yz = q[1] * q[2];
+	const float xw = q[0] * q[3];
+	Matrix3 ret;
+	ret[0] = 1.0f - 2.0f * (yy - zz);
+	ret[1] = 2.0f * (xy + zw);
+	ret[2] = 2.0f * (xz - yw);
+	ret[3] = 2.0f * (xy - zw);
+	ret[4] = 1.0f - 2.0f * (xx - zz);
+	ret[5] = 2.0f * (yz + xw);
+	ret[6] = 2.0f * (xz + yw);
+	ret[7] = 2.0f * (yz - xw);
+	ret[8] = 1.0f - 2.0f * (xx - yy);
+	return ret;
+}
+
+inline Matrix3 operator*(float f, const Matrix3& m) noexcept
+{
+	return m * f;
+}
+
+inline Matrix3 operator*(const Matrix3& m, float f) noexcept
+{
+	// не нужно возвращать через конструктор, иначе поменяется порядок строк/столбцов. В будущем пофиксить
+	Matrix3 result;
+	result[0] = m[0] * f;
+	result[1] = m[1] * f;
+	result[2] = m[2] * f;
+	result[3] = m[3] * f;
+	result[4] = m[4] * f;
+	result[5] = m[5] * f;
+	result[6] = m[6] * f;
+	result[7] = m[7] * f;
+	result[8] = m[8] * f;
+	return result;
+}
+
+inline Matrix3 operator*(const Matrix3& Left, const Matrix3& Right) noexcept
+{
+	Matrix3 multiplied;
+	multiplied[0] = Left[0] * Right[0] + Left[3] * Right[1] + Left[6] * Right[2];
+	multiplied[1] = Left[1] * Right[0] + Left[4] * Right[1] + Left[7] * Right[2];
+	multiplied[2] = Left[2] * Right[0] + Left[5] * Right[1] + Left[8] * Right[2];
+	multiplied[3] = Left[0] * Right[3] + Left[3] * Right[4] + Left[6] * Right[5];
+	multiplied[4] = Left[1] * Right[3] + Left[4] * Right[4] + Left[7] * Right[5];
+	multiplied[5] = Left[2] * Right[3] + Left[5] * Right[4] + Left[8] * Right[5];
+	multiplied[6] = Left[0] * Right[6] + Left[3] * Right[7] + Left[6] * Right[8];
+	multiplied[7] = Left[1] * Right[6] + Left[4] * Right[7] + Left[7] * Right[8];
+	multiplied[8] = Left[2] * Right[6] + Left[5] * Right[7] + Left[8] * Right[8];
+	return multiplied;
+}
+
 //=============================================================================
 // Matrix4 Impl
 //=============================================================================
 
 inline constexpr Matrix4::Matrix4(const float* f)
 {
-	m[ 0] = f[ 0]; m[ 1] = f[ 1]; m[ 2] = f[ 2]; m[ 3] = f[ 3];
-	m[ 4] = f[ 4]; m[ 5] = f[ 5]; m[ 6] = f[ 6]; m[ 7] = f[ 7];
-	m[ 8] = f[ 8]; m[ 9] = f[ 9]; m[10] = f[10]; m[11] = f[11];
-	m[12] = f[12]; m[13] = f[13]; m[14] = f[14]; m[15] = f[15];
+	Set(f);
 }
 
 inline constexpr Matrix4::Matrix4(
-	float  m0, float  m1, float  m2, float  m3,
-	float  m4, float  m5, float  m6, float  m7,
-	float  m8, float  m9, float m10, float m11,
-	float m12, float m13, float m14, float m15)
+	float m11, float m12, float m13, float m14, 
+	float m21, float m22, float m23, float m24, 
+	float m31, float m32, float m33, float m34, 
+	float m41, float m42, float m43, float m44)
 {
-	m[ 0] = m0;  m[ 1] = m1;  m[ 2] = m2;  m[ 3] = m3;
-	m[ 4] = m4;  m[ 5] = m5;  m[ 6] = m6;  m[ 7] = m7;
-	m[ 8] = m8;  m[ 9] = m9;  m[10] = m10; m[11] = m11;
-	m[12] = m12; m[13] = m13; m[14] = m14; m[15] = m15;
+	Set(m11, m12, m13, m14, 
+		m21, m22, m23, m24, 
+		m31, m32, m33, m34, 
+		m41, m42, m43, m44);
 }
 
 inline constexpr void Matrix4::Set(const float* f)
@@ -819,15 +962,27 @@ inline constexpr void Matrix4::Set(const float* f)
 }
 
 inline constexpr void Matrix4::Set(
-	float  m0, float  m1, float  m2, float  m3,
-	float  m4, float  m5, float  m6, float  m7,
-	float  m8, float  m9, float m10, float m11,
-	float m12, float m13, float m14, float m15)
+	float m11, float m12, float m13, float m14,
+	float m21, float m22, float m23, float m24,
+	float m31, float m32, float m33, float m34,
+	float m41, float m42, float m43, float m44)
 {
-	m[ 0] = m0;  m[ 1] = m1;  m[ 2] = m2;  m[ 3] = m3;
-	m[ 4] = m4;  m[ 5] = m5;  m[ 6] = m6;  m[ 7] = m7;
-	m[ 8] = m8;  m[ 9] = m9;  m[10] = m10; m[11] = m11;
-	m[12] = m12; m[13] = m13; m[14] = m14; m[15] = m15;
+	m[0] = m11;
+	m[1] = m21;
+	m[2] = m31;
+	m[3] = m41;
+	m[4] = m12;
+	m[5] = m22;
+	m[6] = m32;
+	m[7] = m42;
+	m[8] = m13;
+	m[9] = m23;
+	m[10] = m33;
+	m[11] = m43;
+	m[12] = m14;
+	m[13] = m24;
+	m[14] = m34;
+	m[15] = m44;
 }
 
 inline constexpr void Matrix4::Set(const Matrix4& M)
@@ -836,4 +991,610 @@ inline constexpr void Matrix4::Set(const Matrix4& M)
 	m[ 4] = M[ 4]; m[ 5] = M[ 5]; m[ 6] = M[6 ]; m[ 7] = M[ 7];
 	m[ 8] = M[ 8]; m[ 9] = M[ 9]; m[10] = M[10]; m[11] = M[11];
 	m[12] = M[12]; m[13] = M[13]; m[14] = M[14]; m[15] = M[15];
+}
+
+inline void Matrix4::Scale(const Vector3 & scale)
+{
+	m[0] *= scale.x;
+	m[5] *= scale.y;
+	m[10] *= scale.z;
+}
+
+inline void Matrix4::Translate(const Vector3& pos)
+{
+	m[12] += pos.x;
+	m[13] += pos.y;
+	m[14] += pos.z;
+}
+
+inline float Matrix4::GetDeterminant() const
+{
+	// TODO: рефакт
+	float m11 = m[0];
+	float m21 = m[1];
+	float m31 = m[2];
+	float m41 = m[3];
+	float m12 = m[4];
+	float m22 = m[5];
+	float m32 = m[6];
+	float m42 = m[7];
+	float m13 = m[8];
+	float m23 = m[9];
+	float m33 = m[10];
+	float m43 = m[11];
+	float m14 = m[12];
+	float m24 = m[13];
+	float m34 = m[14];
+	float m44 = m[15];
+	float determinant = 
+		  m14 * m23 * m32 * m41 - m13 * m24 * m32 * m41
+		- m14 * m22 * m33 * m41 + m12 * m24 * m33 * m41
+		+ m13 * m22 * m34 * m41 - m12 * m23 * m34 * m41
+		- m14 * m23 * m31 * m42 + m13 * m24 * m31 * m42
+		+ m14 * m21 * m33 * m42 - m11 * m24 * m33 * m42
+		- m13 * m21 * m34 * m42 + m11 * m23 * m34 * m42
+		+ m14 * m22 * m31 * m43 - m12 * m24 * m31 * m43
+		- m14 * m21 * m32 * m43 + m11 * m24 * m32 * m43
+		+ m12 * m21 * m34 * m43 - m11 * m22 * m34 * m43
+		- m13 * m22 * m31 * m44 + m12 * m23 * m31 * m44
+		+ m13 * m21 * m32 * m44 - m11 * m23 * m32 * m44
+		- m12 * m21 * m33 * m44 + m11 * m22 * m33 * m44;
+	return determinant;
+}
+
+inline Matrix4 Matrix4::Transpose() const
+{
+	Matrix4 transposed;
+	transposed[0] = m[0];
+	transposed[1] = m[4];
+	transposed[2] = m[8];
+	transposed[3] = m[12];
+	transposed[4] = m[1];
+	transposed[5] = m[5];
+	transposed[6] = m[9];
+	transposed[7] = m[13];
+	transposed[8] = m[2];
+	transposed[9] = m[6];
+	transposed[10] = m[10];
+	transposed[11] = m[14];
+	transposed[12] = m[3];
+	transposed[13] = m[7];
+	transposed[14] = m[11];
+	transposed[15] = m[15];
+	return transposed;
+}
+
+inline Matrix4 Matrix4::Inverse() const
+{
+	float m11 = m[0];
+	float m21 = m[1];
+	float m31 = m[2];
+	float m41 = m[3];
+	float m12 = m[4];
+	float m22 = m[5];
+	float m32 = m[6];
+	float m42 = m[7];
+	float m13 = m[8];
+	float m23 = m[9];
+	float m33 = m[10];
+	float m43 = m[11];
+	float m14 = m[12];
+	float m24 = m[13];
+	float m34 = m[14];
+	float m44 = m[15];
+	Matrix4 inverse;
+	inverse[0] = m22 * m33 * m44
+		- m22 * m43 * m34
+		- m23 * m32 * m44
+		+ m23 * m42 * m34
+		+ m24 * m32 * m43
+		- m24 * m42 * m33;
+	inverse[4] = -m12 * m33 * m44
+		+ m12 * m43 * m34
+		+ m13 * m32 * m44
+		- m13 * m42 * m34
+		- m14 * m32 * m43
+		+ m14 * m42 * m33;
+	inverse[8] = m12 * m23 * m44
+		- m12 * m43 * m24
+		- m13 * m22 * m44
+		+ m13 * m42 * m24
+		+ m14 * m22 * m43
+		- m14 * m42 * m23;
+	inverse[12] = -m12 * m23 * m34
+		+ m12 * m33 * m24
+		+ m13 * m22 * m34
+		- m13 * m32 * m24
+		- m14 * m22 * m33
+		+ m14 * m32 * m23;
+	inverse[1] = -m21 * m33 * m44
+		+ m21 * m43 * m34
+		+ m23 * m31 * m44
+		- m23 * m41 * m34
+		- m24 * m31 * m43
+		+ m24 * m41 * m33;
+	inverse[5] = m11 * m33 * m44
+		- m11 * m43 * m34
+		- m13 * m31 * m44
+		+ m13 * m41 * m34
+		+ m14 * m31 * m43
+		- m14 * m41 * m33;
+	inverse[9] = -m11 * m23 * m44
+		+ m11 * m43 * m24
+		+ m13 * m21 * m44
+		- m13 * m41 * m24
+		- m14 * m21 * m43
+		+ m14 * m41 * m23;
+	inverse[13] = m11 * m23 * m34
+		- m11 * m33 * m24
+		- m13 * m21 * m34
+		+ m13 * m31 * m24
+		+ m14 * m21 * m33
+		- m14 * m31 * m23;
+	inverse[2] = m21 * m32 * m44
+		- m21 * m42 * m34
+		- m22 * m31 * m44
+		+ m22 * m41 * m34
+		+ m24 * m31 * m42
+		- m24 * m41 * m32;
+	inverse[6] = -m11 * m32 * m44
+		+ m11 * m42 * m34
+		+ m12 * m31 * m44
+		- m12 * m41 * m34
+		- m14 * m31 * m42
+		+ m14 * m41 * m32;
+	inverse[10] = m11 * m22 * m44
+		- m11 * m42 * m24
+		- m12 * m21 * m44
+		+ m12 * m41 * m24
+		+ m14 * m21 * m42
+		- m14 * m41 * m22;
+	inverse[14] = -m11 * m22 * m34
+		+ m11 * m32 * m24
+		+ m12 * m21 * m34
+		- m12 * m31 * m24
+		- m14 * m21 * m32
+		+ m14 * m31 * m22;
+	inverse[3] = -m21 * m32 * m43
+		+ m21 * m42 * m33
+		+ m22 * m31 * m43
+		- m22 * m41 * m33
+		- m23 * m31 * m42
+		+ m23 * m41 * m32;
+	inverse[7] = m11 * m32 * m43
+		- m11 * m42 * m33
+		- m12 * m31 * m43
+		+ m12 * m41 * m33
+		+ m13 * m31 * m42
+		- m13 * m41 * m32;
+	inverse[11] = -m11 * m22 * m43
+		+ m11 * m42 * m23
+		+ m12 * m21 * m43
+		- m12 * m41 * m23
+		- m13 * m21 * m42
+		+ m13 * m41 * m22;
+	inverse[15] = m11 * m22 * m33
+		- m11 * m32 * m23
+		- m12 * m21 * m33
+		+ m12 * m31 * m23
+		+ m13 * m21 * m32
+		- m13 * m31 * m22;
+	float inverted_determinant = 1.0f / (m11 * inverse[0] + m21 * inverse[4] + m31 * inverse[8] + m41 * inverse[12]);
+	Matrix4 result;
+	result[0] = inverse[0] * inverted_determinant;
+	result[1] = inverse[1] * inverted_determinant;
+	result[2] = inverse[2] * inverted_determinant;
+	result[3] = inverse[3] * inverted_determinant;
+	result[4] = inverse[4] * inverted_determinant;
+	result[5] = inverse[5] * inverted_determinant;
+	result[6] = inverse[6] * inverted_determinant;
+	result[7] = inverse[7] * inverted_determinant;
+	result[8] = inverse[8] * inverted_determinant;
+	result[9] = inverse[9] * inverted_determinant;
+	result[10] = inverse[10] * inverted_determinant;
+	result[11] = inverse[11] * inverted_determinant;
+	result[12] = inverse[12] * inverted_determinant;
+	result[13] = inverse[13] * inverted_determinant;
+	result[14] = inverse[14] * inverted_determinant;
+	result[15] = inverse[15] * inverted_determinant;
+	return result;
+}
+
+inline Matrix4 Cofactor(const Matrix3& m0)
+{
+	Matrix4 cofactor;
+	Matrix3 minor;
+	minor[0] = m0[5];
+	minor[1] = m0[6];
+	minor[2] = m0[7];
+	minor[3] = m0[9];
+	minor[4] = m0[10];
+	minor[5] = m0[11];
+	minor[6] = m0[13];
+	minor[7] = m0[14];
+	minor[8] = m0[15];
+	cofactor[0] = minor.GetDeterminant();
+	minor[0] = m0[4];
+	minor[1] = m0[6];
+	minor[2] = m0[7];
+	minor[3] = m0[8];
+	minor[4] = m0[10];
+	minor[5] = m0[11];
+	minor[6] = m0[12];
+	minor[7] = m0[14];
+	minor[8] = m0[15];
+	cofactor[1] = -minor.GetDeterminant();
+	minor[0] = m0[4];
+	minor[1] = m0[5];
+	minor[2] = m0[7];
+	minor[3] = m0[8];
+	minor[4] = m0[9];
+	minor[5] = m0[11];
+	minor[6] = m0[12];
+	minor[7] = m0[13];
+	minor[8] = m0[15];
+	cofactor[2] = minor.GetDeterminant();
+	minor[0] = m0[4];
+	minor[1] = m0[5];
+	minor[2] = m0[6];
+	minor[3] = m0[8];
+	minor[4] = m0[9];
+	minor[5] = m0[10];
+	minor[6] = m0[12];
+	minor[7] = m0[13];
+	minor[8] = m0[14];
+	cofactor[3] = -minor.GetDeterminant();
+	minor[0] = m0[1];
+	minor[1] = m0[2];
+	minor[2] = m0[3];
+	minor[3] = m0[9];
+	minor[4] = m0[10];
+	minor[5] = m0[11];
+	minor[6] = m0[13];
+	minor[7] = m0[14];
+	minor[8] = m0[15];
+	cofactor[4] = -minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[2];
+	minor[2] = m0[3];
+	minor[3] = m0[8];
+	minor[4] = m0[10];
+	minor[5] = m0[11];
+	minor[6] = m0[12];
+	minor[7] = m0[14];
+	minor[8] = m0[15];
+	cofactor[5] = minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[1];
+	minor[2] = m0[3];
+	minor[3] = m0[8];
+	minor[4] = m0[9];
+	minor[5] = m0[11];
+	minor[6] = m0[12];
+	minor[7] = m0[13];
+	minor[8] = m0[15];
+	cofactor[6] = -minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[1];
+	minor[2] = m0[2];
+	minor[3] = m0[8];
+	minor[4] = m0[9];
+	minor[5] = m0[10];
+	minor[6] = m0[12];
+	minor[7] = m0[13];
+	minor[8] = m0[14];
+	cofactor[7] = minor.GetDeterminant();
+	minor[0] = m0[1];
+	minor[1] = m0[2];
+	minor[2] = m0[3];
+	minor[3] = m0[5];
+	minor[4] = m0[6];
+	minor[5] = m0[7];
+	minor[6] = m0[13];
+	minor[7] = m0[14];
+	minor[8] = m0[15];
+	cofactor[8] = minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[2];
+	minor[2] = m0[3];
+	minor[3] = m0[4];
+	minor[4] = m0[6];
+	minor[5] = m0[7];
+	minor[6] = m0[12];
+	minor[7] = m0[14];
+	minor[8] = m0[15];
+	cofactor[9] = -minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[1];
+	minor[2] = m0[3];
+	minor[3] = m0[4];
+	minor[4] = m0[5];
+	minor[5] = m0[7];
+	minor[6] = m0[12];
+	minor[7] = m0[13];
+	minor[8] = m0[15];
+	cofactor[10] = minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[1];
+	minor[2] = m0[2];
+	minor[3] = m0[4];
+	minor[4] = m0[5];
+	minor[5] = m0[6];
+	minor[6] = m0[12];
+	minor[7] = m0[13];
+	minor[8] = m0[14];
+	cofactor[11] = -minor.GetDeterminant();
+	minor[0] = m0[1];
+	minor[1] = m0[2];
+	minor[2] = m0[3];
+	minor[3] = m0[5];
+	minor[4] = m0[6];
+	minor[5] = m0[7];
+	minor[6] = m0[9];
+	minor[7] = m0[10];
+	minor[8] = m0[11];
+	cofactor[12] = -minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[2];
+	minor[2] = m0[3];
+	minor[3] = m0[4];
+	minor[4] = m0[6];
+	minor[5] = m0[7];
+	minor[6] = m0[8];
+	minor[7] = m0[10];
+	minor[8] = m0[11];
+	cofactor[13] = minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[1];
+	minor[2] = m0[3];
+	minor[3] = m0[4];
+	minor[4] = m0[5];
+	minor[5] = m0[7];
+	minor[6] = m0[8];
+	minor[7] = m0[9];
+	minor[8] = m0[11];
+	cofactor[14] = -minor.GetDeterminant();
+	minor[0] = m0[0];
+	minor[1] = m0[1];
+	minor[2] = m0[2];
+	minor[3] = m0[4];
+	minor[4] = m0[5];
+	minor[5] = m0[6];
+	minor[6] = m0[8];
+	minor[7] = m0[9];
+	minor[8] = m0[10];
+	cofactor[15] = minor.GetDeterminant();
+	return cofactor;
+}
+
+inline Matrix4 Matrix4Scale(const Vector3& scale)
+{
+	Matrix4 mat;
+	mat[0] = scale.x; mat[4] = 0.0f;    mat[ 8] = 0.0f;    mat[12] = 0.0f;
+	mat[1] = 0.0f;    mat[5] = scale.y; mat[ 9] = 0.0f;    mat[13] = 0.0f;
+	mat[2] = 0.0f;    mat[6] = 0.0f;    mat[10] = scale.z; mat[14] = 0.0f;
+	mat[3] = 0.0f;    mat[7] = 0.0f;    mat[11] = 0.0f;    mat[15] = 1.0f;
+	return mat;
+}
+
+inline Matrix4 Matrix4RotationX(float angle)
+{
+	const float c = cosf(angle);
+	const float s = sinf(angle);
+
+	Matrix4 ret;
+	ret[0] = 1.0f; ret[4] = 0.0f; ret[ 8] = 0.0f; ret[12] = 0.0f;
+	ret[1] = 0.0f; ret[5] = c;    ret[ 9] = -s;   ret[13] = 0.0f;
+	ret[2] = 0.0f; ret[6] = s;    ret[10] = c;    ret[14] = 0.0f;
+	ret[3] = 0.0f; ret[7] = 0.0f; ret[11] = 0.0f; ret[15] = 1.0f;
+	return ret;
+}
+
+inline Matrix4 Matrix4RotationY(float angle)
+{
+	const float s = sinf(angle);
+	const float c = cosf(angle);
+
+	Matrix4 mat;
+	mat[0] = c;    mat[4] = 0.0f; mat[ 8] = s;    mat[12] = 0.0f;
+	mat[1] = 0.0f; mat[5] = 1.0f; mat[ 9] = 0.0f; mat[13] = 0.0f;
+	mat[2] = -s;   mat[6] = 0.0f; mat[10] = c;    mat[14] = 0.0f;
+	mat[3] = 0.0f; mat[7] = 0.0f; mat[11] = 0.0f; mat[15] = 1.0f;
+	return mat;
+}
+
+inline Matrix4 Matrix4RotationZ(float angle)
+{
+	const float s = sinf(angle);
+	const float c = cosf(angle);
+
+	Matrix4 mat;
+	mat[0] = c;    mat[4] = -s;   mat[ 8] = 0.0f; mat[12] = 0.0f;
+	mat[1] = s;    mat[5] = c;    mat[ 9] = 0.0f; mat[13] = 0.0f;
+	mat[2] = 0.0f; mat[6] = 0.0f; mat[10] = 1.0f; mat[14] = 0.0f;
+	mat[3] = 0.0f; mat[7] = 0.0f; mat[11] = 0.0f; mat[15] = 1.0f;
+	return mat;
+}
+
+inline Matrix4 Matrix4Rotation(const Vector3& axis, float angle)
+{
+	const float s = sinf(angle);
+	const float c = cosf(angle);
+	const float one_c = 1.0f - c;
+
+	const float xx = axis.x * axis.x;
+	const float xy = axis.x * axis.y;
+	const float xz = axis.x * axis.z;
+	const float yy = axis.y * axis.y;
+	const float yz = axis.y * axis.z;
+	const float zz = axis.z * axis.z;
+	const float l = xx + yy + zz;
+	const float sqrt_l = sqrtf(l);
+
+	Matrix4 mat;
+	mat[0] = (xx + (yy + zz) * c) / l;
+	mat[1] = (xy * one_c + axis.z * sqrt_l * s) / l;
+	mat[2] = (xz * one_c - axis.y * sqrt_l * s) / l;
+	mat[3] = 0.0f;
+	mat[4] = (xy * one_c - axis.z * sqrt_l * s) / l;
+	mat[5] = (yy + (xx + zz) * c) / l;
+	mat[6] = (yz * one_c + axis.x * sqrt_l * s) / l;
+	mat[7] = 0.0f;
+	mat[8] = (xz * one_c + axis.y * sqrt_l * s) / l;
+	mat[9] = (yz * one_c - axis.x * sqrt_l * s) / l;
+	mat[10] = (zz + (xx + yy) * c) / l;
+	mat[11] = 0.0f;
+	mat[12] = 0.0f;
+	mat[13] = 0.0f;
+	mat[14] = 0.0f;
+	mat[15] = 1.0f;
+	return mat;
+}
+
+inline Matrix4 Matrix4Rotation(const Quaternion& q0)
+{
+	const float xx = q0[0] * q0[0];
+	const float yy = q0[1] * q0[1];
+	const float zz = q0[2] * q0[2];
+	const float xy = q0[0] * q0[1];
+	const float zw = q0[2] * q0[3];
+	const float xz = q0[0] * q0[2];
+	const float yw = q0[1] * q0[3];
+	const float yz = q0[1] * q0[2];
+	const float xw = q0[0] * q0[3];
+	Matrix4 mat;
+	mat[0] = 1.0f - 2.0f * (yy + zz);
+	mat[1] = 2.0f * (xy + zw);
+	mat[2] = 2.0f * (xz - yw);
+	mat[3] = 0.0f;
+	mat[4] = 2.0f * (xy - zw);
+	mat[5] = 1.0f - 2.0f * (xx + zz);
+	mat[6] = 2.0f * (yz + xw);
+	mat[7] = 0.0f;
+	mat[8] = 2.0f * (xz + yw);
+	mat[9] = 2.0f * (yz - xw);
+	mat[10] = 1.0f - 2.0f * (xx + yy);
+	mat[11] = 0.0f;
+	mat[12] = 0.0f;
+	mat[13] = 0.0f;
+	mat[14] = 0.0f;
+	mat[15] = 1.0f;
+	return mat;
+}
+
+inline Matrix4 Matrix4Translate(const Vector3 & v)
+{
+	Matrix4 mat;
+	mat[0] = 1.0f; mat[4] = 0.0f; mat[ 8] = 0.0f; mat[12] = v.x;
+	mat[1] = 0.0f; mat[5] = 1.0f; mat[ 9] = 0.0f; mat[13] = v.y;
+	mat[2] = 0.0f; mat[6] = 0.0f; mat[10] = 1.0f; mat[14] = v.z;
+	mat[3] = 0.0f; mat[7] = 0.0f; mat[11] = 0.0f; mat[15] = 1.0f;
+	return mat;
+}
+
+inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
+{
+	Vector3 tmp_forward = (dir - eye).GetNormalize();
+	Vector3 tmp_side = CrossProduct(tmp_forward, up).GetNormalize();
+	Vector3 tmp_up = CrossProduct(tmp_side, tmp_forward);
+	Matrix4 m0;
+	m0[0] = tmp_side.x;     m0[4] = tmp_side.y;     m0[ 8] = tmp_side.z;     m0[12] = -DotProduct(tmp_side, eye);
+	m0[1] = tmp_up.x;       m0[5] = tmp_up.y;       m0[ 9] = tmp_up.z;       m0[13] = -DotProduct(tmp_up, eye);
+	m0[2] = -tmp_forward.x; m0[6] = -tmp_forward.y; m0[10] = -tmp_forward.z; m0[14] = -DotProduct(tmp_forward, eye);
+	m0[3] = 0.0f;           m0[7] = 0.0f;           m0[11] = 0.0f;           m0[15] = 1.0f;
+}
+
+inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, float f)
+{
+	Matrix4 result;
+	result[0] = 2.0f / (right - left);
+	result[1] = 0.0f;
+	result[2] = 0.0f;
+	result[3] = 0.0f;
+	result[4] = 0.0f;
+	result[5] = 2.0f / (top - bottom);
+	result[6] = 0.0f;
+	result[7] = 0.0f;
+	result[8] = 0.0f;
+	result[9] = 0.0f;
+	result[10] = -2.0f / (f - n);
+	result[11] = 0.0f;
+	result[12] = -((right + left) / (right - left));
+	result[13] = -((top + bottom) / (top - bottom));
+	result[14] = -((f + n) / (f - n));
+	result[15] = 1.0f;
+	return result;
+}
+
+inline Matrix4 Perspective(float fov_y, float aspect, float n, float f)
+{
+	const float tan_half_fov_y = 1.0f / tanf(fov_y * 0.5f);
+	Matrix4 mat;
+	mat[ 0] = 1.0f / aspect * tan_half_fov_y;
+	mat[ 1] = 0.0f;
+	mat[ 2] = 0.0f;
+	mat[ 3] = 0.0f;
+	mat[ 4] = 0.0f;
+	mat[ 5] = 1.0f / tan_half_fov_y;
+	mat[ 6] = 0.0f;
+	mat[ 7] = 0.0f;
+	mat[ 8] = 0.0f;
+	mat[ 9] = 0.0f;
+	mat[10] = f / (n - f);
+	mat[11] = -1.0f;
+	mat[12] = 0.0f;
+	mat[13] = 0.0f;
+	mat[14] = -(f * n) / (f - n);
+	mat[15] = 0.0f;
+	return mat;
+}
+
+inline Matrix4 operator*(float f, const Matrix4& m) noexcept
+{
+	return m * f;
+}
+
+inline Matrix4 operator*(const Matrix4& m, float f) noexcept
+{
+	// не нужно возвращать через конструктор, иначе поменяется порядок строк/столбцов. В будущем пофиксить
+	Matrix4 result;
+	result[0] = m[0] * f;
+	result[1] = m[1] * f;
+	result[2] = m[2] * f;
+	result[3] = m[3] * f;
+	result[4] = m[4] * f;
+	result[5] = m[5] * f;
+	result[6] = m[6] * f;
+	result[7] = m[7] * f;
+	result[8] = m[8] * f;
+	result[9] = m[9] * f;
+	result[10] = m[10] * f;
+	result[11] = m[11] * f;
+	result[12] = m[12] * f;
+	result[13] = m[13] * f;
+	result[14] = m[14] * f;
+	result[15] = m[15] * f;
+	return result;
+}
+
+inline Matrix4 operator*(const Matrix4& m0, const Matrix4& m1) noexcept
+{
+	Matrix4 multiplied;
+	multiplied[0] = m0[0] * m1[0] + m0[4] * m1[1] + m0[8] * m1[2] + m0[12] * m1[3];
+	multiplied[1] = m0[1] * m1[0] + m0[5] * m1[1] + m0[9] * m1[2] + m0[13] * m1[3];
+	multiplied[2] = m0[2] * m1[0] + m0[6] * m1[1] + m0[10] * m1[2] + m0[14] * m1[3];
+	multiplied[3] = m0[3] * m1[0] + m0[7] * m1[1] + m0[11] * m1[2] + m0[15] * m1[3];
+	multiplied[4] = m0[0] * m1[4] + m0[4] * m1[5] + m0[8] * m1[6] + m0[12] * m1[7];
+	multiplied[5] = m0[1] * m1[4] + m0[5] * m1[5] + m0[9] * m1[6] + m0[13] * m1[7];
+	multiplied[6] = m0[2] * m1[4] + m0[6] * m1[5] + m0[10] * m1[6] + m0[14] * m1[7];
+	multiplied[7] = m0[3] * m1[4] + m0[7] * m1[5] + m0[11] * m1[6] + m0[15] * m1[7];
+	multiplied[8] = m0[0] * m1[8] + m0[4] * m1[9] + m0[8] * m1[10] + m0[12] * m1[11];
+	multiplied[9] = m0[1] * m1[8] + m0[5] * m1[9] + m0[9] * m1[10] + m0[13] * m1[11];
+	multiplied[10] = m0[2] * m1[8] + m0[6] * m1[9] + m0[10] * m1[10] + m0[14] * m1[11];
+	multiplied[11] = m0[3] * m1[8] + m0[7] * m1[9] + m0[11] * m1[10] + m0[15] * m1[11];
+	multiplied[12] = m0[0] * m1[12] + m0[4] * m1[13] + m0[8] * m1[14] + m0[12] * m1[15];
+	multiplied[13] = m0[1] * m1[12] + m0[5] * m1[13] + m0[9] * m1[14] + m0[13] * m1[15];
+	multiplied[14] = m0[2] * m1[12] + m0[6] * m1[13] + m0[10] * m1[14] + m0[14] * m1[15];
+	multiplied[15] = m0[3] * m1[12] + m0[7] * m1[13] + m0[11] * m1[14] + m0[15] * m1[15];
+	return multiplied;
 }

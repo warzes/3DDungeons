@@ -121,10 +121,10 @@ void ExampleFrame()
 	bool MoveCamera = cam.OnKeys(Keys, 0.01f, Movement);
 	if (MoveCamera) cam.Move(Movement);
 
-	Matrix4Old view = cam.GetViewMatrix();
-	Matrix4Old perpective = Matrix4Old::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
-	Matrix4Old world1;
-	Matrix4Old world2 = Matrix4Old::Translate({ 3.0f, 0.0f, 0.0f });
+	Matrix4 view = cam.GetViewMatrix();
+	Matrix4 perpective = Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4 world1;
+	Matrix4 world2 = Matrix4Translate({ 3.0f, 0.0f, 0.0f });
 
 	shader.Bind();
 	shader.SetUniform(uniformViewMatrix, view);
@@ -135,9 +135,6 @@ void ExampleFrame()
 
 	shader.SetUniform(uniformWorldMatrix, world2);
 	customModel.Draw();
-
-
-
 
 	DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, { -10.0f, 2.0f, 5.0f }, RED);
 
