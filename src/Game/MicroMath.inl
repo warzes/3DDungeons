@@ -1544,14 +1544,14 @@ inline Matrix4 Matrix4Translate(const Vector3 & v)
 
 inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 {
-	Vector3 tmp_forward = (dir - eye).GetNormalize();
-	Vector3 tmp_side = CrossProduct(up, tmp_forward).GetNormalize();
-	Vector3 tmp_up = CrossProduct(tmp_forward, tmp_side);
+	Vector3 forward = (dir - eye).GetNormalize();
+	Vector3 side = CrossProduct(up, forward).GetNormalize();
+	Vector3 up = CrossProduct(forward, side);
 	Matrix4 m0;
-	m0[0] = tmp_side.x;    m0[4] = tmp_side.y;    m0[ 8] = tmp_side.z;    m0[12] = -DotProduct(tmp_side, eye);
-	m0[1] = tmp_up.x;      m0[5] = tmp_up.y;      m0[ 9] = tmp_up.z;      m0[13] = -DotProduct(tmp_up, eye);
-	m0[2] = tmp_forward.x; m0[6] = tmp_forward.y; m0[10] = tmp_forward.z; m0[14] = -DotProduct(tmp_forward, eye);
-	m0[3] = 0.0f;          m0[7] = 0.0f;          m0[11] = 0.0f;          m0[15] = 1.0f;
+	m0[0] = side.x;    m0[4] = side.y;    m0[ 8] = side.z;    m0[12] = -DotProduct(side, eye);
+	m0[1] = up.x;      m0[5] = up.y;      m0[ 9] = up.z;      m0[13] = -DotProduct(up, eye);
+	m0[2] = forward.x; m0[6] = forward.y; m0[10] = forward.z; m0[14] = -DotProduct(forward, eye);
+	m0[3] = 0.0f;      m0[7] = 0.0f;      m0[11] = 0.0f;      m0[15] = 1.0f;
 	return m0;
 }
 

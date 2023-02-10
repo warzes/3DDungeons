@@ -1,15 +1,8 @@
 ﻿#pragma once
 
-//https://github.com/felselva/mathc
-//проверить Vector3::Slide
-//exengine\math
-
-
-
-//FWK\code\split
-//Engine 0.2
-
 /*
+* Matrix Column Row
+* 
 Left handed
   1 Y   Z
     |  / 1
