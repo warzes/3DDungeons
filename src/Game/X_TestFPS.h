@@ -1,14 +1,16 @@
-#pragma once
+п»ї#pragma once
 
-//а можно ведь не резать меш. можно так
-//когда Я делаю коллайдер - Я же беру все вершины
-//можно по другому - брать треугольник (по индексам) и смотреь где он находитсЯ на сетке, туда и писать.
-//тогда надо сравниваь только клетки
+//Р° РјРѕР¶РЅРѕ РІРµРґСЊ РЅРµ СЂРµР·Р°С‚СЊ РјРµС€. РјРѕР¶РЅРѕ С‚Р°Рє
+//РєРѕРіРґР° РЇ РґРµР»Р°СЋ РєРѕР»Р»Р°Р№РґРµСЂ - РЇ Р¶Рµ Р±РµСЂСѓ РІСЃРµ РІРµСЂС€РёРЅС‹
+//РјРѕР¶РЅРѕ РїРѕ РґСЂСѓРіРѕРјСѓ - Р±СЂР°С‚СЊ С‚СЂРµСѓРіРѕР»СЊРЅРёРє (РїРѕ РёРЅРґРµРєСЃР°Рј) Рё СЃРјРѕС‚СЂРµСЊ РіРґРµ РѕРЅ РЅР°С…РѕРґРёС‚СЃРЇ РЅР° СЃРµС‚РєРµ, С‚СѓРґР° Рё РїРёСЃР°С‚СЊ.
+//С‚РѕРіРґР° РЅР°РґРѕ СЃСЂР°РІРЅРёРІР°СЊ С‚РѕР»СЊРєРѕ РєР»РµС‚РєРё
 //
-//также сделать сабмеш
-//генерацию нормалей (взЯть из гитхаба глм пример)
+//С‚Р°РєР¶Рµ СЃРґРµР»Р°С‚СЊ СЃР°Р±РјРµС€
+//РіРµРЅРµСЂР°С†РёСЋ РЅРѕСЂРјР°Р»РµР№ (РІР·РЇС‚СЊ РёР· РіРёС‚С…Р°Р±Р° РіР»Рј РїСЂРёРјРµСЂ)
 
 #include <iterator>
+
+#define ENABLE_FPS 0
 
 
 class Poly
@@ -23,12 +25,12 @@ Poly MeshGetPoly(const Mesh& mesh)
 	Poly poly;
 
 #if 1
-	for( size_t i = 0; i < mesh.indices.size(); i++ ) // TODO: медленно, надо переделать
+	for( size_t i = 0; i < mesh.indices.size(); i++ ) // TODO: РјРµРґР»РµРЅРЅРѕ, РЅР°РґРѕ РїРµСЂРµРґРµР»Р°С‚СЊ
 	{
 		poly.verts.push_back(mesh.vertices[mesh.indices[i]].position);
 	}
 #else
-	for( size_t i = 0; i < vertices.size(); i++ ) // TODO: медленно, надо переделать
+	for( size_t i = 0; i < vertices.size(); i++ ) // TODO: РјРµРґР»РµРЅРЅРѕ, РЅР°РґРѕ РїРµСЂРµРґРµР»Р°С‚СЊ
 	{
 		poly.verts.push_back(vertices[i].position);
 	}
@@ -93,7 +95,7 @@ namespace Collisions
 		if (determinant < 0.0f) return false;
 
 		// calculate the two roots: (if determinant == 0 then
-		// x1==x2 but let’s disregard that slight optimization)
+		// x1==x2 but letвЂ™s disregard that slight optimization)
 		float sqrtD = sqrt(determinant);
 		float r1 = (-b - sqrtD) / (2.0f * a);
 		float r2 = (-b + sqrtD) / (2.0f * a);
@@ -224,7 +226,7 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 	// Calculate the signed distance from sphere position to triangle Plane
 	float signedDistToTrianglePlane = trianglePlane.SignedDistanceTo(colPackage->basePoint);
 
-	// cache this as we’re going to use it a few times below:
+	// cache this as weвЂ™re going to use it a few times below:
 	float normalDotVelocity = DotProduct(trianglePlane.normal, colPackage->velocity);
 	// if sphere is travelling parrallel to the Plane:
 	if (normalDotVelocity == 0.0f)
@@ -296,7 +298,7 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 			collisionPoint = PlaneIntersectionPoint;
 		}
 	}
-	// if we haven’t found a collision already we’ll have to
+	// if we havenвЂ™t found a collision already weвЂ™ll have to
 	// sweep sphere against points and edges of the triangle.
 	// Note: A collision inside the triangle (the check above)
 	// will always happen before a vertex or edge collision!
@@ -437,10 +439,10 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 	// Set result:
 	if (foundCollison == true)
 	{
-		// distance to collision: ’t’ is time of collision
+		// distance to collision: вЂ™tвЂ™ is time of collision
 		float distToCollision = t * colPackage->velocity.GetLength();
 		// Does this triangle qualify for the closest hit?
-		// it does if it’s the first hit or the closest
+		// it does if itвЂ™s the first hit or the closest
 		if (colPackage->foundCollision == false || distToCollision < colPackage->nearestDistance)
 		{
 			// Collision information nessesary for sliding
@@ -652,7 +654,7 @@ inline void CharacterEntity::CollideWithWorld2(Vector3& e_position, Vector3& e_v
 		// If no collision we just move along the velocity
 		if (collisionPackage.foundCollision == false)
 		{
-			e_position = dest; // TODO: переделать на возврат
+			e_position = dest; // TODO: РїРµСЂРµРґРµР»Р°С‚СЊ РЅР° РІРѕР·РІСЂР°С‚
 			return;
 		}
 
@@ -773,7 +775,7 @@ Vector3 CharacterEntity::CollideWithWorld(const Vector3& pos, const Vector3& vel
 	if (collisionPackage.nearestDistance >= veryCloseDistance)
 	{
 		Vector3 v = (float)Min(vel.GetLength(), collisionPackage.nearestDistance - veryCloseDistance) * vel;
-		// TODO: может это вместо выше v.SetLength(collisionPackage->nearestDistance - veryCloseDistance);
+		// TODO: РјРѕР¶РµС‚ СЌС‚Рѕ РІРјРµСЃС‚Рѕ РІС‹С€Рµ v.SetLength(collisionPackage->nearestDistance - veryCloseDistance);
 		newBasePoint = collisionPackage.basePoint + v;
 
 		// Adjust polygon intersection point (so sliding
@@ -823,14 +825,12 @@ Vector3 CharacterEntity::CollideWithWorld(const Vector3& pos, const Vector3& vel
 
 void CharacterEntity::CheckCollision()
 {
-	// сначала тестим все объекты на попадание в AABB
-	// в выбранных получаем список треугольников, при этом каждый треугольник хранит (или вычисляется) свой размер - для простоты в виде AABB.
-	// теперь проверяем эти треугольники в попадание зоны ААББ объекта-игрока.
-	// и вот с полученными уже обрабатываем коллизии
-	// при этом если меш - примитив (куб, сфера, плоскость) - то вместо проверки на треугольники делать только проверку на объемы
-	// на случай пролета объектов через объект (обычно юзают Continuous Collision Detection) - разбивать движение на итерации с фиксированным расстоянием и циклом каждое проверить - например шаг 0.1, персонаж сдвинулся с 8 до 9, значит не двигать по формуле pos + velocity, где Velocity равно 1. а разделить на десять итераций со сдвигом в 0.1 и в каждую проверять столкновение. Вроде называется Supersampling
-
-
+	// СЃРЅР°С‡Р°Р»Р° С‚РµСЃС‚РёРј РІСЃРµ РѕР±СЉРµРєС‚С‹ РЅР° РїРѕРїР°РґР°РЅРёРµ РІ AABB
+	// РІ РІС‹Р±СЂР°РЅРЅС‹С… РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ, РїСЂРё СЌС‚РѕРј РєР°Р¶РґС‹Р№ С‚СЂРµСѓРіРѕР»СЊРЅРёРє С…СЂР°РЅРёС‚ (РёР»Рё РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ) СЃРІРѕР№ СЂР°Р·РјРµСЂ - РґР»СЏ РїСЂРѕСЃС‚РѕС‚С‹ РІ РІРёРґРµ AABB.
+	// С‚РµРїРµСЂСЊ РїСЂРѕРІРµСЂСЏРµРј СЌС‚Рё С‚СЂРµСѓРіРѕР»СЊРЅРёРєРё РІ РїРѕРїР°РґР°РЅРёРµ Р·РѕРЅС‹ РђРђР‘Р‘ РѕР±СЉРµРєС‚Р°-РёРіСЂРѕРєР°.
+	// Рё РІРѕС‚ СЃ РїРѕР»СѓС‡РµРЅРЅС‹РјРё СѓР¶Рµ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РєРѕР»Р»РёР·РёРё
+	// РїСЂРё СЌС‚РѕРј РµСЃР»Рё РјРµС€ - РїСЂРёРјРёС‚РёРІ (РєСѓР±, СЃС„РµСЂР°, РїР»РѕСЃРєРѕСЃС‚СЊ) - С‚Рѕ РІРјРµСЃС‚Рѕ РїСЂРѕРІРµСЂРєРё РЅР° С‚СЂРµСѓРіРѕР»СЊРЅРёРєРё РґРµР»Р°С‚СЊ С‚РѕР»СЊРєРѕ РїСЂРѕРІРµСЂРєСѓ РЅР° РѕР±СЉРµРјС‹
+	// РЅР° СЃР»СѓС‡Р°Р№ РїСЂРѕР»РµС‚Р° РѕР±СЉРµРєС‚РѕРІ С‡РµСЂРµР· РѕР±СЉРµРєС‚ (РѕР±С‹С‡РЅРѕ СЋР·Р°СЋС‚ Continuous Collision Detection) - СЂР°Р·Р±РёРІР°С‚СЊ РґРІРёР¶РµРЅРёРµ РЅР° РёС‚РµСЂР°С†РёРё СЃ С„РёРєСЃРёСЂРѕРІР°РЅРЅС‹Рј СЂР°СЃСЃС‚РѕСЏРЅРёРµРј Рё С†РёРєР»РѕРј РєР°Р¶РґРѕРµ РїСЂРѕРІРµСЂРёС‚СЊ - РЅР°РїСЂРёРјРµСЂ С€Р°Рі 0.1, РїРµСЂСЃРѕРЅР°Р¶ СЃРґРІРёРЅСѓР»СЃСЏ СЃ 8 РґРѕ 9, Р·РЅР°С‡РёС‚ РЅРµ РґРІРёРіР°С‚СЊ РїРѕ С„РѕСЂРјСѓР»Рµ pos + velocity, РіРґРµ Velocity СЂР°РІРЅРѕ 1. Р° СЂР°Р·РґРµР»РёС‚СЊ РЅР° РґРµСЃСЏС‚СЊ РёС‚РµСЂР°С†РёР№ СЃРѕ СЃРґРІРёРіРѕРј РІ 0.1 Рё РІ РєР°Р¶РґСѓСЋ РїСЂРѕРІРµСЂСЏС‚СЊ СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ. Р’СЂРѕРґРµ РЅР°Р·С‹РІР°РµС‚СЃСЏ Supersampling
 
 	// check collision against triangles
 
@@ -841,6 +841,7 @@ void CharacterEntity::CheckCollision()
 			const Vector3 a = colliders[i].poly.verts[j + 0] / collisionPackage.eRadius;
 			const Vector3 b = colliders[i].poly.verts[j + 1] / collisionPackage.eRadius;
 			const Vector3 c = colliders[i].poly.verts[j + 2] / collisionPackage.eRadius;
+
 			CheckCollisionsTriangle(&collisionPackage, a, b, c);
 		}
 	}
@@ -913,7 +914,7 @@ void main()
 {
 	outColor = texture(Texture, TexCoord) * vec4(fragmentColor, 1.0);
 
-	float NdotLD = max(dot(Light.Direction, normalize(Normal)), 0.0); // ламберт
+	float NdotLD = max(dot(Light.Direction, normalize(Normal)), 0.0); // Р»Р°РјР±РµСЂС‚
 	outColor.rgb *= Light.Ambient + Light.Diffuse * NdotLD;
 	//float attenuation = saturate(1.0 - DistanceToLight / LightRadius);
 	//frag_Color.rgb *= Light.Ambient + Light.Diffuse * NdotLD * attenuation;
@@ -944,22 +945,22 @@ void ExampleInit()
 	Vector3 LightDirection = Vector3(0.467757f, 0.424200f, -0.775409f);
 	shader.SetUniform(shader.GetUniformLocation("Light.Direction"), LightDirection);
 	
-	shader.SetUniform(uniformNormalMatrix, Matrix3().Inverse().Transpose()); // пока единичную, а так оно такое  NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
+	shader.SetUniform(uniformNormalMatrix, Matrix3().Inverse().Transpose()); // РїРѕРєР° РµРґРёРЅРёС‡РЅСѓСЋ, Р° С‚Р°Рє РѕРЅРѕ С‚Р°РєРѕРµ  NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
 
 	texture.Create("../data/textures/1mx1m.png");
 
 	model.Create("../data/mesh/untitled.obj", "../data/mesh/");
-	//model.SetMaterial({ .diffuseTexture = &texture }); // если материала нет
+	//model.SetMaterial({ .diffuseTexture = &texture }); // РµСЃР»Рё РјР°С‚РµСЂРёР°Р»Р° РЅРµС‚
 
 	entity = new CharacterEntity(&model, boundingEllipse);// initialize player infront of model
-	entity->position.x = -60;
+	entity->position.x = -62;
 	entity->position.y = 150;
 	entity->position.z = 0;
 	
-	cam.Look({ -60.0f, 80.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+	cam.Look({ -62.0f, 80.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
 
 
-	SetMouseVisible(false);
+	//SetMouseVisible(false);
 }
 
 void ExampleClose()
@@ -976,11 +977,11 @@ void ExampleFrame()
 		auto deltaCursor = GetCursorDelta();
 		if( deltaCursor.x != 0 || deltaCursor.y != 0 )
 		{
-			//if( IsMouseButtonDown(MouseButton::Right) )
+			if( IsMouseButtonDown(MouseButton::Right) )
 				cam.OnMouseMove(deltaCursor.x, deltaCursor.y);
 		}
 
-
+#if ENABLE_FPS
 		Vector3 PlayerUp = cam.y;
 		Vector3 PlayerRight = cam.x;
 		Vector3 PlayerForward = cam.z;
@@ -991,17 +992,16 @@ void ExampleFrame()
 		if( IsKeyDown('A') ) PlayerMovement -= PlayerRight;
 		if( IsKeyDown('D') ) PlayerMovement += PlayerRight;
 
-		entity->velocity.x = 1000.0f * PlayerMovement.x * GetDeltaTime();
+		PlayerMovement *= 1000.0f * GetDeltaTime();
+		entity->velocity.x = PlayerMovement.x;
 		//entity->velocity.y = -500.0f * GetDeltaTime();
-		entity->velocity.z = 1000.0f * PlayerMovement.z * GetDeltaTime();
+		entity->velocity.z = PlayerMovement.z;
 
 		static float impulseSpace = 0.0f;
-
 		if( IsKeyPressed('Q') && entity->grounded == 1 && impulseSpace <= 0.0f )
 		{
 			impulseSpace = 400;
 		}
-
 		if( impulseSpace <= 0.0f )
 		{
 			entity->velocity.y = -900.0f * GetDeltaTime();
@@ -1011,41 +1011,41 @@ void ExampleFrame()
 			entity->velocity.y = 900.0f * GetDeltaTime();
 			impulseSpace -= entity->velocity.y;
 		}
+#else
+		short Keys = 0x0000;
+		if( IsKeyDown('W') ) Keys |= CAMERA_KEY_W;
+		if( IsKeyDown('S') ) Keys |= CAMERA_KEY_S;
+		if( IsKeyDown('A') ) Keys |= CAMERA_KEY_A;
+		if( IsKeyDown('D') ) Keys |= CAMERA_KEY_D;
+		if( IsKeyDown('R') ) Keys |= CAMERA_KEY_R;
+		if( IsKeyDown('F') ) Keys |= CAMERA_KEY_F;
+		if( IsKeyDown('Q') ) Keys |= CAMERA_KEY_Q;
+		if( IsKeyDown('E') ) Keys |= CAMERA_KEY_E;
+		if( IsKeyDown('C') ) Keys |= CAMERA_KEY_E;
 
+		if( IsKeyDown(0x20/*VK_SPACE*/) ) Keys |= CAMERA_KEY_SPACE;
+		if( IsKeyDown(0x10/*VK_SHIFT*/) ) Keys |= CAMERA_KEY_SHIFT;
+		if( IsKeyDown(0x11/*VK_CONTROL*/) ) Keys |= CAMERA_KEY_CONTROL;
 
+		Vector3 Movement;
+		bool MoveCamera = cam.OnKeys(Keys, 70 * GetDeltaTime(), Movement);
+		if( MoveCamera ) cam.Move(Movement);
 
-		//short Keys = 0x0000;
-		//if( IsKeyDown('W') ) Keys |= CAMERA_KEY_W;
-		//if( IsKeyDown('S') ) Keys |= CAMERA_KEY_S;
-		//if( IsKeyDown('A') ) Keys |= CAMERA_KEY_A;
-		//if( IsKeyDown('D') ) Keys |= CAMERA_KEY_D;
-		//if( IsKeyDown('R') ) Keys |= CAMERA_KEY_R;
-		//if( IsKeyDown('F') ) Keys |= CAMERA_KEY_F;
-		//if( IsKeyDown('Q') ) Keys |= CAMERA_KEY_Q;
-		//if( IsKeyDown('E') ) Keys |= CAMERA_KEY_E;
-		//if( IsKeyDown('C') ) Keys |= CAMERA_KEY_E;
+		entity->velocity.x = 0.0f;
+		if( IsKeyDown('L') ) entity->velocity.x = 500.0f * GetDeltaTime();
+		if( IsKeyDown('J') ) entity->velocity.x = -500.0f * GetDeltaTime();
 
-		//if( IsKeyDown(0x20/*VK_SPACE*/) ) Keys |= CAMERA_KEY_SPACE;
-		//if( IsKeyDown(0x10/*VK_SHIFT*/) ) Keys |= CAMERA_KEY_SHIFT;
-		//if( IsKeyDown(0x11/*VK_CONTROL*/) ) Keys |= CAMERA_KEY_CONTROL;
+		entity->velocity.y = -980.0f * GetDeltaTime();
 
-		//Vector3 Movement;
-		//bool MoveCamera = cam.OnKeys(Keys, 70 * GetDeltaTime(), Movement);
-		//if( MoveCamera ) cam.Move(Movement);
-
-		//entity->velocity.x = 0.0f;
-		//if( IsKeyDown('L') ) entity->velocity.x = 500.0f * GetDeltaTime();
-		//if( IsKeyDown('J') ) entity->velocity.x = -500.0f * GetDeltaTime();
-
-		//entity->velocity.y = -980.0f * GetDeltaTime();
-
-		//entity->velocity.z = 0.0f;
-		//if( IsKeyDown('I') ) entity->velocity.z = 500.0f * GetDeltaTime();
-		//if( IsKeyDown('K') ) entity->velocity.z = -500.0f * GetDeltaTime();
+		entity->velocity.z = 0.0f;
+		if( IsKeyDown('I') ) entity->velocity.z = 500.0f * GetDeltaTime();
+		if( IsKeyDown('K') ) entity->velocity.z = -500.0f * GetDeltaTime();
+#endif
 	}
 	entity->Update2(GetDeltaTime());
-	cam.SetPosition(entity->position + Vector3(0.0f, 1.8f, 0.0f));
-
+#if ENABLE_FPS
+	cam.SetPosition(entity->position + Vector3(0.0f, boundingEllipse.y-0.2f, 0.0f));
+#endif
 
 	Matrix4 view = cam.GetViewMatrix();
 	Matrix4 perpective = Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 100000.f);

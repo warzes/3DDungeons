@@ -1,15 +1,19 @@
 ﻿Механики
 	анимация взмаха меча и щита - https://genaralskar.itch.io/dungeon-crawler - стоит посмотреть
 
-
 Уроки
 	https://sites.google.com/site/john87connor/scene-light-material
 	https://www.dhpoware.com/demos/index.html
 
-Матемтаика
+Математика
+	https://github.com/felselva/mathc - смотрел примеры
+	https://github.com/HandmadeMath/HandmadeMath
 	https://github.com/polymonster/maths - там еще есть и коллизии
 	https://opensource.apple.com/source/WebCore/WebCore-514/platform/graphics/transforms/TransformationMatrix.cpp   - matrix decompose
 	https://github.com/xoorath/xo-math - оптим математика
+
+Поиск пути
+	https://github.com/felselva/uastar
 
 Физика и коллизии
 	https://github.com/gszauer/GamePhysicsCookbook
@@ -38,6 +42,7 @@
 		https://gist.github.com/mlfarrell/76fe8d1a0e01322093f8ff828e360b50
 
 Варианты стиля
+	https://www.youtube.com/watch?v=RcH1MYLpRZQ
 	вот такой кубический опенмир неплох - https://mudgate.itch.io/mudgate
 
 	https://reveu-games.itch.io/dungeon-game
