@@ -28,6 +28,8 @@ int main(
 #if START_EXAMPLE
 	AppSystemCreateInfo createInfo;
 	createInfo.window.Vsync = true;
+	createInfo.window.Width = 1600;
+	createInfo.window.Height = 900;
 	if (AppSystemCreate(createInfo))
 	{
 		ExampleInit();

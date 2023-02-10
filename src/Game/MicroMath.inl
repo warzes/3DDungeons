@@ -751,11 +751,18 @@ inline constexpr Matrix3::Matrix3(const float* f)
 }
 
 inline constexpr Matrix3::Matrix3(
-	float m11, float m12, float m13,
-	float m21, float m22, float m23,
-	float m31, float m32, float m33)
+	float m11, float m21, float m31,
+	float m12, float m22, float m32,
+	float m13, float m23, float m33)
 {
-	Set(m11, m12, m13, m21, m22, m23, m31, m32, m33);
+	Set(m11, m21, m31, m12, m22, m32, m13, m23, m33);
+}
+
+inline Matrix3::Matrix3(const Matrix4& m)
+{
+	Set(m[0], m[1], m[2], 
+		m[4], m[5], m[6], 
+		m[8], m[9], m[10]);
 }
 
 inline constexpr void Matrix3::Set(const float* f)
@@ -772,9 +779,9 @@ inline constexpr void Matrix3::Set(const float* f)
 }
 
 inline constexpr void Matrix3::Set(
-	float m11, float m12, float m13, 
-	float m21, float m22, float m23, 
-	float m31, float m32, float m33)
+	float m11, float m21, float m31,
+	float m12, float m22, float m32,
+	float m13, float m23, float m33)
 {
 	m[0] = m11;
 	m[1] = m21;
@@ -818,6 +825,49 @@ inline Matrix3 Matrix3::Transpose() const
 	transposed[7] = m[5];
 	transposed[8] = m[8];
 	return transposed;
+}
+
+inline Matrix3 Matrix3::Inverse() const
+{
+	const float OneOverDeterminant = 1.0f / (
+		+ m[0] * (m[4] * m[8] - m[7] * m[5])
+		- m[3] * (m[1] * m[8] - m[7] * m[2])
+		+ m[6] * (m[1] * m[5] - m[4] * m[2])
+		);
+	Matrix3 Inverse;
+	Inverse[0] = +(m[4] * m[8] - m[7] * m[5]) * OneOverDeterminant;
+	Inverse[3] = -(m[3] * m[8] - m[6] * m[5]) * OneOverDeterminant;
+	Inverse[6] = +(m[3] * m[7] - m[6] * m[4]) * OneOverDeterminant;
+	Inverse[1] = -(m[1] * m[8] - m[7] * m[2]) * OneOverDeterminant;
+	Inverse[4] = +(m[0] * m[8] - m[6] * m[2]) * OneOverDeterminant;
+	Inverse[7] = -(m[0] * m[7] - m[6] * m[1]) * OneOverDeterminant;
+	Inverse[2] = +(m[1] * m[5] - m[4] * m[2]) * OneOverDeterminant;
+	Inverse[5] = -(m[0] * m[5] - m[3] * m[2]) * OneOverDeterminant;
+	Inverse[8] = +(m[0] * m[4] - m[3] * m[1]) * OneOverDeterminant;
+	return Inverse;
+
+
+	////const float det =
+	////	m[0] * m[4] * m[8] +
+	////	m[3] * m[7] * m[2] +
+	////	m[6] * m[1] * m[5] -
+	////	m[6] * m[4] * m[2] -
+	////	m[3] * m[1] * m[8] -
+	////	m[0] * m[7] * m[5]; // ODL
+	//const float det = GetDeterminant();
+	//const float invDet = 1.0f / det;
+
+	//return {
+	//	 (m[4] * m[8] - m[7] * m[5]) * invDet,
+	//	-(m[1] * m[8] - m[7] * m[2]) * invDet,
+	//	 (m[1] * m[5] - m[4] * m[2]) * invDet,
+	//	-(m[3] * m[8] - m[6] * m[5]) * invDet,
+	//	 (m[0] * m[8] - m[6] * m[2]) * invDet,
+	//	-(m[0] * m[5] - m[3] * m[2]) * invDet,
+	//	 (m[3] * m[7] - m[6] * m[4]) * invDet,
+	//	-(m[0] * m[7] - m[6] * m[1]) * invDet,
+	//	 (m[0] * m[4] - m[3] * m[1]) * invDet
+	//};
 }
 
 inline void Matrix3::Scale(const Vector3& scale)
@@ -942,15 +992,15 @@ inline constexpr Matrix4::Matrix4(const float* f)
 }
 
 inline constexpr Matrix4::Matrix4(
-	float m11, float m12, float m13, float m14, 
-	float m21, float m22, float m23, float m24, 
-	float m31, float m32, float m33, float m34, 
-	float m41, float m42, float m43, float m44)
+	float m11, float m21, float m31, float m41,
+	float m12, float m22, float m32, float m42,
+	float m13, float m23, float m33, float m43,
+	float m14, float m24, float m34, float m44)
 {
-	Set(m11, m12, m13, m14, 
-		m21, m22, m23, m24, 
-		m31, m32, m33, m34, 
-		m41, m42, m43, m44);
+	Set(m11, m21, m31, m41, 
+		m12, m22, m32, m42, 
+		m13, m23, m33, m43, 
+		m14, m24, m34, m44);
 }
 
 inline constexpr void Matrix4::Set(const float* f)
@@ -962,10 +1012,10 @@ inline constexpr void Matrix4::Set(const float* f)
 }
 
 inline constexpr void Matrix4::Set(
-	float m11, float m12, float m13, float m14,
-	float m21, float m22, float m23, float m24,
-	float m31, float m32, float m33, float m34,
-	float m41, float m42, float m43, float m44)
+	float m11, float m21, float m31, float m41,
+	float m12, float m22, float m32, float m42,
+	float m13, float m23, float m33, float m43,
+	float m14, float m24, float m34, float m44)
 {
 	m[0] = m11;
 	m[1] = m21;

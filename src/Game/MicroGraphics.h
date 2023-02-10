@@ -73,6 +73,7 @@ public:
 	}
 
 	std::vector<Mesh>& GetSubMesh() { return m_subMeshes; }
+	const std::vector<Mesh>& GetSubMesh() const { return m_subMeshes; }
 
 private:
 	bool loadObjFile(const char* fileName, const char* pathMaterialFiles = "./");
@@ -103,6 +104,7 @@ public:
 
 	virtual void Look(const Vector3& Position, const Vector3& Reference);
 	virtual void Move(const Vector3& Movement);
+	virtual void SetPosition(const Vector3& Movement);
 	virtual bool OnKeys(short Keys, float FrameTime, Vector3& Movement) = 0;
 	virtual void OnMouseMove(int dx, int dy) = 0;
 

@@ -460,9 +460,10 @@ public:
 	constexpr Matrix3(const Matrix3&) = default;
 	constexpr Matrix3(const float* f);
 	constexpr Matrix3(
-		float m11, float m12, float m13, 
-		float m21, float m22, float m23, 
-		float m31, float m32, float m33);
+		float m11, float m21, float m31, 
+		float m12, float m22, float m32, 
+		float m13, float m23, float m33);
+	Matrix3(const Matrix4& m);
 
 	constexpr Matrix3& operator=(Matrix3&&) = default;
 	constexpr Matrix3& operator=(const Matrix3&) = default;
@@ -472,14 +473,15 @@ public:
 
 	constexpr void Set(const float* f);
 	constexpr void Set(
-		float m11, float m12, float m13,
-		float m21, float m22, float m23,
-		float m31, float m32, float m33);
+		float m11, float m21, float m31,
+		float m12, float m22, float m32,
+		float m13, float m23, float m33);
 	constexpr void Set(const Matrix3& M);
 
 	float GetDeterminant() const;
 
 	Matrix3 Transpose() const;
+	Matrix3 Inverse() const;
 
 	void Scale(const Vector3& scale);
 
@@ -516,10 +518,10 @@ public:
 	constexpr Matrix4(const Matrix4&) = default;
 	constexpr Matrix4(const float* f);
 	constexpr Matrix4(
-		float m11, float m12, float m13, float m14, 
-		float m21, float m22, float m23, float m24, 
-		float m31, float m32, float m33, float m34, 
-		float m41, float m42, float m43, float m44);
+		float m11, float m21, float m31, float m41, 
+		float m12, float m22, float m32, float m42, 
+		float m13, float m23, float m33, float m43, 
+		float m14, float m24, float m34, float m44);
 
 	constexpr Matrix4& operator=(Matrix4&&) = default;
 	constexpr Matrix4& operator=(const Matrix4&) = default;
@@ -529,10 +531,10 @@ public:
 
 	constexpr void Set(const float* f);
 	constexpr void Set(
-		float m11, float m12, float m13, float m14,
-		float m21, float m22, float m23, float m24,
-		float m31, float m32, float m33, float m34,
-		float m41, float m42, float m43, float m44);
+		float m11, float m21, float m31, float m41,
+		float m12, float m22, float m32, float m42,
+		float m13, float m23, float m33, float m43,
+		float m14, float m24, float m34, float m44);
 	constexpr void Set(const Matrix4& M);
 
 	void Scale(const Vector3& scale);

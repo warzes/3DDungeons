@@ -1,13 +1,61 @@
 #pragma once
 
-а можно ведь не резать меш. можно так
-когда я делаю коллайдер - я же беру все вершины
-можно по другому - брать треугольник (по индексам) и смотреь где он находится на сетке, туда и писать.
-тогда надо сравниваь только клетки
+//а можно ведь не резать меш. можно так
+//когда я делаю коллайдер - я же беру все вершины
+//можно по другому - брать треугольник (по индексам) и смотреь где он находится на сетке, туда и писать.
+//тогда надо сравниваь только клетки
+//
+//также сделать сабмеш
+//генерацию нормалей (взять из гитхаба глм пример)
 
-также сделать сабмеш
-генерацию нормалей (взять из гитхаба глм пример)
+#include <iterator>
 
+
+class Poly
+{
+public:
+	std::vector<Vector3> verts;
+	int cnt = 0; // todo: delete, in verts.size
+};
+
+Poly MeshGetPoly(const Mesh& mesh)
+{
+	Poly poly;
+
+#if 1
+	for( size_t i = 0; i < mesh.indices.size(); i++ ) // TODO: медленно, надо переделать
+	{
+		poly.verts.push_back(mesh.vertices[mesh.indices[i]].position);
+	}
+#else
+	for( size_t i = 0; i < vertices.size(); i++ ) // TODO: медленно, надо переделать
+	{
+		poly.verts.push_back(vertices[i].position);
+	}
+#endif
+	poly.cnt = poly.verts.size();
+
+	return poly;
+}
+
+
+class MeshColliderData
+{
+public:
+	void Init(const Model& model)
+	{
+		for( int i = 0; i < model.GetSubMesh().size(); i++ )
+		{
+			Poly subPoly = MeshGetPoly(model.GetSubMesh()[i]);
+
+			// https://www.techiedelight.com/ru/concatenate-two-vectors-cpp/
+			std::move(subPoly.verts.begin(), subPoly.verts.end(), std::back_inserter(poly.verts));
+			poly.cnt += subPoly.cnt;
+		}
+	}
+
+	Poly poly;
+};
 
 
 namespace Collisions
@@ -430,6 +478,7 @@ public:
 	Vector3 position, velocity, radius;
 	CollisionPacket collisionPackage;
 	std::vector<Model*> models;
+	std::vector<MeshColliderData> colliders;
 	int grounded;
 };
 
@@ -439,7 +488,10 @@ CharacterEntity::CharacterEntity(Model* model, Vector3 radius)
 	position = Vector3(0.0f);
 	velocity = Vector3(0.0f);
 
-	this->models.push_back(model);
+	models.push_back(model);
+	colliders.push_back({});
+	colliders[0].Init(*models[0]);
+
 	grounded = 0;
 }
 
@@ -450,6 +502,11 @@ CharacterEntity::CharacterEntity(std::vector<Model*> models, Vector3 radius)
 	velocity = Vector3(0.0f);
 
 	this->models = models;
+	for( size_t i = 0; i < this->models.size(); i++ )
+	{
+		colliders.push_back({});
+		colliders[colliders.size()-1].Init(*this->models[i]);
+	}
 	grounded = 0;
 }
 
@@ -764,47 +821,6 @@ Vector3 CharacterEntity::CollideWithWorld(const Vector3& pos, const Vector3& vel
 	return CollideWithWorld(newBasePoint, newVelocityVector);
 }
 
-class Poly
-{
-public:
-	std::vector<Vector3> verts;
-	int cnt = 0; // todo: delete, in verts.size
-};
-
-Poly MeshGetPoly(Mesh& mesh)
-{
-	Poly poly;
-
-#if 1
-	for (size_t i = 0; i < mesh.indices.size(); i++) // TODO: медленно, надо переделать
-	{
-		poly.verts.push_back(mesh.vertices[mesh.indices[i]].position);
-	}
-#else
-	for (size_t i = 0; i < vertices.size(); i++) // TODO: медленно, надо переделать
-	{
-		poly.verts.push_back(vertices[i].position);
-	}
-#endif
-	poly.cnt = poly.verts.size();
-
-	return poly;
-}
-
-Poly ModelGetPoly(Model& model)
-{
-	Poly poly;
-
-	for (int i = 0; i < model.GetSubMesh().size(); i++)
-	{
-		Poly subPoly = MeshGetPoly(model.GetSubMesh()[i]);
-		poly.verts.assign(subPoly.verts.begin(), subPoly.verts.end());
-		poly.cnt += subPoly.cnt;
-	}
-
-	return poly;
-}
-
 void CharacterEntity::CheckCollision()
 {
 	// сначала тестим все объекты на попадание в AABB
@@ -818,17 +834,13 @@ void CharacterEntity::CheckCollision()
 
 	// check collision against triangles
 
-	// TODO: если не сработает, то получать сабмеши. “акже надо подумать над вершинами и индексами
-	for (size_t i = 0; i < models.size(); i++)
+	for( size_t i = 0; i < colliders.size(); i++ )
 	{
-		auto poly = ModelGetPoly(*models[i]);
-		//auto poly = modelPoly;
-
-		for (size_t j = 0; j < poly.verts.size(); j += 3)
+		for( size_t j = 0; j < colliders[i].poly.verts.size(); j += 3 )
 		{
-			Vector3 a = poly.verts[j + 0] / collisionPackage.eRadius;
-			Vector3 b = poly.verts[j + 1] / collisionPackage.eRadius;
-			Vector3 c = poly.verts[j + 2] / collisionPackage.eRadius;
+			const Vector3 a = colliders[i].poly.verts[j + 0] / collisionPackage.eRadius;
+			const Vector3 b = colliders[i].poly.verts[j + 1] / collisionPackage.eRadius;
+			const Vector3 c = colliders[i].poly.verts[j + 2] / collisionPackage.eRadius;
 			CheckCollisionsTriangle(&collisionPackage, a, b, c);
 		}
 	}
@@ -852,7 +864,7 @@ void CharacterEntity::Update(float dt)
 
 CharacterEntity* entity;
 // size of collision ellipse, experiment with this to change fidelity of detection
-static Vector3 boundingEllipse = { 0.5f, 1.0f, 0.5f };
+static Vector3 boundingEllipse = { 0.5f, 2.0f, 0.5f };
 
 constexpr const char* vertexShaderText = R"(
 #version 330 core
@@ -862,17 +874,20 @@ layout(location = 1) in vec3 vertexNormal;
 layout(location = 2) in vec3 vertexColor;
 layout(location = 3) in vec2 vertexTexCoord;
 
+uniform mat3 NormalMatrix;
 uniform mat4 uWorld;
 uniform mat4 uView;
 uniform mat4 uProjection;
 
 out vec3 fragmentColor;
+out vec3 Normal;
 out vec2 TexCoord;
 
 void main()
 {
 	gl_Position   = uProjection * uView * uWorld * vec4(vertexPosition, 1.0);
 	fragmentColor = vertexColor;
+	Normal        = NormalMatrix * vertexNormal;
 	TexCoord      = vertexTexCoord;
 }
 )";
@@ -880,7 +895,15 @@ constexpr const char* fragmentShaderText = R"(
 #version 330 core
 
 in vec3 fragmentColor;
+in vec3 Normal;
 in vec2 TexCoord;
+
+struct DirectionalLight
+{
+	float Ambient, Diffuse;
+	vec3 Direction;
+};
+uniform DirectionalLight Light;
 
 uniform sampler2D Texture;
 
@@ -889,10 +912,16 @@ out vec4 outColor;
 void main()
 {
 	outColor = texture(Texture, TexCoord) * vec4(fragmentColor, 1.0);
+
+	float NdotLD = max(dot(Light.Direction, normalize(Normal)), 0.0); // ламберт
+	outColor.rgb *= Light.Ambient + Light.Diffuse * NdotLD;
+	//float attenuation = saturate(1.0 - DistanceToLight / LightRadius);
+	//frag_Color.rgb *= Light.Ambient + Light.Diffuse * NdotLD * attenuation;
 }
 )";
 
 ShaderProgram shader;
+int uniformNormalMatrix;
 int uniformWorldMatrix;
 int uniformViewMatrix;
 int uniformProjectionMatrix;
@@ -904,22 +933,33 @@ FlyingCamera cam;
 void ExampleInit()
 {
 	shader.CreateFromMemories(vertexShaderText, fragmentShaderText);
+	uniformNormalMatrix = shader.GetUniformLocation("NormalMatrix");
 	uniformWorldMatrix = shader.GetUniformLocation("uWorld");
 	uniformViewMatrix = shader.GetUniformLocation("uView");
 	uniformProjectionMatrix = shader.GetUniformLocation("uProjection");
+	shader.Bind();
+	shader.SetUniform(shader.GetUniformLocation("Light.Ambient"), 0.333333f);
+	shader.SetUniform(shader.GetUniformLocation("Light.Diffuse"), 0.666666f);
+	shader.SetUniform(shader.GetUniformLocation("Light.Diffuse"), 0.966666f);
+	Vector3 LightDirection = Vector3(0.467757f, 0.424200f, -0.775409f);
+	shader.SetUniform(shader.GetUniformLocation("Light.Direction"), LightDirection);
+	
+	shader.SetUniform(uniformNormalMatrix, Matrix3().Inverse().Transpose()); // пока единичную, а так оно такое  NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
 
 	texture.Create("../data/textures/1mx1m.png");
 
-	model.Create("../data/mesh/eeew.obj");
-	model.SetMaterial({ .diffuseTexture = &texture }); // если материала нет
+	model.Create("../data/mesh/untitled.obj", "../data/mesh/");
+	//model.SetMaterial({ .diffuseTexture = &texture }); // если материала нет
 
 	entity = new CharacterEntity(&model, boundingEllipse);// initialize player infront of model
-	entity->position[1] = 1000;
+	entity->position.x = -60;
+	entity->position.y = 150;
+	entity->position.z = 0;
 	
-	cam.Look({ 0.0f, 3.0f, -6.0f }, { 0.0f, 0.0f, 0.0f });
+	cam.Look({ -60.0f, 80.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
 
 
-	//SetMouseVisible(false);
+	SetMouseVisible(false);
 }
 
 void ExampleClose()
@@ -931,49 +971,85 @@ void ExampleClose()
 
 void ExampleFrame()
 {
-	auto deltaCursor = GetCursorDelta();
-	if (deltaCursor.x != 0 || deltaCursor.y != 0)
+	// input
 	{
-		if (IsMouseButtonDown(MouseButton::Right))
-			cam.OnMouseMove(deltaCursor.x, deltaCursor.y);
+		auto deltaCursor = GetCursorDelta();
+		if( deltaCursor.x != 0 || deltaCursor.y != 0 )
+		{
+			//if( IsMouseButtonDown(MouseButton::Right) )
+				cam.OnMouseMove(deltaCursor.x, deltaCursor.y);
+		}
+
+
+		Vector3 PlayerUp = cam.y;
+		Vector3 PlayerRight = cam.x;
+		Vector3 PlayerForward = cam.z;
+
+		Vector3 PlayerMovement;
+		if( IsKeyDown('W')) PlayerMovement += PlayerForward;
+		if( IsKeyDown('S') ) PlayerMovement -= PlayerForward;
+		if( IsKeyDown('A') ) PlayerMovement -= PlayerRight;
+		if( IsKeyDown('D') ) PlayerMovement += PlayerRight;
+
+		entity->velocity.x = 1000.0f * PlayerMovement.x * GetDeltaTime();
+		//entity->velocity.y = -500.0f * GetDeltaTime();
+		entity->velocity.z = 1000.0f * PlayerMovement.z * GetDeltaTime();
+
+		static float impulseSpace = 0.0f;
+
+		if( IsKeyPressed('Q') && entity->grounded == 1 && impulseSpace <= 0.0f )
+		{
+			impulseSpace = 400;
+		}
+
+		if( impulseSpace <= 0.0f )
+		{
+			entity->velocity.y = -900.0f * GetDeltaTime();
+		}
+		else
+		{
+			entity->velocity.y = 900.0f * GetDeltaTime();
+			impulseSpace -= entity->velocity.y;
+		}
+
+
+
+		//short Keys = 0x0000;
+		//if( IsKeyDown('W') ) Keys |= CAMERA_KEY_W;
+		//if( IsKeyDown('S') ) Keys |= CAMERA_KEY_S;
+		//if( IsKeyDown('A') ) Keys |= CAMERA_KEY_A;
+		//if( IsKeyDown('D') ) Keys |= CAMERA_KEY_D;
+		//if( IsKeyDown('R') ) Keys |= CAMERA_KEY_R;
+		//if( IsKeyDown('F') ) Keys |= CAMERA_KEY_F;
+		//if( IsKeyDown('Q') ) Keys |= CAMERA_KEY_Q;
+		//if( IsKeyDown('E') ) Keys |= CAMERA_KEY_E;
+		//if( IsKeyDown('C') ) Keys |= CAMERA_KEY_E;
+
+		//if( IsKeyDown(0x20/*VK_SPACE*/) ) Keys |= CAMERA_KEY_SPACE;
+		//if( IsKeyDown(0x10/*VK_SHIFT*/) ) Keys |= CAMERA_KEY_SHIFT;
+		//if( IsKeyDown(0x11/*VK_CONTROL*/) ) Keys |= CAMERA_KEY_CONTROL;
+
+		//Vector3 Movement;
+		//bool MoveCamera = cam.OnKeys(Keys, 70 * GetDeltaTime(), Movement);
+		//if( MoveCamera ) cam.Move(Movement);
+
+		//entity->velocity.x = 0.0f;
+		//if( IsKeyDown('L') ) entity->velocity.x = 500.0f * GetDeltaTime();
+		//if( IsKeyDown('J') ) entity->velocity.x = -500.0f * GetDeltaTime();
+
+		//entity->velocity.y = -980.0f * GetDeltaTime();
+
+		//entity->velocity.z = 0.0f;
+		//if( IsKeyDown('I') ) entity->velocity.z = 500.0f * GetDeltaTime();
+		//if( IsKeyDown('K') ) entity->velocity.z = -500.0f * GetDeltaTime();
 	}
+	entity->Update2(GetDeltaTime());
+	cam.SetPosition(entity->position + Vector3(0.0f, 1.8f, 0.0f));
 
-	short Keys = 0x0000;
-	if (IsKeyDown('W')) Keys |= CAMERA_KEY_W;
-	if (IsKeyDown('S')) Keys |= CAMERA_KEY_S;
-	if (IsKeyDown('A')) Keys |= CAMERA_KEY_A;
-	if (IsKeyDown('D')) Keys |= CAMERA_KEY_D;
-	if (IsKeyDown('R')) Keys |= CAMERA_KEY_R;
-	if (IsKeyDown('F')) Keys |= CAMERA_KEY_F;
-	if (IsKeyDown('Q')) Keys |= CAMERA_KEY_Q;
-	if (IsKeyDown('E')) Keys |= CAMERA_KEY_E;
-	if (IsKeyDown('C')) Keys |= CAMERA_KEY_E;
-
-	if (IsKeyDown(0x20/*VK_SPACE*/)) Keys |= CAMERA_KEY_SPACE;
-	if (IsKeyDown(0x10/*VK_SHIFT*/)) Keys |= CAMERA_KEY_SHIFT;
-	if (IsKeyDown(0x11/*VK_CONTROL*/)) Keys |= CAMERA_KEY_CONTROL;
-
-	Vector3 Movement;
-	bool MoveCamera = cam.OnKeys(Keys, 100*GetDeltaTime(), Movement);
-	if (MoveCamera) cam.Move(Movement);
 
 	Matrix4 view = cam.GetViewMatrix();
 	Matrix4 perpective = Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 100000.f);
 	Matrix4 world1;
-
-
-	entity->velocity.x = 0.0f;
-	if (IsKeyDown('L')) entity->velocity.x = 500.0f * GetDeltaTime();
-	if (IsKeyDown('J')) entity->velocity.x = -500.0f * GetDeltaTime();
-
-	entity->velocity.y = -980.0f * GetDeltaTime();
-
-	entity->velocity.z = 0.0f;
-	if (IsKeyDown('I')) entity->velocity.z = 500.0f * GetDeltaTime();
-	if (IsKeyDown('K')) entity->velocity.z = -500.0f * GetDeltaTime();
-
-	entity->Update2(GetDeltaTime());
-
 
 	shader.Bind();
 	shader.SetUniform(uniformViewMatrix, view);
@@ -985,14 +1061,9 @@ void ExampleFrame()
 	DebugDraw::DrawGrid(100);
 
 	DebugDraw::DrawCapsule(
-		{ entity->position.x, entity->position.y - 0.5f, entity->position.z },
-		{ entity->position.x, entity->position.y + 0.5f, entity->position.z },
+		{ entity->position.x, entity->position.y - boundingEllipse.y/2.0f, entity->position.z },
+		{ entity->position.x, entity->position.y + boundingEllipse.y / 2.0f, entity->position.z },
 		0.5f, RED);
 
 	DebugDraw::Flush(perpective * view);
-
-	std::string sss = "x=" + std::to_string(cam.position.x) +
-		";y=" + std::to_string(cam.position.y) +
-		";z=" + std::to_string(cam.position.z) ;
-	puts(sss.c_str());
 }

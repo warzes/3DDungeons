@@ -79,10 +79,13 @@ namespace std
 bool Model::Create(const char* fileName, const char* pathMaterialFiles)
 {
 	Destroy();
-	if (std::string(fileName).find(".obj") != std::string::npos)
-		return loadObjFile(fileName, pathMaterialFiles);
+	bool success = false;
+	if( std::string(fileName).find(".obj") != std::string::npos )
+	{
+		success = loadObjFile(fileName, pathMaterialFiles);
+	}
 
-	return false;
+	return success;
 }
 //-----------------------------------------------------------------------------
 bool Model::Create(std::vector<Mesh>&& meshes)
@@ -182,11 +185,14 @@ bool Model::loadObjFile(const char* fileName, const char* pathMaterialFiles)
 				const tinyobj::real_t vz = attributes.vertices[3 * size_t(idx.vertex_index) + 2];
 
 				// Check if `normal_index` is zero or positive. negative = no normal data
+				tinyobj::real_t nx = 0.0f;
+				tinyobj::real_t ny = 0.0f;
+				tinyobj::real_t nz = 0.0f;
 				if (idx.normal_index >= 0)
 				{
-					tinyobj::real_t nx = attributes.normals[3 * size_t(idx.normal_index) + 0];
-					tinyobj::real_t ny = attributes.normals[3 * size_t(idx.normal_index) + 1];
-					tinyobj::real_t nz = attributes.normals[3 * size_t(idx.normal_index) + 2];
+					nx = attributes.normals[3 * size_t(idx.normal_index) + 0];
+					ny = attributes.normals[3 * size_t(idx.normal_index) + 1];
+					nz = attributes.normals[3 * size_t(idx.normal_index) + 2];
 				}
 
 				// Check if `texcoord_index` is zero or positive. negative = no texcoord data
@@ -205,7 +211,8 @@ bool Model::loadObjFile(const char* fileName, const char* pathMaterialFiles)
 
 				VertexMesh vertex;
 				vertex.position = { vx, vy, vz };
-				vertex.color = { 1.0f };
+				vertex.normal = {nx, ny, nz};
+				vertex.color = { r, g, b };
 				vertex.texCoord = { tx,ty };
 
 				if (uniqueVertices[materialId].count(vertex) == 0)
@@ -318,6 +325,12 @@ void ICamera::Look(const Vector3& Position, const Vector3& Reference)
 void ICamera::Move(const Vector3& Movement)
 {
 	position += Movement;
+	calculateViewMatrix();
+}
+//-----------------------------------------------------------------------------
+void ICamera::SetPosition(const Vector3& Movement)
+{
+	position = Movement;
 	calculateViewMatrix();
 }
 //-----------------------------------------------------------------------------

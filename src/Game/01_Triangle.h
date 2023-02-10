@@ -37,9 +37,9 @@ struct testVertex
 
 testVertex vert[] =
 {
-	{{-1.0f, -1.0f, -4.0f}, {1.0f, 0.0f, 0.0f}},
-	{{ 0.0f,  1.0f, -4.0f}, {0.0f, 1.0f, 0.0f}},
-	{{ 1.0f, -1.0f, -4.0f}, {0.0f, 0.0f, 1.0f}}
+	{{-1.0f, -1.0f, 4.0f}, {1.0f, 0.0f, 0.0f}},
+	{{ 0.0f,  1.0f, 4.0f}, {0.0f, 1.0f, 0.0f}},
+	{{ 1.0f, -1.0f, 4.0f}, {0.0f, 0.0f, 1.0f}}
 };
 
 ShaderProgram shader;
@@ -66,7 +66,7 @@ void ExampleClose()
 void ExampleFrame()
 {
 	shader.Bind();
-	Matrix4Old mat = Matrix4Old::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4 mat = Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
 	shader.SetUniform(uniformProjectionMatrix, mat);
 	vao.Draw();
 }

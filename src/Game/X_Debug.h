@@ -175,11 +175,12 @@ t t t 1
 		;
 	}
 
-
 	float position[VEC3_SIZE];
 	float t8[MAT4_SIZE]; // mathc.c
 	mat4_identity(t8);
 	mat4_translation(t8, t8, vec3(position, 2.0f, 3.0f, 4.0f));
+
+
 
 	float t9[MAT3_SIZE];
 	mat3(t9,
@@ -211,6 +212,49 @@ t t t 1
 
 
 	Matrix4Old m10 = m2.Inverse();
+
+	Matrix3 m223(
+		2.0f, 3.0f, 4.0f,
+		5.0f, 6.0f, 7.0f,
+		8.0f, 9.0f, 10.0f);
+
+	glm::mat3 m2_13(
+		2.0f, 3.0f, 4.0f,
+		5.0f, 6.0f, 7.0f,
+		8.0f, 9.0f, 10.0f);
+
+
+	Matrix4 m22(
+		2.0f, 3.0f, 4.0f, 5.0f,
+		6.0f, 7.0f, 8.0f, 9.0f,
+		10.0f, 11.0f, 12.0f, 13.0f,
+		14.0f, 15.0f, 16.0f, 17.0f);
+
+	Matrix3 m33 = Matrix3(m22);
+	Matrix3 m33_13 = m33.Inverse();
+
+
+	glm::mat4 m2_1(
+		2.0f, 3.0f, 4.0f, 5.0f,
+		6.0f, 7.0f, 8.0f, 9.0f,
+		10.0f, 11.0f, 12.0f, 13.0f,
+		14.0f, 15.0f, 16.0f, 17.0f);
+
+	glm::mat3 m33_1 = glm::mat3(m2_1);
+
+	glm::mat3 m33_12 = glm::inverse(m33_1);
+
+	auto m_00 = m33_1[0][0];
+	auto m_01 = m33_1[0][1];
+	auto m_02 = m33_1[0][2];
+	auto m_10 = m33_1[1][0];
+	auto m_11 = m33_1[1][1];
+	auto m_12 = m33_1[1][2];
+	auto m_20 = m33_1[2][1];
+	auto m_21 = m33_1[2][1];
+	auto m_22 = m33_1[2][2];
+
+
 
 	cam.Look({ 0.0f, 3.0f, 6.0f }, { 0.0f, 0.0f, 0.0f });
 }
@@ -256,9 +300,9 @@ void ExampleFrame()
 	DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, t1, RED);
 	DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, t2, GREEN);
 
-	//DebugDraw::DrawGrid(10.0f);
+	DebugDraw::DrawGrid(10.0f);
 
-	//DebugDraw::Flush(view * perpective); // TODO: пофиксить порядок
+	DebugDraw::Flush(perpective * view);
 
 	puts(std::to_string(Angle(t1, t2)).c_str());
 
