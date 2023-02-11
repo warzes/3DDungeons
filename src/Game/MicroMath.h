@@ -282,6 +282,8 @@ inline Vector3 operator+(const Vector3& Left, const Vector3& Right) noexcept;
 inline Vector3 operator*(float Left, const Vector3& Right) noexcept;
 inline Vector3 operator*(const Vector3& Left, float Right) noexcept;
 inline Vector3 operator*(const Vector3& Left, const Vector3& Right) noexcept;
+inline Vector3 operator*(const Quaternion& Left, const Vector3& Right) noexcept;
+inline Vector3 operator*(const Vector3& Left, const Quaternion& Right) noexcept;
 inline Vector3 operator*(const Matrix3& Left, const Vector3& Right) noexcept;
 inline Vector3 operator*(const Vector3& Left, const Matrix3& Right) noexcept;
 inline Vector3 operator/(float Left, const Vector3& Right) noexcept;
@@ -355,6 +357,8 @@ inline Vector4 operator+(const Vector4& Left, const Vector4& Right) noexcept;
 inline Vector4 operator*(float Left, const Vector4& Right) noexcept;
 inline Vector4 operator*(const Vector4& Left, float Right) noexcept;
 inline Vector4 operator*(const Vector4& Left, const Vector4& Right) noexcept;
+inline Vector4 operator*(const Quaternion& Left, const Vector4& Right) noexcept;
+inline Vector4 operator*(const Vector4& Left, const Quaternion& Right) noexcept;
 inline Vector4 operator*(const Matrix4& Left, const Vector4& Right) noexcept;
 inline Vector4 operator*(const Vector4& Left, const Matrix4& Right) noexcept;
 inline Vector4 operator/(float Left, const Vector4& Right) noexcept;
@@ -386,8 +390,9 @@ public:
 	constexpr Quaternion(float nx, float ny, float nz, float nw) : x(nx), y(ny), z(nz), w(nw) {}
 
 	Quaternion(float angle, const Vector3& axis); // Construct from an angle and axis.
-	Quaternion(float ax, float ay, float az); // Construct from Euler angles
-	Quaternion(const Vector3& start, const Vector3& end); // Construct from the rotation difference between two direction vectors.
+	Quaternion(float ax, float ay, float az); // Build a quaternion from euler angles (pitch, yaw, roll), in radians.
+	Quaternion(const Vector3& u, const Vector3& v);
+	Quaternion(const Matrix3& m);
 	Quaternion(const Matrix4& m);
 
 	constexpr Quaternion& operator=(Quaternion&&) = default;
@@ -396,14 +401,18 @@ public:
 	constexpr float& operator[](size_t i) noexcept { return (&x)[i]; }
 	constexpr const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
+	explicit operator Matrix3() const;
+	explicit operator Matrix4() const;
+
 	constexpr void Set(float nx, float ny, float nz, float nw) { x = nx; y = ny; z = nz; w = nw; }
+
+	Matrix3 ToMatrix3() const;
+	Matrix4 ToMatrix4() const;
 
 	// Define from an angle and axis.
 	void FromAngleAxis(float angle, const Vector3& axis);
 	// Define from Euler angles
 	void FromEulerAngles(float x, float y, float z);
-	// Define from the rotation difference between two direction vectors.
-	void FromRotationTo(const Vector3& start, const Vector3& end);
 	void FromMatrix(const Matrix4& m0);
 
 	Quaternion Conjugate() const { return { -x, -y, -z, w }; }
@@ -434,6 +443,7 @@ inline float DotProduct(const Quaternion& v1, const Quaternion& v2);
 inline Quaternion QuatPower(const Quaternion& in, const Quaternion& q0, float exponent);
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept;
+inline bool operator!=(const Quaternion& Left, const Quaternion& Right) noexcept;
 
 inline Quaternion operator-(const Quaternion& In) noexcept;
 inline Quaternion operator-(const Quaternion& Left, const Quaternion& Right) noexcept;
@@ -442,12 +452,12 @@ inline Quaternion operator*(float Left, const Quaternion& Right) noexcept;
 inline Quaternion operator*(const Quaternion& Left, float Right) noexcept;
 inline Quaternion operator*(const Quaternion& Left, const Quaternion& Right) noexcept;
 inline Quaternion operator/(const Quaternion& Left, float Right) noexcept;
-inline Quaternion operator/(const Quaternion& Left, const Quaternion& Right) noexcept;
 
 inline Quaternion& operator-=(Quaternion& Left, const Quaternion& Right) noexcept;
 inline Quaternion& operator+=(Quaternion& Left, const Quaternion& Right) noexcept;
 inline Quaternion& operator*=(Quaternion& Left, float Right) noexcept;
 inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcept;
+inline Quaternion& operator/=(Quaternion& Left, float Right) noexcept;
 
 //=============================================================================
 // Matrix3

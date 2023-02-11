@@ -365,6 +365,20 @@ inline Vector3 operator+(const Vector3& Left, const Vector3& Right) noexcept { r
 inline Vector3 operator*(float Left, const Vector3& Right) noexcept          { return {   Left * Right.x,   Left * Right.y,   Left * Right.z }; }
 inline Vector3 operator*(const Vector3& Left, float Right) noexcept          { return { Left.x * Right,   Left.y * Right,   Left.z * Right   }; }
 inline Vector3 operator*(const Vector3& Left, const Vector3& Right) noexcept { return { Left.x * Right.x, Left.y * Right.y, Left.z * Right.z }; }
+inline Vector3 operator*(const Quaternion& Left, const Vector3& Right) noexcept
+{
+	const Vector3 QuatVector(Left.x, Left.y, Left.z);
+	const Vector3 uv(CrossProduct(QuatVector, Right));
+	const Vector3 uuv(CrossProduct(QuatVector, uv));
+
+	return Right + ((uv * Left.w) + uuv) * 2.0f;
+}
+
+inline Vector3 operator*(const Vector3& Left, const Quaternion& Right) noexcept
+{
+	return Right.Inverse() * Left;
+}
+
 inline Vector3 operator*(const Matrix3& Left, const Vector3& Right) noexcept
 {
 	return {
@@ -373,6 +387,7 @@ inline Vector3 operator*(const Matrix3& Left, const Vector3& Right) noexcept
 		Left[2] * Right.x + Left[5] * Right.y + Left[8] * Right.z
 	};
 }
+
 inline Vector3 operator*(const Vector3& Left, const Matrix3& Right) noexcept
 {
 	return {
@@ -475,6 +490,17 @@ inline Vector4 operator+(const Vector4& Left, const Vector4& Right) noexcept { r
 inline Vector4 operator*(float Left, const Vector4& Right) noexcept          { return {   Left * Right.x,   Left * Right.y,   Left * Right.z,   Left * Right.w }; }
 inline Vector4 operator*(const Vector4& Left, float Right) noexcept          { return { Left.x * Right,   Left.y * Right,   Left.z * Right,   Left.w * Right   }; }
 inline Vector4 operator*(const Vector4& Left, const Vector4& Right) noexcept { return { Left.x * Right.x, Left.y * Right.y, Left.z * Right.z, Left.w * Right.w }; }
+
+inline Vector4 operator*(const Quaternion& Left, const Vector4& Right) noexcept
+{
+	return Vector4(Left * Vector3(Right.x, Right.y, Right.z), Right.w);
+}
+
+inline Vector4 operator*(const Vector4& Left, const Quaternion& Right) noexcept
+{
+	return Right.Inverse() * Left;
+}
+
 inline Vector4 operator*(const Matrix4& Left, const Vector4& Right) noexcept
 {
 	return {
@@ -530,17 +556,44 @@ inline Quaternion::Quaternion(float angle, const Vector3& axis)
 
 inline Quaternion::Quaternion(float ax, float ay, float az)
 {
-	FromEulerAngles(x, y, z);
+	FromEulerAngles(ax, ay, az);
 }
 
-inline Quaternion::Quaternion(const Vector3& start, const Vector3& end)
+inline Quaternion::Quaternion(const Vector3& u, const Vector3& v)
 {
-	FromRotationTo(start, end);
+	const float norm_u_norm_v = sqrtf(DotProduct(u, u) * DotProduct(v, v));
+	float real_part = norm_u_norm_v + DotProduct(u, v);
+	Vector3 t;
+	if (real_part < 1.e-6f * norm_u_norm_v)
+	{
+		// If u and v are exactly opposite, rotate 180 degrees
+		// around an arbitrary orthogonal axis. Axis normalisation
+		// can happen later, when we normalise the quaternion.
+		real_part = 0.0f;
+
+		t = fabsf(u.x) > fabsf(u.z) ? Vector3(-u.y, u.x, 0.0f) : Vector3(0.0f, -u.z, u.y);
+	}
+	else
+	{
+		// Otherwise, build quaternion the standard way.
+		t = CrossProduct(u, v);
+	}
+	*this = Quaternion(t.x, t.y, t.z, real_part).GetNormalize(); // TODO: не ошибка ли тут - real_part это w или x?
 }
 
 inline Quaternion::Quaternion(const Matrix4& m)
 {
 	FromMatrix(m);
+}
+
+inline Quaternion::operator Matrix3() const
+{
+	return ToMatrix3();
+}
+
+inline Quaternion::operator Matrix4() const
+{
+	return ToMatrix4();
 }
 
 inline void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
@@ -557,47 +610,20 @@ inline void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
 
 inline void Quaternion::FromEulerAngles(float x_, float y_, float z_)
 {
-	// Order of rotations: Z first, then X, then Y (mimics typical FPS camera with gimbal lock at top/bottom)
 	x_ *= 0.5f;
 	y_ *= 0.5f;
 	z_ *= 0.5f;
-	const float sinX = sinf(x_);
 	const float cosX = cosf(x_);
-	const float sinY = sinf(y_);
 	const float cosY = cosf(y_);
-	const float sinZ = sinf(z_);
 	const float cosZ = cosf(z_);
+	const float sinX = sinf(x_);
+	const float sinY = sinf(y_);
+	const float sinZ = sinf(z_);
 
-	x = cosY * sinX * cosZ + sinY * cosX * sinZ;
-	y = sinY * cosX * cosZ - cosY * sinX * sinZ;
-	z = cosY * cosX * sinZ - sinY * sinX * cosZ;
-	w = cosY * cosX * cosZ + sinY * sinX * sinZ;
-}
-
-inline void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
-{
-	const Vector3 normStart = start.GetNormalize();
-	const Vector3 normEnd = end.GetNormalize();
-	const float d = DotProduct(normStart, normEnd);
-
-	if( d > -1.0f + EPSILON )
-	{
-		const Vector3 c = CrossProduct(normStart, normEnd);
-		const float s = sqrtf((1.0f + d) * 2.0f);
-		const float invS = 1.0f / s;
-
-		x = c.x * invS;
-		y = c.y * invS;
-		z = c.z * invS;
-		w = 0.5f * s;
-	}
-	else
-	{
-		Vector3 axis = CrossProduct(Vector3::Right, normStart);
-		if( axis.GetLength() < EPSILON )
-			axis = CrossProduct(Vector3::Up, normStart);
-		FromAngleAxis(180.0f*DEG2RAD, axis);
-	}
+	x = sinX * cosY * cosZ - cosX * sinY * sinZ;
+	y = cosX * sinY * cosZ + sinX * cosY * sinZ;
+	z = cosX * cosY * sinZ - sinX * sinY * cosZ;
+	w = cosX * cosY * cosZ + sinX * sinY * sinZ;
 }
 
 inline void Quaternion::FromMatrix(const Matrix4& m0)
@@ -766,6 +792,7 @@ inline Quaternion QuatPower(const Quaternion& in, const Quaternion& q0, float ex
 }
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }
+inline bool operator!=(const Quaternion& Left, const Quaternion& Right) noexcept { return !(Left == Right); }
 
 inline Quaternion operator-(const Quaternion& In) noexcept                            { return { -In.x, -In.y, -In.z, -In.w }; }
 inline Quaternion operator-(const Quaternion& Left, const Quaternion& Right) noexcept { return { Left.x - Right.x, Left.y - Right.y, Left.z - Right.z, Left.w - Right.w }; }
@@ -782,25 +809,14 @@ inline Quaternion operator*(const Quaternion& Left, const Quaternion& Right) noe
 	};
 }
 inline Quaternion operator/(const Quaternion& Left, float Right) noexcept { return { Left.x / Right,   Left.y / Right,   Left.z / Right,   Left.w / Right }; }
-inline Quaternion operator/(const Quaternion& Left, const Quaternion& Right) noexcept
-{
-	const float ls = Right[0] * Right[0] + Right[1] * Right[1] + Right[2] * Right[2] + Right[3] * Right[3];
-	const float normalized_x = -Right[0] / ls;
-	const float normalized_y = -Right[1] / ls;
-	const float normalized_z = -Right[2] / ls;
-	const float normalized_w =  Right[3] / ls;
-	return {
-		Left.x * normalized_w + normalized_x * Left.w + (Left.y * normalized_z - Left.z * normalized_y),
-		Left.y * normalized_w + normalized_y * Left.w + (Left.z * normalized_x - Left.x * normalized_z),
-		Left.z * normalized_w + normalized_z * Left.w + (Left.x * normalized_y - Left.y * normalized_x),
-		Left.w * normalized_w - (Left.x * normalized_x + Left.y * normalized_y + Left.z * normalized_z)
-	};
-}
+
+inline Quaternion operator/(const Quaternion& Left, float Right) noexcept;
 
 inline Quaternion& operator-=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left - Right; }
 inline Quaternion& operator+=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left + Right; }
 inline Quaternion& operator*=(Quaternion& Left, float Right) noexcept { return Left = Left * Right; }
 inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left * Right; }
+inline Quaternion& operator/=(Quaternion& Left, float Right) noexcept { return Left = Left / Right; }
 
 //=============================================================================
 // Matrix3 Impl
