@@ -598,14 +598,23 @@ inline Quaternion::operator Matrix4() const
 
 inline void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
 {
-	Vector3 normAxis = axis.GetNormalize();
+	Vector3 tmp = axis;
+
+	// Axis of rotation must be normalised
+	const float len = tmp.GetLength();
+	if (fabsf(len - 1.0f) > 0.001f)
+	{
+		const float oneOverLen = 1.0f / len;
+		tmp.x *= oneOverLen;
+		tmp.y *= oneOverLen;
+		tmp.z *= oneOverLen;
+	}
 	const float half = angle * 0.5f;
 	const float sinAngle = sinf(half);
-	const float cosAngle = cosf(half);
-	x = normAxis.x * sinAngle;
-	y = normAxis.y * sinAngle;
-	z = normAxis.z * sinAngle;
-	w = cosAngle;
+	x = tmp.x * sinAngle;
+	y = tmp.y * sinAngle;
+	z = tmp.z * sinAngle;
+	w = cosf(half);
 }
 
 inline void Quaternion::FromEulerAngles(float x_, float y_, float z_)
@@ -671,16 +680,37 @@ inline float Quaternion::GetLength() const { return sqrtf(x * x + y * y + z * z 
 inline float Quaternion::GetLengthSquared() const { return x * x + y * y + z * z + w * w; }
 inline Quaternion Quaternion::GetNormalize() const
 {
-	const float invLen = 1.0f / GetLength();
-	return { x * invLen, y * invLen, z * invLen, w * invLen };
+	const float len = GetLength();
+	if (len <= 0.0f) return Quaternion::Identity;
+	const float oneOverLen = 1.0f / len;
+	return { x * oneOverLen, y * oneOverLen, z * oneOverLen, w * oneOverLen };
 }
 
 inline Quaternion Quaternion::Inverse() const
 {
-	const float lenSquared = GetLengthSquared();
-	if( lenSquared == 1.0f ) return Conjugate();
-	else if( lenSquared >= EPSILON ) return Conjugate() * (1.0f / lenSquared);
-	else return Identity;
+	return Conjugate() / DotProduct(*this, *this);
+}
+
+inline float Quaternion::GetAngle() const
+{
+	if (fabsf(w) > float(0.877582561890372716130286068203503191)/*cos_one_over_two*/)
+	{
+		const float a = asinf(sqrtf(x * x + y * y + z * z)) * 2.0f;
+		if (w < 0.0f)
+			return PI * 2.0f - a;
+		return a;
+	}
+
+	return acosf(w) * 2.0f;
+}
+
+inline Vector3 Quaternion::GetAxis() const
+{
+	const float tmp1 = 1.0f - w * w;
+	if (tmp1 <= 0.0f)
+		return { 0.0f, 0.0f, 1.0f };
+	const float tmp2 = 1.0f / sqrtf(tmp1);
+	return { x * tmp2, y * tmp2, z * tmp2 };
 }
 
 inline Vector3 Quaternion::EulerAngles() const
@@ -739,56 +769,74 @@ inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) no
 		&& Equals(v1.w, v2.w, epsilon);
 }
 
-inline Quaternion Lerp(const Quaternion& a, const Quaternion& b, float x)
+inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a)
 {
-	return a + (b - a) * x;
-}
-
-inline Quaternion SLerp(const Quaternion& q0, const Quaternion& q1, float f)
-{
-	float d = DotProduct(q0, q1);
-	Quaternion tmp1 = q1;
-	float f0;
-	float f1;
-	if( d < 0.0f )
+	const float cosTheta = DotProduct(x, y);
+	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+	if (cosTheta > 1.0f - std::numeric_limits<float>::epsilon())
 	{
-		tmp1 = -tmp1;
-		d = -d;
-	}
-
-	if( d > 0.9995f )
-	{
-		f0 = 1.0f - f;
-		f1 = f;
+		// Linear interpolation
+		return Quaternion(
+			Mix(x.x, y.x, a),
+			Mix(x.y, y.y, a),
+			Mix(x.z, y.z, a),
+			Mix(x.w, y.w, a)
+		);
 	}
 	else
 	{
-		float theta = acosf(d);
-		float sin_theta = sinf(theta);
-		f0 = sinf((1.0f - f) * theta) / sin_theta;
-		f1 = sinf(f * theta) / sin_theta;
+		const float angle = acosf(cosTheta);
+		return (sinf((1.0f - a) * angle) * x + sinf(a * angle) * y) / sinf(angle);
 	}
+}
+
+inline Quaternion Lerp(const Quaternion& x, const Quaternion& y, float a)
+{
+	return x * (1.0f - a) + (y * a);
+}
+
+inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a)
+{
+	Quaternion z = y;
+
+	float cosTheta = DotProduct(x, y);
+
+	// If cosTheta < 0, the interpolation will take the long way around the sphere.
+	// To fix this, one quat must be negated.
+	if (cosTheta < 0.0f)
+	{
+		z = -y;
+		cosTheta = -cosTheta;
+	}
+
+	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+	if (cosTheta > 1.0f - std::numeric_limits<float>::epsilon())
+	{
+		// Linear interpolation
+		return Quaternion(
+			Mix(x.x, z.x, a),
+			Mix(x.y, z.y, a),
+			Mix(x.z, z.z, a),
+			Mix(x.w, z.w, a)
+		);
+	}
+	else
+	{
+		const float angle = acosf(cosTheta);
+		return (sinf((1.0f - a) * angle) * x + sinf(a * angle) * z) / sinf(angle);
+	}
+}
+
+inline float DotProduct(const Quaternion& q1, const Quaternion& q2) { return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w; }
+
+inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2)
+{
 	return {
-		q0[0] * f0 + tmp1[0] * f1,
-		q0[1] * f0 + tmp1[1] * f1,
-		q0[2] * f0 + tmp1[2] * f1,
-		q0[3] * f0 + tmp1[3] * f1
+		q1.w* q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
+		q1.w* q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z,
+		q1.w* q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x,
+		q1.w* q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z
 	};
-}
-
-inline float DotProduct(const Quaternion& v1, const Quaternion& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w; }
-
-inline Quaternion QuatPower(const Quaternion& in, const Quaternion& q0, float exponent)
-{
-	if( fabsf(q0[3]) < 1.0f - EPSILON )
-	{
-		const float alpha = acosf(q0[3]);
-		const float new_alpha = alpha * exponent;
-		const float s = sinf(new_alpha) / sinf(alpha);
-		return { in.x * s, in.y * s, in.z * s, cosf(new_alpha) };
-	}
-	else
-		return q0;
 }
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }

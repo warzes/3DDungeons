@@ -20,6 +20,7 @@ Left handed
 #	pragma warning(disable : 5264)
 #endif // _MSC_VER
 #include <math.h>
+#include <limits>
 
 //=============================================================================
 // Constant definitions
@@ -415,7 +416,7 @@ public:
 	Matrix4 ToMatrix4() const;
 
 	// Define from an angle and axis.
-	void FromAngleAxis(float angle, const Vector3& axis);
+	void FromAngleAxis(float angle, const Vector3& axis); // TODO: проверить
 	// Define from Euler angles
 	void FromEulerAngles(float x, float y, float z);
 	void FromMatrix(const Matrix4& m0);
@@ -426,13 +427,18 @@ public:
 	Quaternion GetNormalize() const;
 	Quaternion Inverse() const;
 
-	// Return Euler angles in degrees.
+	// returns the quaternion rotation angle.
+	float GetAngle() const;
+	// Returns the q rotation axis.
+	Vector3 GetAxis() const;
+
+	// Return Euler angles
 	Vector3 EulerAngles() const;
-	// Return yaw angle in degrees.
+	// Return yaw angle
 	float YawAngle() const;
-	// Return pitch angle in degrees.
+	// Return pitch angle
 	float PitchAngle() const;
-	// Return roll angle in degrees.
+	// Return roll angle
 	float RollAngle() const;
 
 	float x = 0.0f;
@@ -442,10 +448,15 @@ public:
 };
 
 inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon = EPSILON) noexcept;
-inline Quaternion Lerp(const Quaternion& a, const Quaternion& b, float x);
-inline Quaternion SLerp(const Quaternion& a, const Quaternion& b, float x);
-inline float DotProduct(const Quaternion& v1, const Quaternion& v2);
-inline Quaternion QuatPower(const Quaternion& in, const Quaternion& q0, float exponent);
+// Spherical linear interpolation of two quaternions.
+// a - Interpolation factor. The interpolation is defined beyond the range [0, 1].
+inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a);
+// Linear interpolation of two quaternions.
+inline Quaternion Lerp(const Quaternion& x, const Quaternion& y, float a);
+// Spherical linear interpolation of two quaternions.
+inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a);
+inline float DotProduct(const Quaternion& q1, const Quaternion& q2);
+inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2);
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept;
 inline bool operator!=(const Quaternion& Left, const Quaternion& Right) noexcept;
