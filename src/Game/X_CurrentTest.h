@@ -379,7 +379,7 @@ out vec4 frag_Color;
 void main()
 {
 	frag_Color = texture(Texture, TexCoord);
-	float NdotLD = max(dot(Light.Direction, normalize(Normal)), 0.0); // ламберт
+	float NdotLD = max(dot(Light.Direction, normalize(Normal)), 0.0); // Р»Р°РјР±РµСЂС‚
 	frag_Color.rgb *= Light.Ambient + Light.Diffuse * NdotLD;
 	//float attenuation = saturate(1.0 - DistanceToLight / LightRadius);
 	//frag_Color.rgb *= Light.Ambient + Light.Diffuse * NdotLD * attenuation;

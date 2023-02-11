@@ -20,7 +20,6 @@
 //-----------------------------------------------------------------------------
 std::unordered_map<std::string, Texture2D> FileTextures2D;
 std::unordered_map<std::string, Model> FileModel;
-
 //-----------------------------------------------------------------------------
 //=============================================================================
 // ResourceCacheSystem
@@ -109,7 +108,7 @@ GLuint vao, vbo;
 std::map<unsigned, std::vector<Vector3>> Points;
 std::map<unsigned, std::vector<Vector3>> Lines;
 //-----------------------------------------------------------------------------
-// TODO: можно оптимизировать, если хранить цвет в вершине, тогда не нужно использовать мап, можно использовать массив который только растет (а сбрасывается только счетчик). но займет больше памяти. хотя и н сильно
+// TODO: РјРѕР¶РЅРѕ РѕРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ, РµСЃР»Рё С…СЂР°РЅРёС‚СЊ С†РІРµС‚ РІ РІРµСЂС€РёРЅРµ, С‚РѕРіРґР° РЅРµ РЅСѓР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РјР°Рї, РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РјР°СЃСЃРёРІ РєРѕС‚РѕСЂС‹Р№ С‚РѕР»СЊРєРѕ СЂР°СЃС‚РµС‚ (Р° СЃР±СЂР°СЃС‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ СЃС‡РµС‚С‡РёРє). РЅРѕ Р·Р°Р№РјРµС‚ Р±РѕР»СЊС€Рµ РїР°РјСЏС‚Рё. С…РѕС‚СЏ Рё РЅ СЃРёР»СЊРЅРѕ
 //-----------------------------------------------------------------------------
 void drawGround(float scale)
 { // 10x10
@@ -456,7 +455,7 @@ void DebugDraw::DrawCapsule(const Vector3& from, const Vector3& to, float r, uns
 void DebugDraw::DrawDiamond(const Vector3& from, const Vector3& to, float size, unsigned rgb)
 {
 
-	class poly // TODO: удалить?
+	class poly // TODO: СѓРґР°Р»РёС‚СЊ?
 	{
 	public:
 		std::vector<Vector3> verts;
@@ -683,7 +682,7 @@ void DebugDraw::Flush(const Matrix4& ViewProj)
 	shaderProgram.Bind();
 	shaderProgram.SetUniform(MatrixID, ViewProj);
 
-	// TODO: сделать интерфейс
+	// TODO: СЃРґРµР»Р°С‚СЊ РёРЅС‚РµСЂС„РµР№СЃ
 	VertexArrayBuffer::UnBind();
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -725,8 +724,8 @@ void DebugDraw::Flush(const Matrix4& ViewProj)
 	//glDisable(GL_PROGRAM_POINT_SIZE);
 	glBindVertexArray(0);
 
-	Points.clear(); // TODO: надо по другому - без реальной очистки памяти
-	Lines.clear(); // TODO: надо по другому - без реальной очистки памяти
+	Points.clear(); // TODO: РЅР°РґРѕ РїРѕ РґСЂСѓРіРѕРјСѓ - Р±РµР· СЂРµР°Р»СЊРЅРѕР№ РѕС‡РёСЃС‚РєРё РїР°РјСЏС‚Рё
+	Lines.clear(); // TODO: РЅР°РґРѕ РїРѕ РґСЂСѓРіРѕРјСѓ - Р±РµР· СЂРµР°Р»СЊРЅРѕР№ РѕС‡РёСЃС‚РєРё РїР°РјСЏС‚Рё
 }
 //-----------------------------------------------------------------------------
 bool DebugDraw::Init()

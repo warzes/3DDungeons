@@ -424,7 +424,7 @@ bool VertexArrayBuffer::Create(VertexBuffer* vbo, IndexBuffer* ibo, const std::v
 	if (m_ibo) m_ibo->Bind();
 
 	glBindVertexArray(state::CurrentVAO); // restore VAO
-	// TODO: нужно ли ресторить vbo и ibo?
+	// TODO: РЅСѓР¶РЅРѕ Р»Рё СЂРµСЃС‚РѕСЂРёС‚СЊ vbo Рё ibo?
 	return true;
 }
 //-----------------------------------------------------------------------------
@@ -540,7 +540,7 @@ inline bool getTextureFormatType(TexelsFormat inFormat, GLenum textureType, GLen
 		internalFormat = GL_RG8;
 		oglType = GL_UNSIGNED_BYTE;
 		const GLint swizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_GREEN };
-		glTexParameteriv(textureType, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask); // TODO: могут быть проблемы с браузерами, тогда только грузить stb с указанием нужного формата
+		glTexParameteriv(textureType, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask); // TODO: РјРѕРіСѓС‚ Р±С‹С‚СЊ РїСЂРѕР±Р»РµРјС‹ СЃ Р±СЂР°СѓР·РµСЂР°РјРё, С‚РѕРіРґР° С‚РѕР»СЊРєРѕ РіСЂСѓР·РёС‚СЊ stb СЃ СѓРєР°Р·Р°РЅРёРµРј РЅСѓР¶РЅРѕРіРѕ С„РѕСЂРјР°С‚Р°
 	}
 	else if (inFormat == TexelsFormat::RGB_U8)
 	{
@@ -590,11 +590,11 @@ bool Texture2D::Create(const char* fileName, const Texture2DInfo& textureInfo)
 {
 	//stbi_set_flip_vertically_on_load(verticallyFlip ? 1 : 0);
 
-	const int desiredСhannels = STBI_default;
+	const int desiredРЎhannels = STBI_default;
 	int width = 0;
 	int height = 0;
 	int nrChannels = 0;
-	stbi_uc* pixelData = stbi_load(fileName, &width, &height, &nrChannels, desiredСhannels);
+	stbi_uc* pixelData = stbi_load(fileName, &width, &height, &nrChannels, desiredРЎhannels);
 	if (!pixelData || nrChannels < STBI_grey || nrChannels > STBI_rgb_alpha || width == 0 || height == 0)
 	{
 		LogError("Image loading failed! Filename='" + std::string(fileName) + "'");
@@ -605,8 +605,8 @@ bool Texture2D::Create(const char* fileName, const Texture2DInfo& textureInfo)
 	const size_t imageDataSize = (size_t)width * height * nrChannels;
 
 	bool IsTransparent = false;
-	// TODO: может быть медленно, проверить скорость и поискать другое решение
-	if (nrChannels == STBI_rgb_alpha) // TODO: сделать еще и для 2
+	// TODO: РјРѕР¶РµС‚ Р±С‹С‚СЊ РјРµРґР»РµРЅРЅРѕ, РїСЂРѕРІРµСЂРёС‚СЊ СЃРєРѕСЂРѕСЃС‚СЊ Рё РїРѕРёСЃРєР°С‚СЊ РґСЂСѓРіРѕРµ СЂРµС€РµРЅРёРµ
+	if (nrChannels == STBI_rgb_alpha) // TODO: СЃРґРµР»Р°С‚СЊ РµС‰Рµ Рё РґР»СЏ 2
 	{
 		for (size_t i = 0; i < imageDataSize-4; i += 4)
 		{
@@ -736,11 +736,11 @@ bool TextureCube::Create(const char* fileNameRight, const char* fileNameLeft, co
 	{
 		stbi_set_flip_vertically_on_load(1);
 
-		const int desiredСhannels = STBI_rgb; // Конвертировать в RGB
+		const int desiredРЎhannels = STBI_rgb; // РљРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ РІ RGB
 		int width = 0;
 		int height = 0;
 		int nrChannels = 0;
-		stbi_uc* pixelData = stbi_load(fileNames[i], &width, &height, &nrChannels, desiredСhannels);
+		stbi_uc* pixelData = stbi_load(fileNames[i], &width, &height, &nrChannels, desiredРЎhannels);
 		if( !pixelData || width == 0 || height == 0 )
 		{
 			LogError("Image loading failed! Filename='" + std::string(fileNames[i]) + "'");

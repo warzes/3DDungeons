@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 /*
 * Matrix Column Row
@@ -53,6 +53,7 @@ inline constexpr int   Max(int a, int b) noexcept;
 inline constexpr float Max(float a, float b) noexcept;
 inline constexpr float Clamp(float value, float min, float max) noexcept;
 inline constexpr float Lerp(float a, float b, float f) noexcept; // Linear interpolation between two float values.
+inline constexpr float Mix(float u, float v, float a) noexcept;
 
 //=============================================================================
 // Color
@@ -140,16 +141,15 @@ public:
 	constexpr Vector2() = default;
 	constexpr Vector2(Vector2&&) = default;
 	constexpr Vector2(const Vector2&) = default;
-	constexpr Vector2(float num) : x(num), y(num) {}
+	constexpr Vector2(float scalar) : x(scalar), y(scalar) {}
 	constexpr Vector2(float nx, float ny) : x(nx), y(ny) {}
 
 	constexpr Vector2& operator=(Vector2&&) = default;
 	constexpr Vector2& operator=(const Vector2&) = default;
 
-	float& operator[](size_t i) noexcept { return (&x)[i]; }
-	const float operator[](size_t i) const noexcept { return (&x)[i]; }
+	constexpr float& operator[](size_t i) noexcept { return (&x)[i]; }
+	constexpr const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
-	float GetAngle() const;
 	float GetLength() const;
 	float GetLengthSquared() const;
 	Vector2 GetNormalize() const;
@@ -165,9 +165,12 @@ inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x);
 inline Vector2 Mix(const Vector2& u, const Vector2& v, float a);
 inline float Distance(const Vector2& v1, const Vector2& v2);
 inline float DotProduct(const Vector2& v1, const Vector2& v2);
+inline Vector2 Reflect(const Vector2& v, const Vector2& normal);
+inline Vector2 Refract(const Vector2& i, const Vector2& normal, float eta);
+
+
 inline Vector2 Project(const Vector2& v1, const Vector2& v2);
 inline Vector2 Slide(const Vector2& v, const Vector2& normal);
-inline Vector2 Reflect(const Vector2& v, const Vector2& normal);
 inline Vector2 Tangent(const Vector2& v);
 inline Vector2 Rotate(const Vector2& v, float angle);
 inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, float f);
@@ -179,6 +182,7 @@ inline void Ceil(Vector2& v);
 inline void Round(Vector2& v);
 
 inline bool operator==(const Vector2& Left, const Vector2& Right) noexcept;
+inline bool operator!=(const Vector2& Left, const Vector2& Right) noexcept;
 
 inline Vector2 operator-(const Vector2& In) noexcept;
 inline Vector2 operator-(float Left, const Vector2& Right) noexcept;
@@ -227,8 +231,8 @@ public:
 	constexpr Vector3& operator=(Vector3&&) = default;
 	constexpr Vector3& operator=(const Vector3&) = default;
 
-	float& operator[](size_t i) noexcept { return (&x)[i]; }
-	const float operator[](size_t i) const noexcept { return (&x)[i]; }
+	constexpr float& operator[](size_t i) noexcept { return (&x)[i]; }
+	constexpr const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
 	float GetLength() const;
 	float GetLengthSquared() const;
@@ -244,18 +248,18 @@ inline Vector3 Min(const Vector3& v1, const Vector3& v2);
 inline Vector3 Max(const Vector3& v1, const Vector3& v2);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
 inline Vector3 Mix(const Vector3& u, const Vector3& v, float t);
-
 inline float Distance(const Vector3& v1, const Vector3& v2);
 inline float DotProduct(const Vector3& v1, const Vector3& v2);
 inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2);
-inline Vector3 Project(const Vector3& v1, const Vector3& v2);
+inline Vector3 Reflect(const Vector3& v, const Vector3& normal);
+inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta);
 
+inline Vector3 Project(const Vector3& v1, const Vector3& v2);
 inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v); // TODO: удалить?
 // Return the angle between this vector and another vector in degrees.
 inline float Angle(const Vector3& v1, const Vector3& v2);
 // Returns this vector slide along a plane defined by the given normal.
 inline Vector3 Slide(const Vector3& v, const Vector3& normal);
-inline Vector3 Reflect(const Vector3& v, const Vector3& normal);
 inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle);
 inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f);
 inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3, float f);
@@ -266,6 +270,7 @@ inline void Ceil(Vector3& v);
 inline void Round(Vector3& v);
 
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept;
+inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept;
 
 inline Vector3 operator-(const Vector3& In) noexcept;
 inline Vector3 operator-(float Left, const Vector3& Right) noexcept;
@@ -277,10 +282,13 @@ inline Vector3 operator+(const Vector3& Left, const Vector3& Right) noexcept;
 inline Vector3 operator*(float Left, const Vector3& Right) noexcept;
 inline Vector3 operator*(const Vector3& Left, float Right) noexcept;
 inline Vector3 operator*(const Vector3& Left, const Vector3& Right) noexcept;
-inline Vector3 operator*(const Matrix3& m, const Vector3& v) noexcept;
+inline Vector3 operator*(const Matrix3& Left, const Vector3& Right) noexcept;
+inline Vector3 operator*(const Vector3& Left, const Matrix3& Right) noexcept;
 inline Vector3 operator/(float Left, const Vector3& Right) noexcept;
 inline Vector3 operator/(const Vector3& Left, float Right) noexcept;
 inline Vector3 operator/(const Vector3& Left, const Vector3& Right) noexcept;
+inline Vector3 operator/(const Matrix3& Left, const Vector3& Right) noexcept;
+inline Vector3 operator/(const Vector3& Left, const Matrix3& Right) noexcept;
 
 inline Vector3& operator-=(Vector3& Left, float Right) noexcept;
 inline Vector3& operator-=(Vector3& Left, const Vector3& Right) noexcept;
@@ -307,8 +315,8 @@ public:
 	constexpr Vector4& operator=(Vector4&&) = default;
 	constexpr Vector4& operator=(const Vector4&) = default;
 
-	float& operator[](size_t i) noexcept { return (&x)[i]; }
-	const float operator[](size_t i) const noexcept { return (&x)[i]; }
+	constexpr float& operator[](size_t i) noexcept { return (&x)[i]; }
+	constexpr const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
 	float* operator&() { return (float*)this; }
 
@@ -326,6 +334,7 @@ inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon = EPSILON
 inline Vector4 Min(const Vector4& v1, const Vector4& v2);
 inline Vector4 Max(const Vector4& v1, const Vector4& v2);
 inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x);
+inline Vector4 Mix(const Vector4& u, const Vector4& v, float a);
 inline float DotProduct(const Vector4& v1, const Vector4& v2);
 
 inline void Abs(Vector4& v);
@@ -334,6 +343,7 @@ inline void Ceil(Vector4& v);
 inline void Round(Vector4& v);
 
 inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept;
+inline bool operator!=(const Vector4& Left, const Vector4& Right) noexcept;
 
 inline Vector4 operator-(const Vector4& In) noexcept;
 inline Vector4 operator-(float Left, const Vector4& Right) noexcept;
@@ -380,8 +390,8 @@ public:
 	constexpr Quaternion& operator=(Quaternion&&) = default;
 	constexpr Quaternion& operator=(const Quaternion&) = default;
 
-	float& operator[](size_t i) noexcept { return (&x)[i]; }
-	const float operator[](size_t i) const noexcept { return (&x)[i]; }
+	constexpr float& operator[](size_t i) noexcept { return (&x)[i]; }
+	constexpr const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
 	constexpr void Set(float nx, float ny, float nz, float nw) { x = nx; y = ny; z = nz; w = nw; }
 
@@ -439,23 +449,16 @@ inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcep
 //=============================================================================
 // Matrix3
 //=============================================================================
-/*
-Matrix 3×3 representation:
-0/m11 3/m12 6/m13
-1/m21 4/m22 7/m23
-2/m31 5/m32 8/m33
-*/
 class Matrix3
 {
 public:
 	constexpr Matrix3() = default;
 	constexpr Matrix3(Matrix3&&) = default;
 	constexpr Matrix3(const Matrix3&) = default;
-	constexpr Matrix3(const float* f);
 	constexpr Matrix3(
-		float m11, float m21, float m31, 
-		float m12, float m22, float m32, 
-		float m13, float m23, float m33);
+		float x0, float y0, float z0,
+		float x1, float y1, float z1,
+		float x2, float y2, float z2);
 	Matrix3(const Matrix4& m);
 
 	constexpr Matrix3& operator=(Matrix3&&) = default;
@@ -464,11 +467,10 @@ public:
 	constexpr float& operator[](size_t i) noexcept { return m[i]; }
 	constexpr const float operator[](size_t i) const noexcept { return m[i]; }
 
-	constexpr void Set(const float* f);
 	constexpr void Set(
-		float m11, float m21, float m31,
-		float m12, float m22, float m32,
-		float m13, float m23, float m33);
+		float x0, float y0, float z0,
+		float x1, float y1, float z1,
+		float x2, float y2, float z2);
 	constexpr void Set(const Matrix3& M);
 
 	float GetDeterminant() const;
@@ -489,15 +491,37 @@ inline Matrix3 Matrix3RotationY(float angle);
 inline Matrix3 Matrix3RotationZ(float angle);
 inline Matrix3 Matrix3Rotation(const Quaternion& q);
 
-inline Matrix3 operator*(float f, const Matrix3 &m) noexcept;
-inline Matrix3 operator*(const Matrix3 &m, float f) noexcept;
+inline bool operator==(const Matrix3& Left, const Matrix3& Right) noexcept;
+inline bool operator!=(const Matrix3& Left, const Matrix3& Right) noexcept;
+
+inline Matrix3 operator-(const Matrix3& In) noexcept;
+inline Matrix3 operator-(float Left, const Matrix3& Right) noexcept;
+inline Matrix3 operator-(const Matrix3& Left, float Right) noexcept;
+inline Matrix3 operator-(const Matrix3& Left, const Matrix3& Right) noexcept;
+inline Matrix3 operator+(float Left, const Matrix3& Right) noexcept;
+inline Matrix3 operator+(const Matrix3& Left, float Right) noexcept;
+inline Matrix3 operator+(const Matrix3& Left, const Matrix3& Right) noexcept;
+inline Matrix3 operator*(float Left, const Matrix3& Right) noexcept;
+inline Matrix3 operator*(const Matrix3& Left, float Right) noexcept;
 inline Matrix3 operator*(const Matrix3& Left, const Matrix3& Right) noexcept;
+inline Matrix3 operator/(float Left, const Matrix3& Right) noexcept;
+inline Matrix3 operator/(const Matrix3& Left, float Right) noexcept;
+inline Matrix3 operator/(const Matrix3& Left, const Matrix3& Right) noexcept;
+
+inline Matrix3& operator-=(Matrix3& Left, float Right) noexcept;
+inline Matrix3& operator-=(Matrix3& Left, const Matrix3& Right) noexcept;
+inline Matrix3& operator+=(Matrix3& Left, float Right) noexcept;
+inline Matrix3& operator+=(Matrix3& Left, const Matrix3& Right) noexcept;
+inline Matrix3& operator*=(Matrix3& Left, float Right) noexcept;
+inline Matrix3& operator*=(Matrix3& Left, const Matrix3& Right) noexcept;
+inline Matrix3& operator/=(Matrix3& Left, float Right) noexcept;
+inline Matrix3& operator/=(Matrix3& Left, const Matrix3& Right) noexcept;
 
 //=============================================================================
 // Matrix4
 //=============================================================================
 /*
-Matrix 4×4 representation:
+Matrix 4?4 representation:
 0/m11 4/m12  8/m13 12/m14
 1/m21 5/m22  9/m23 13/m24
 2/m31 6/m32 10/m33 14/m34

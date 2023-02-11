@@ -1,6 +1,6 @@
 #pragma once
 
-// TODO: для сортировки строк https://spiskin.ru/scripts/sort_alphabet/
+// TODO: РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё СЃС‚СЂРѕРє https://spiskin.ru/scripts/sort_alphabet/
 
 #ifdef __gl_h_
 #	error OpenGL (gl.h) header already included (API: gl), remove previous include!

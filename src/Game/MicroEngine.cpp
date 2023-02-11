@@ -1,7 +1,7 @@
 //=============================================================================
 // Header
 //=============================================================================
-
+//-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma warning(push)
 //#	pragma warning(disable : 4005)
@@ -36,7 +36,7 @@
 #if defined(_MSC_VER)
 #	pragma warning(pop)
 #endif // _MSC_VER
-
+//-----------------------------------------------------------------------------
 //=============================================================================
 // Global var
 //=============================================================================
@@ -502,11 +502,11 @@ bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
 		return false;
 	}
 
-	// временное окно не создается так как нет установки пиксельформата (а обычно стоит его делать - https://www.khronos.org/opengl/wiki/Creating_an_OpenGL_Context_(WGL) - Create a False Context
+	// РІСЂРµРјРµРЅРЅРѕРµ РѕРєРЅРѕ РЅРµ СЃРѕР·РґР°РµС‚СЃСЏ С‚Р°Рє РєР°Рє РЅРµС‚ СѓСЃС‚Р°РЅРѕРІРєРё РїРёРєСЃРµР»СЊС„РѕСЂРјР°С‚Р° (Р° РѕР±С‹С‡РЅРѕ СЃС‚РѕРёС‚ РµРіРѕ РґРµР»Р°С‚СЊ - https://www.khronos.org/opengl/wiki/Creating_an_OpenGL_Context_(WGL) - Create a False Context
 	HGLRC tempContext = wglCreateContext(window::Win32DCHandle);
 	if (!tempContext || !wglMakeCurrent(window::Win32DCHandle, tempContext))
 	{
-		Fatal("Сreating temp render context fail");
+		Fatal("РЎreating temp render context fail");
 		return false;
 	}
 

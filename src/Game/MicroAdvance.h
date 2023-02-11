@@ -12,11 +12,6 @@ class Texture2D;
 class Model;
 
 //=============================================================================
-// Config
-//=============================================================================
-#define USE_SIMPLE_PERLIN_NOISE 1
-
-//=============================================================================
 // File Resource Cache System
 //=============================================================================
 namespace ResourceCacheSystem
@@ -36,6 +31,11 @@ namespace ResourceCacheSystem
 // Debug Draw
 //=============================================================================
 
+// ------------------------------------------------------------------------
+// debugdraw framework
+// Credits: Based on work by @glampert https://github.com/glampert/debug-draw (PD)
+namespace DebugDraw
+{
 #define RGBX(rgb,x)   ( ((rgb)&0xFFFFFF) | (((unsigned)(x))<<24) )
 #define RGB3(r,g,b)   ( ((r)<<16) | ((g)<<8) | (b) )
 #define RGB4(r,g,b,a) RGBX(RGB3(r,g,b),a)
@@ -53,23 +53,10 @@ namespace ResourceCacheSystem
 #define PINK    RGB3(  255,48,144 )
 #define AQUA    RGB3(  48,255,144 )
 
-inline constexpr Vector3 RGBToVec(unsigned rgb)
-{
-	return { ((rgb >> 16) & 255) / 255.f, ((rgb >> 8) & 255) / 255.f, ((rgb >> 0) & 255) / 255.f };
-}
-
-namespace DebugDraw
-{
-	// ------------------------------------------------------------------------
-	// debugdraw framework
-	// Credits: Based on work by @glampert https://github.com/glampert/debug-draw (PD)
-	// [x] grid, axis, frustum, cube, sphere, triangle, square, pentagon, hexagon, circle, normal.
-	// [x] arrow, point, text, capsule, aabb, plane, flotilla-style locator, boid,
-	// [x] line batching
-	// [*] line width and stipple
-	// [*] (proper) gizmo,
-	// [ ] bone (pyramid? two boids?), ring,
-	// [ ] camera, light bulb, light probe,
+	inline constexpr Vector3 RGBToVec(unsigned rgb)
+	{
+		return { ((rgb >> 16) & 255) / 255.f, ((rgb >> 8) & 255) / 255.f, ((rgb >> 0) & 255) / 255.f };
+	}
 
 	void DrawPoint(const Vector3& from, unsigned rgb);
 	void DrawLine(const Vector3& from, const Vector3& to, unsigned rgb);
@@ -82,7 +69,7 @@ namespace DebugDraw
 	void DrawTriangle(const Vector3& p1, const Vector3& p2, const Vector3& p3, unsigned rgb);
 
 	void DrawArrow(const Vector3& begin, const Vector3& end, unsigned rgb);
-	void DrawBounds(const Vector3 points[8], unsigned rgb); // TODO: передавать points по ссылке, сейчас оно копируется
+	void DrawBounds(const Vector3 points[8], unsigned rgb); // TODO: РїРµСЂРµРґР°РІР°С‚СЊ points РїРѕ СЃСЃС‹Р»РєРµ, СЃРµР№С‡Р°СЃ РѕРЅРѕ РєРѕРїРёСЂСѓРµС‚СЃСЏ
 	void DrawBox(const Vector3& c, const Vector3& extents, unsigned rgb);
 	void DrawCube(const Vector3& center, float radius, unsigned rgb);
 	void DrawPlane(const Vector3& p, const Vector3& n, float scale, unsigned rgb);
@@ -111,10 +98,3 @@ namespace DebugDraw
 	bool Init();
 	void Close();
 } // DebugDraw
-
-//=============================================================================
-// Simple Perlin Noise
-//=============================================================================
-#if USE_SIMPLE_PERLIN_NOISE
-
-#endif // USE_SIMPLE_PERLIN_NOISE

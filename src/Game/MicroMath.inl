@@ -34,6 +34,10 @@ inline constexpr float Lerp(float a, float b, float f) noexcept
 	return a + f * (b - a);
 }
 
+inline constexpr float Mix(float u, float v, float a) noexcept
+{
+	return u * (1.0f - a) + v * a; 
+}
 
 //=============================================================================
 // Color Impl
@@ -87,7 +91,6 @@ inline Point2& operator/=(Point2& Left, const Point2& Right) noexcept { return L
 // Vector2 Impl
 //=============================================================================
 
-inline float Vector2::GetAngle() const { return atan2f(y, x); }
 inline float Vector2::GetLength() const { return sqrtf(x * x + y * y); }
 inline float Vector2::GetLengthSquared() const { return x * x + y * y; }
 inline Vector2 Vector2::GetNormalize() const
@@ -107,8 +110,21 @@ inline Vector2 Max(const Vector2& v1, const Vector2& v2) { return { Max(v1.x, v2
 inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x) { return a + (b - a) * x; }
 inline Vector2 Mix(const Vector2& u, const Vector2& v, float a) { return u * (1.0f - a) + v * a; }
 
-inline float Distance(const Vector2& v1, const Vector2& v2) { return (v1 - v2).GetLength(); }
+inline float Distance(const Vector2& v1, const Vector2& v2) { return (v2 - v1).GetLength(); }
 inline float DotProduct(const Vector2& v1, const Vector2& v2) { return v1.x * v2.x + v1.y * v2.y; }
+
+inline Vector2 Reflect(const Vector2& v, const Vector2& normal)
+{
+	return v - normal * DotProduct(normal, v) * 2.0f;
+}
+
+inline Vector2 Refract(const Vector2& i, const Vector2& normal, float eta)
+{
+	const float dotValue = DotProduct(normal, i);
+	const float k = 1.0f - eta * eta * (1.0f - dotValue * dotValue);
+	return (k >= 0.0f) ? (eta * i - (eta * dotValue + sqrtf(k)) * normal) : Vector2(0.0f);
+}
+
 inline Vector2 Project(const Vector2& v1, const Vector2& v2)
 {
 	const float d = DotProduct(v2, v2);
@@ -118,14 +134,10 @@ inline Vector2 Project(const Vector2& v1, const Vector2& v2)
 inline Vector2 Slide(const Vector2& v, const Vector2& normal)
 {
 	const float d = DotProduct(v, normal);
-	return v - normal * d; // проверить что так { v.x - normal.x * d, v.y - normal.y * d };
+	return v - normal * d; // РїСЂРѕРІРµСЂРёС‚СЊ С‡С‚Рѕ С‚Р°Рє { v.x - normal.x * d, v.y - normal.y * d };
 }
 
-inline Vector2 Reflect(const Vector2& v, const Vector2& normal)
-{
-	const float d = 2.0f * DotProduct(v, normal);
-	return normal * d - v; // проверить что так  { normal.x * d - v.x, normal.y * d - v.y };
-}
+
 
 inline Vector2 Tangent(const Vector2& v)
 {
@@ -184,6 +196,7 @@ inline void Round(Vector2& v)
 }
 
 inline bool operator==(const Vector2& Left, const Vector2& Right) noexcept   { return Left.x == Right.x && Left.y == Right.y; }
+inline bool operator!=(const Vector2& Left, const Vector2& Right) noexcept   { return !(Left == Right); }
 
 inline Vector2 operator-(const Vector2& In) noexcept                         { return { -In.x, -In.y }; }
 inline Vector2 operator-(float Left, const Vector2& Right) noexcept          { return {   Left - Right.x,   Left - Right.y }; }
@@ -240,7 +253,7 @@ inline Vector3 Max(const Vector3& v1, const Vector3& v2) { return { Max(v1.x, v2
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x) { return a + (b - a) * x; }
 inline Vector3 Mix(const Vector3& u, const Vector3& v, float t) { return u * (1.0f - t) + v * t; }
 
-inline float Distance(const Vector3& v1, const Vector3& v2) { return (v1 - v2).GetLength(); }
+inline float Distance(const Vector3& v1, const Vector3& v2) { return (v2 - v1).GetLength(); }
 inline float DotProduct(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
 inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2) 
 {
@@ -250,6 +263,19 @@ inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2)
 		v1.x * v2.y - v1.y * v2.x
 	};
 }
+
+inline Vector3 Reflect(const Vector3& v, const Vector3& normal)
+{
+	return v - normal * DotProduct(normal, v) * 2.0f;
+}
+
+inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta)
+{
+	const float dotValue = DotProduct(normal, i);
+	const float k = 1.0f - eta * eta * (1.0f - dotValue * dotValue);
+	return (k >= 0.0f) ? (eta * i - (eta * dotValue + sqrtf(k)) * normal) : Vector3(0.0f);
+}
+
 inline Vector3 Project(const Vector3& v0, const Vector3& v1)
 {
 	const float d = DotProduct(v1, v1);
@@ -260,19 +286,13 @@ inline Vector3 Project(const Vector3& v0, const Vector3& v1)
 inline float Angle(const Vector3& v1, const Vector3& v2)
 {
 	float x = DotProduct(v1, v2) / (v1.GetLength() * v2.GetLength());
-	return RAD2DEG * acosf(Clamp(x, -1.0f, 1.0f)); // TODO: не конвертировать в градусы
+	return RAD2DEG * acosf(Clamp(x, -1.0f, 1.0f)); // TODO: РЅРµ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ РІ РіСЂР°РґСѓСЃС‹
 }
 
 inline Vector3 Slide(const Vector3& v, const Vector3& normal)
 {
 	const float d = DotProduct(v, normal);
-	return v - normal * d; //проверить что так { v.x - normal.x * d, v.y - normal.y * d, v.z - normal.z * d };
-}
-
-inline Vector3 Reflect(const Vector3& v, const Vector3& normal)
-{
-	const float d = 2.0f * DotProduct(v, normal);
-	return normal * d - v; // проверить что так  { normal.x * d - v.x, normal.y * d - v.y, normal.z * d - v.z };
+	return v - normal * d; //РїСЂРѕРІРµСЂРёС‚СЊ С‡С‚Рѕ С‚Р°Рє { v.x - normal.x * d, v.y - normal.y * d, v.z - normal.z * d };
 }
 
 inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle)
@@ -333,6 +353,7 @@ inline void Round(Vector3& v)
 }
 
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept   { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z; }
+inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept   { return !(Left == Right); }
 
 inline Vector3 operator-(const Vector3& In) noexcept                         { return { -In.x, -In.y, -In.z }; }
 inline Vector3 operator-(float Left, const Vector3& Right) noexcept          { return {   Left - Right.x,   Left - Right.y,   Left - Right.z }; }
@@ -344,18 +365,36 @@ inline Vector3 operator+(const Vector3& Left, const Vector3& Right) noexcept { r
 inline Vector3 operator*(float Left, const Vector3& Right) noexcept          { return {   Left * Right.x,   Left * Right.y,   Left * Right.z }; }
 inline Vector3 operator*(const Vector3& Left, float Right) noexcept          { return { Left.x * Right,   Left.y * Right,   Left.z * Right   }; }
 inline Vector3 operator*(const Vector3& Left, const Vector3& Right) noexcept { return { Left.x * Right.x, Left.y * Right.y, Left.z * Right.z }; }
-inline Vector3 operator*(const Matrix3& m, const Vector3& v) noexcept
+inline Vector3 operator*(const Matrix3& Left, const Vector3& Right) noexcept
 {
 	return {
-		m[0] * v.x + m[3] * v.y + m[6] * v.z,
-		m[1] * v.x + m[4] * v.y + m[7] * v.z,
-		m[2] * v.x + m[5] * v.y + m[8] * v.z
+		Left[0] * Right.x + Left[3] * Right.y + Left[6] * Right.z,
+		Left[1] * Right.x + Left[4] * Right.y + Left[7] * Right.z,
+		Left[2] * Right.x + Left[5] * Right.y + Left[8] * Right.z
+	};
+}
+inline Vector3 operator*(const Vector3& Left, const Matrix3& Right) noexcept
+{
+	return {
+		Left[0] * Left.x + Left[1] * Left.y + Left[2] * Left.z,
+		Left[3] * Left.x + Left[4] * Left.y + Left[5] * Left.z,
+		Left[6] * Left.x + Left[7] * Left.y + Left[8] * Left.z
 	};
 }
 
 inline Vector3 operator/(float Left, const Vector3& Right) noexcept          { return {   Left / Right.x,   Left / Right.y,   Left / Right.z }; }
 inline Vector3 operator/(const Vector3& Left, float Right) noexcept          { return { Left.x / Right,   Left.y / Right,   Left.z / Right   }; }
 inline Vector3 operator/(const Vector3& Left, const Vector3& Right) noexcept { return { Left.x / Right.x, Left.y / Right.y, Left.z / Right.z }; }
+
+inline Vector3 operator/(const Matrix3& Left, const Vector3& Right) noexcept
+{
+	return Left.Inverse() * Right;
+}
+
+inline Vector3 operator/(const Vector3& Left, const Matrix3& Right) noexcept
+{
+	return Left * Right.Inverse();
+}
 
 inline Vector3& operator-=(Vector3& Left, float Right) noexcept { return Left = Left - Right; }
 inline Vector3& operator-=(Vector3& Left, const Vector3& Right) noexcept { return Left = Left - Right; }
@@ -388,6 +427,7 @@ inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon) noexcept
 inline Vector4 Min(const Vector4& v1, const Vector4& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z), Min(v1.w, v2.w) }; }
 inline Vector4 Max(const Vector4& v1, const Vector4& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z), Max(v1.w, v2.w) }; }
 inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x) { return a + (b - a) * x; }
+inline Vector4 Mix(const Vector4& u, const Vector4& v, float a) { return u * (1.0f - a) + v * a; }
 inline float DotProduct(const Vector4& v1, const Vector4& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w; }
 
 inline void Abs(Vector4& v)
@@ -422,7 +462,8 @@ inline void Round(Vector4& v)
 	v.w = roundf(v.w);
 }
 
-inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }
+inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept   { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }
+inline bool operator!=(const Vector4& Left, const Vector4& Right) noexcept   { return !(Left == Right); }
 
 inline Vector4 operator-(const Vector4& In) noexcept                         { return { -In.x, -In.y, -In.z, -In.w }; }
 inline Vector4 operator-(float Left, const Vector4& Right) noexcept          { return {   Left - Right.x,   Left - Right.y,   Left - Right.z,   Left - Right.w }; }
@@ -745,17 +786,12 @@ inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcep
 // Matrix3 Impl
 //=============================================================================
 
-inline constexpr Matrix3::Matrix3(const float* f)
-{
-	Set(f);
-}
-
 inline constexpr Matrix3::Matrix3(
-	float m11, float m21, float m31,
-	float m12, float m22, float m32,
-	float m13, float m23, float m33)
+	float x0, float y0, float z0,
+	float x1, float y1, float z1,
+	float x2, float y2, float z2)
 {
-	Set(m11, m21, m31, m12, m22, m32, m13, m23, m33);
+	Set(x0, y0, z0, x1, y1, z1, x2, y2, z2);
 }
 
 inline Matrix3::Matrix3(const Matrix4& m)
@@ -765,40 +801,19 @@ inline Matrix3::Matrix3(const Matrix4& m)
 		m[8], m[9], m[10]);
 }
 
-inline constexpr void Matrix3::Set(const float* f)
-{
-	m[0] = f[0];
-	m[1] = f[1];
-	m[2] = f[2];
-	m[3] = f[3];
-	m[4] = f[4];
-	m[5] = f[5];
-	m[6] = f[6];
-	m[7] = f[7];
-	m[8] = f[8];
-}
-
 inline constexpr void Matrix3::Set(
-	float m11, float m21, float m31,
-	float m12, float m22, float m32,
-	float m13, float m23, float m33)
+	float x0, float y0, float z0,
+	float x1, float y1, float z1,
+	float x2, float y2, float z2)
 {
-	m[0] = m11;
-	m[1] = m21;
-	m[2] = m31;
-	m[3] = m12;
-	m[4] = m22;
-	m[5] = m32;
-	m[6] = m13;
-	m[7] = m23;
-	m[8] = m33;
+	m[0] = x0; m[1] = y0; m[2] = z0;
+	m[3] = x1; m[4] = y1; m[5] = z1;
+	m[6] = x2; m[7] = y2; m[8] = z2;
 }
 
 inline constexpr void Matrix3::Set(const Matrix3& M)
 {
-	m[0] = M[0]; m[1] = M[1]; m[2] = M[2];
-	m[3] = M[3]; m[4] = M[4]; m[5] = M[5];
-	m[6] = M[6]; m[7] = M[7]; m[8] = M[8];
+	*this = M;
 }
 
 inline float Matrix3::GetDeterminant() const
@@ -946,41 +961,146 @@ inline Matrix3 Matrix3Rotation(const Quaternion& q)
 	return ret;
 }
 
-inline Matrix3 operator*(float f, const Matrix3& m) noexcept
+inline bool operator==(const Matrix3& Left, const Matrix3& Right) noexcept
 {
-	return m * f;
+	return (
+		Left[0] == Right[0] &&
+		Left[1] == Right[1] &&
+		Left[2] == Right[2] &&
+		Left[3] == Right[3] &&
+		Left[4] == Right[4] &&
+		Left[5] == Right[5] &&
+		Left[6] == Right[6] &&
+		Left[7] == Right[7] &&
+		Left[8] == Right[8]);
 }
 
-inline Matrix3 operator*(const Matrix3& m, float f) noexcept
+inline bool operator!=(const Matrix3& Left, const Matrix3& Right) noexcept
 {
-	// не нужно возвращать через конструктор, иначе поменяется порядок строк/столбцов. В будущем пофиксить
-	Matrix3 result;
-	result[0] = m[0] * f;
-	result[1] = m[1] * f;
-	result[2] = m[2] * f;
-	result[3] = m[3] * f;
-	result[4] = m[4] * f;
-	result[5] = m[5] * f;
-	result[6] = m[6] * f;
-	result[7] = m[7] * f;
-	result[8] = m[8] * f;
-	return result;
+	return !(Left == Right);
+}
+
+inline Matrix3 operator-(const Matrix3& In) noexcept
+{
+	return {
+		-In[0], -In[1], -In[2],
+		-In[3], -In[4], -In[5],
+		-In[6], -In[7], -In[8]
+	};
+}
+
+inline Matrix3 operator-(float Left, const Matrix3& Right) noexcept
+{
+	return {
+		Left - Right[0], Left - Right[1], Left - Right[2],
+		Left - Right[3], Left - Right[4], Left - Right[5],
+		Left - Right[6], Left - Right[7], Left - Right[8]
+	};
+}
+
+inline Matrix3 operator-(const Matrix3& Left, float Right) noexcept
+{
+	return {
+		Left[0] - Right, Left[1] - Right, Left[2] - Right,
+		Left[3] - Right, Left[4] - Right, Left[5] - Right,
+		Left[6] - Right, Left[7] - Right, Left[8] - Right
+	};
+}
+
+inline Matrix3 operator-(const Matrix3& Left, const Matrix3& Right) noexcept
+{
+	return {
+		Left[0] - Right[0], Left[1] - Right[1], Left[2] - Right[2],
+		Left[3] - Right[3], Left[4] - Right[4], Left[5] - Right[5],
+		Left[6] - Right[6], Left[7] - Right[7], Left[8] - Right[8]
+	};
+}
+
+inline Matrix3 operator+(float Left, const Matrix3& Right) noexcept
+{
+	return Right + Left;
+}
+
+inline Matrix3 operator+(const Matrix3& Left, float Right) noexcept
+{
+	return {
+		Left[0] + Right, Left[1] + Right, Left[2] + Right,
+		Left[3] + Right, Left[4] + Right, Left[5] + Right,
+		Left[6] + Right, Left[7] + Right, Left[8] + Right
+	};
+}
+
+inline Matrix3 operator+(const Matrix3& Left, const Matrix3& Right) noexcept
+{
+	return {
+		Left[0] + Right[0], Left[1] + Right[1], Left[2] + Right[2],
+		Left[3] + Right[3], Left[4] + Right[4], Left[5] + Right[5],
+		Left[6] + Right[6], Left[7] + Right[7], Left[8] + Right[8]
+	};
+}
+
+inline Matrix3 operator*(float Left, const Matrix3& Right) noexcept
+{
+	return Right * Left;
+}
+
+inline Matrix3 operator*(const Matrix3& Left, float Right) noexcept
+{
+	return {
+		Left[0] * Right, Left[1] * Right, Left[2] * Right,
+		Left[3] * Right, Left[4] * Right, Left[5] * Right,
+		Left[6] * Right, Left[7] * Right, Left[8] * Right
+	};
 }
 
 inline Matrix3 operator*(const Matrix3& Left, const Matrix3& Right) noexcept
 {
-	Matrix3 multiplied;
-	multiplied[0] = Left[0] * Right[0] + Left[3] * Right[1] + Left[6] * Right[2];
-	multiplied[1] = Left[1] * Right[0] + Left[4] * Right[1] + Left[7] * Right[2];
-	multiplied[2] = Left[2] * Right[0] + Left[5] * Right[1] + Left[8] * Right[2];
-	multiplied[3] = Left[0] * Right[3] + Left[3] * Right[4] + Left[6] * Right[5];
-	multiplied[4] = Left[1] * Right[3] + Left[4] * Right[4] + Left[7] * Right[5];
-	multiplied[5] = Left[2] * Right[3] + Left[5] * Right[4] + Left[8] * Right[5];
-	multiplied[6] = Left[0] * Right[6] + Left[3] * Right[7] + Left[6] * Right[8];
-	multiplied[7] = Left[1] * Right[6] + Left[4] * Right[7] + Left[7] * Right[8];
-	multiplied[8] = Left[2] * Right[6] + Left[5] * Right[7] + Left[8] * Right[8];
-	return multiplied;
+	return {
+		Left[0] * Right[0] + Left[3] * Right[1] + Left[6] * Right[2],
+		Left[1] * Right[0] + Left[4] * Right[1] + Left[7] * Right[2],
+		Left[2] * Right[0] + Left[5] * Right[1] + Left[8] * Right[2],
+		Left[0] * Right[3] + Left[3] * Right[4] + Left[6] * Right[5],
+		Left[1] * Right[3] + Left[4] * Right[4] + Left[7] * Right[5],
+		Left[2] * Right[3] + Left[5] * Right[4] + Left[8] * Right[5],
+		Left[0] * Right[6] + Left[3] * Right[7] + Left[6] * Right[8],
+		Left[1] * Right[6] + Left[4] * Right[7] + Left[7] * Right[8],
+		Left[2] * Right[6] + Left[5] * Right[7] + Left[8] * Right[8]
+	};
 }
+
+inline Matrix3 operator/(float Left, const Matrix3& Right) noexcept
+{
+	return {
+		Left / Right[0], Left / Right[1], Left / Right[2],
+		Left / Right[3], Left / Right[4], Left / Right[5],
+		Left / Right[6], Left / Right[7], Left / Right[8]
+	};
+}
+
+inline Matrix3 operator/(const Matrix3& Left, float Right) noexcept
+{
+	return {
+		Left[0] / Right, Left[1] / Right, Left[2] / Right,
+		Left[3] / Right, Left[4] / Right, Left[5] / Right,
+		Left[6] / Right, Left[7] / Right, Left[8] / Right
+	};
+}
+
+inline Matrix3 operator/(const Matrix3& Left, const Matrix3& Right) noexcept
+{
+	Matrix3 m1_copy(Left);
+	return m1_copy /= Right;
+}
+
+inline Matrix3& operator-=(Matrix3& Left, float Right) noexcept { return Left = Left - Right; }
+inline Matrix3& operator-=(Matrix3& Left, const Matrix3& Right) noexcept { return Left = Left - Right; }
+inline Matrix3& operator+=(Matrix3& Left, float Right) noexcept { return Left = Left + Right; }
+inline Matrix3& operator+=(Matrix3& Left, const Matrix3& Right) noexcept { return Left = Left + Right; }
+inline Matrix3& operator*=(Matrix3& Left, float Right) noexcept { return Left = Left * Right; }
+inline Matrix3& operator*=(Matrix3& Left, const Matrix3& Right) noexcept { return Left = Left * Right; }
+inline Matrix3& operator/=(Matrix3& Left, float Right) noexcept { return Left = Left / Right; }
+inline Matrix3& operator/=(Matrix3& Left, const Matrix3& Right) noexcept { return Left = Left * Right.Inverse(); }
+
 
 //=============================================================================
 // Matrix4 Impl
@@ -1037,10 +1157,7 @@ inline constexpr void Matrix4::Set(
 
 inline constexpr void Matrix4::Set(const Matrix4& M)
 {
-	m[ 0] = M[ 0]; m[ 1] = M[ 1]; m[ 2] = M[ 2]; m[ 3] = M[ 3];
-	m[ 4] = M[ 4]; m[ 5] = M[ 5]; m[ 6] = M[6 ]; m[ 7] = M[ 7];
-	m[ 8] = M[ 8]; m[ 9] = M[ 9]; m[10] = M[10]; m[11] = M[11];
-	m[12] = M[12]; m[13] = M[13]; m[14] = M[14]; m[15] = M[15];
+	*this = M;
 }
 
 inline void Matrix4::Scale(const Vector3 & scale)
@@ -1059,7 +1176,7 @@ inline void Matrix4::Translate(const Vector3& pos)
 
 inline float Matrix4::GetDeterminant() const
 {
-	// TODO: рефакт
+	// TODO: СЂРµС„Р°РєС‚
 	float m11 = m[0];
 	float m21 = m[1];
 	float m31 = m[2];
@@ -1546,10 +1663,10 @@ inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 {
 	Vector3 forward = (dir - eye).GetNormalize();
 	Vector3 side = CrossProduct(up, forward).GetNormalize();
-	Vector3 up = CrossProduct(forward, side);
+	Vector3 lookUp = CrossProduct(forward, side);
 	Matrix4 m0;
 	m0[0] = side.x;    m0[4] = side.y;    m0[ 8] = side.z;    m0[12] = -DotProduct(side, eye);
-	m0[1] = up.x;      m0[5] = up.y;      m0[ 9] = up.z;      m0[13] = -DotProduct(up, eye);
+	m0[1] = lookUp.x;  m0[5] = lookUp.y;  m0[ 9] = lookUp.z;  m0[13] = -DotProduct(lookUp, eye); // TODO: РїСЂРѕРІРµСЂРёС‚СЊ
 	m0[2] = forward.x; m0[6] = forward.y; m0[10] = forward.z; m0[14] = -DotProduct(forward, eye);
 	m0[3] = 0.0f;      m0[7] = 0.0f;      m0[11] = 0.0f;      m0[15] = 1.0f;
 	return m0;
@@ -1607,7 +1724,7 @@ inline Matrix4 operator*(float f, const Matrix4& m) noexcept
 
 inline Matrix4 operator*(const Matrix4& m, float f) noexcept
 {
-	// не нужно возвращать через конструктор, иначе поменяется порядок строк/столбцов. В будущем пофиксить
+	// РЅРµ РЅСѓР¶РЅРѕ РІРѕР·РІСЂР°С‰Р°С‚СЊ С‡РµСЂРµР· РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ, РёРЅР°С‡Рµ РїРѕРјРµРЅСЏРµС‚СЃСЏ РїРѕСЂСЏРґРѕРє СЃС‚СЂРѕРє/СЃС‚РѕР»Р±С†РѕРІ. Р’ Р±СѓРґСѓС‰РµРј РїРѕС„РёРєСЃРёС‚СЊ
 	Matrix4 result;
 	result[0] = m[0] * f;
 	result[1] = m[1] * f;

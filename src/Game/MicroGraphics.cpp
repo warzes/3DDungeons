@@ -28,7 +28,7 @@ namespace ResourceCacheSystem
 //-----------------------------------------------------------------------------
 namespace std
 {
-	// магия хеширования из glm, по хорошему изменить
+	// РјР°РіРёСЏ С…РµС€РёСЂРѕРІР°РЅРёСЏ РёР· glm, РїРѕ С…РѕСЂРѕС€РµРјСѓ РёР·РјРµРЅРёС‚СЊ
 	void hash_combine(size_t& seed, size_t hash)
 	{
 		hash += 0x9e3779b9 + (seed << 6) + (seed >> 2);
@@ -242,14 +242,14 @@ bool Model::loadObjFile(const char* fileName, const char* pathMaterialFiles)
 		}
 	}
 
-	// сортировка по прозрачности
+	// СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
 	if (isFindToTransparent)
 	{
 		std::vector<Mesh> tempMesh2;
 
-		// TODO: медленно, оптимизировать
+		// TODO: РјРµРґР»РµРЅРЅРѕ, РѕРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ
 
-		// сначала непрозрачное
+		// СЃРЅР°С‡Р°Р»Р° РЅРµРїСЂРѕР·СЂР°С‡РЅРѕРµ
 		for (int i = 0; i < tempMesh.size(); i++)
 		{
 			if (!tempMesh[i].material.diffuseTexture)
@@ -257,7 +257,7 @@ bool Model::loadObjFile(const char* fileName, const char* pathMaterialFiles)
 			else if (!tempMesh[i].material.diffuseTexture->isTransparent)
 				tempMesh2.push_back(tempMesh[i]);
 		}
-		// теперь прозрачное
+		// С‚РµРїРµСЂСЊ РїСЂРѕР·СЂР°С‡РЅРѕРµ
 		for (int i = 0; i < tempMesh.size(); i++)
 		{
 			if (tempMesh[i].material.diffuseTexture->isTransparent)
@@ -274,7 +274,7 @@ bool Model::loadObjFile(const char* fileName, const char* pathMaterialFiles)
 //-----------------------------------------------------------------------------
 bool Model::createBuffer()
 {
-	// формат вершин
+	// С„РѕСЂРјР°С‚ РІРµСЂС€РёРЅ
 	const std::vector<VertexAttribute> formatVertex =
 	{
 		{.size = 3, .normalized = false, .stride = sizeof(VertexMesh), .pointer = (void*)offsetof(VertexMesh, position)},

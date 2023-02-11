@@ -3,29 +3,6 @@
 #include <DirectXMath.h>
 #include "mathc.h"
 #include "HandmadeMath.h"
-/*
-Left handed
-	Y   Z
-	|  /
-	| /
-	|/___X
-*/
-#define GLM_FORCE_LEFT_HANDED
-#define GLM_FORCE_INLINE
-#define GLM_ENABLE_EXPERIMENTAL
-#define GLM_FORCE_XYZW_ONLY
-#define GLM_FORCE_SILENT_WARNINGS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/hash.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
-#include <glm/gtx/euler_angles.hpp>
-#include <glm/gtx/normal.hpp>
-
-#include <glm/detail/type_vec2.hpp>
 
 FlyingCamera cam;
 //============================================================================
@@ -101,8 +78,13 @@ static inline void mat4x4_translate(mat4x4 T, Vector3 t)
 
 void ExampleInit()
 {
+	extern bool GLMTest();
+	GLMTest();
+
+
+
 	Matrix4Old t1;
-	t1.SetTranslation({ 2.0f, 3.0f, 4.0f }); // ìîé
+	t1.SetTranslation({ 2.0f, 3.0f, 4.0f }); // Ð¼Ð¾Ð¹
 	/*
 	1 0 0 t
 	0 1 0 t
@@ -112,7 +94,7 @@ void ExampleInit()
 
 	Matrix4x4f t2;
 	t2 = t2.SetIdentity();
-	t2.SetPosition({ 2.0f, 3.0f, 4.0f }); // þíèòè
+	t2.SetPosition({ 2.0f, 3.0f, 4.0f }); // ÑŽÐ½Ð¸Ñ‚Ð¸
 	/*
 1 0 0 0
 0 1 0 0
@@ -129,7 +111,7 @@ t t t 1
 0 0 1 0
 t t t 1
 */
-	Matrix t4 = MatrixTranslate(2.0f, 3.0f, 4.0f); // ðåéëèá
+	Matrix t4 = MatrixTranslate(2.0f, 3.0f, 4.0f); // Ñ€ÐµÐ¹Ð»Ð¸Ð±
 	float matMVPfloat[16] = {
 				t4.m0, t4.m1, t4.m2, t4.m3,
 				t4.m4, t4.m5, t4.m6, t4.m7,
@@ -144,7 +126,7 @@ t t t 1
 	*/
 
 	matrix4 t5;
-	t5.settranslation(2.0f, 3.0f, 4.0f); // êóá
+	t5.settranslation(2.0f, 3.0f, 4.0f); // ÐºÑƒÐ±
 	/*
 1 0 0 0
 0 1 0 0
@@ -162,7 +144,7 @@ t t t 1
 0 0 0 1
 */
 
-	glm::mat4 t7 = glm::mat4(1.0f);
+	/*glm::mat4 t7 = glm::mat4(1.0f);
 	glm::mat4 t72 = glm::mat4(1.0f);
 	t7 = glm::translate(t7, glm::vec3(2.0f, 3.0f, 4.0f));
 
@@ -173,7 +155,7 @@ t t t 1
 	if( t7 == t72 )
 	{
 		;
-	}
+	}*/
 
 	float position[VEC3_SIZE];
 	float t8[MAT4_SIZE]; // mathc.c
@@ -218,41 +200,43 @@ t t t 1
 		5.0f, 6.0f, 7.0f,
 		8.0f, 9.0f, 10.0f);
 
-	glm::mat3 m2_13(
-		2.0f, 3.0f, 4.0f,
-		5.0f, 6.0f, 7.0f,
-		8.0f, 9.0f, 10.0f);
+	//glm::mat3 m2_13(
+	//	2.0f, 3.0f, 4.0f,
+	//	5.0f, 6.0f, 7.0f,
+	//	8.0f, 9.0f, 10.0f);
 
 
-	Matrix4 m22(
-		2.0f, 3.0f, 4.0f, 5.0f,
-		6.0f, 7.0f, 8.0f, 9.0f,
-		10.0f, 11.0f, 12.0f, 13.0f,
-		14.0f, 15.0f, 16.0f, 17.0f);
+	//Matrix4 m22(
+	//	2.0f, 3.0f, 4.0f, 5.0f,
+	//	6.0f, 7.0f, 8.0f, 9.0f,
+	//	10.0f, 11.0f, 12.0f, 13.0f,
+	//	14.0f, 15.0f, 16.0f, 17.0f);
 
-	Matrix3 m33 = Matrix3(m22);
-	Matrix3 m33_13 = m33.Inverse();
+	//Matrix3 m33 = Matrix3(m22);
+	//Matrix3 m33_13 = m33.Inverse();
 
 
-	glm::mat4 m2_1(
-		2.0f, 3.0f, 4.0f, 5.0f,
-		6.0f, 7.0f, 8.0f, 9.0f,
-		10.0f, 11.0f, 12.0f, 13.0f,
-		14.0f, 15.0f, 16.0f, 17.0f);
+	//glm::mat4 m2_1(
+	//	2.0f, 3.0f, 4.0f, 5.0f,
+	//	6.0f, 7.0f, 8.0f, 9.0f,
+	//	10.0f, 11.0f, 12.0f, 13.0f,
+	//	14.0f, 15.0f, 16.0f, 17.0f);
 
-	glm::mat3 m33_1 = glm::mat3(m2_1);
+	//glm::mat3 m33_1 = glm::mat3(m2_1) + glm::mat3();
 
-	glm::mat3 m33_12 = glm::inverse(m33_1);
+	//glm::mat3 m33_12 = glm::inverse(m33_1);
 
-	auto m_00 = m33_1[0][0];
-	auto m_01 = m33_1[0][1];
-	auto m_02 = m33_1[0][2];
-	auto m_10 = m33_1[1][0];
-	auto m_11 = m33_1[1][1];
-	auto m_12 = m33_1[1][2];
-	auto m_20 = m33_1[2][1];
-	auto m_21 = m33_1[2][1];
-	auto m_22 = m33_1[2][2];
+	//glm::mat3 m33_123 = glm::transpose(m33_12);
+
+	//auto m_00 = m33_1[0][0];
+	//auto m_01 = m33_1[0][1];
+	//auto m_02 = m33_1[0][2];
+	//auto m_10 = m33_1[1][0];
+	//auto m_11 = m33_1[1][1];
+	//auto m_12 = m33_1[1][2];
+	//auto m_20 = m33_1[2][1];
+	//auto m_21 = m33_1[2][1];
+	//auto m_22 = m33_1[2][2];
 
 
 

@@ -237,7 +237,7 @@ enum class PrimitiveDraw
 
 struct VertexAttribute
 {
-	int location = -1;   // если -1, то берется индекс массива атрибутов
+	int location = -1;   // РµСЃР»Рё -1, С‚Рѕ Р±РµСЂРµС‚СЃСЏ РёРЅРґРµРєСЃ РјР°СЃСЃРёРІР° Р°С‚СЂРёР±СѓС‚РѕРІ
 	unsigned size;
 	bool normalized;
 	unsigned stride;     // sizeof Vertex

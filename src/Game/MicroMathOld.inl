@@ -1228,7 +1228,7 @@ inline Matrix4Old Matrix4Old::LookAt(const Vector3& eye, const Vector3& dir, con
 {
 	const Vector3 z = (eye - dir).GetNormalize();
 	const Vector3 x = CrossProduct(up, z).GetNormalize();
-	//const Vector3 y = CrossProduct(z, x).GetNormalize(); // TODO: удалить?
+	//const Vector3 y = CrossProduct(z, x).GetNormalize(); // TODO: СѓРґР°Р»РёС‚СЊ?
 	const Vector3 y = CrossProduct(z, x);
 
 	Matrix4Old m0;
