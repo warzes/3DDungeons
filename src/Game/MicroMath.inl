@@ -391,9 +391,9 @@ inline Vector3 operator*(const Matrix3& Left, const Vector3& Right) noexcept
 inline Vector3 operator*(const Vector3& Left, const Matrix3& Right) noexcept
 {
 	return {
-		Left[0] * Left.x + Left[1] * Left.y + Left[2] * Left.z,
-		Left[3] * Left.x + Left[4] * Left.y + Left[5] * Left.z,
-		Left[6] * Left.x + Left[7] * Left.y + Left[8] * Left.z
+		Right[0] * Left.x + Right[1] * Left.y + Right[2] * Left.z,
+		Right[3] * Left.x + Right[4] * Left.y + Right[5] * Left.z,
+		Right[6] * Left.x + Right[7] * Left.y + Right[8] * Left.z
 	};
 }
 
@@ -855,12 +855,9 @@ inline constexpr void Matrix3::Set(const Matrix3& M)
 inline float Matrix3::GetDeterminant() const
 {
 	return
-		  m[0] * m[4] * m[8]
-		+ m[3] * m[7] * m[2]
-		+ m[6] * m[1] * m[5]
-		- m[0] * m[7] * m[5]
-		- m[3] * m[1] * m[8]
-		- m[6] * m[4] * m[2];
+		+ m[0] * (m[4] * m[8] - m[7] * m[5])
+		- m[3] * (m[1] * m[8] - m[7] * m[2])
+		+ m[6] * (m[1] * m[5] - m[4] * m[2]);
 }
 
 inline Matrix3 Matrix3::Transpose() const
@@ -883,8 +880,8 @@ inline Matrix3 Matrix3::Inverse() const
 	const float OneOverDeterminant = 1.0f / (
 		+ m[0] * (m[4] * m[8] - m[7] * m[5])
 		- m[3] * (m[1] * m[8] - m[7] * m[2])
-		+ m[6] * (m[1] * m[5] - m[4] * m[2])
-		);
+		+ m[6] * (m[1] * m[5] - m[4] * m[2]));
+
 	Matrix3 Inverse;
 	Inverse[0] = +(m[4] * m[8] - m[7] * m[5]) * OneOverDeterminant;
 	Inverse[3] = -(m[3] * m[8] - m[6] * m[5]) * OneOverDeterminant;
@@ -896,29 +893,6 @@ inline Matrix3 Matrix3::Inverse() const
 	Inverse[5] = -(m[0] * m[5] - m[3] * m[2]) * OneOverDeterminant;
 	Inverse[8] = +(m[0] * m[4] - m[3] * m[1]) * OneOverDeterminant;
 	return Inverse;
-
-
-	////const float det =
-	////	m[0] * m[4] * m[8] +
-	////	m[3] * m[7] * m[2] +
-	////	m[6] * m[1] * m[5] -
-	////	m[6] * m[4] * m[2] -
-	////	m[3] * m[1] * m[8] -
-	////	m[0] * m[7] * m[5]; // ODL
-	//const float det = GetDeterminant();
-	//const float invDet = 1.0f / det;
-
-	//return {
-	//	 (m[4] * m[8] - m[7] * m[5]) * invDet,
-	//	-(m[1] * m[8] - m[7] * m[2]) * invDet,
-	//	 (m[1] * m[5] - m[4] * m[2]) * invDet,
-	//	-(m[3] * m[8] - m[6] * m[5]) * invDet,
-	//	 (m[0] * m[8] - m[6] * m[2]) * invDet,
-	//	-(m[0] * m[5] - m[3] * m[2]) * invDet,
-	//	 (m[3] * m[7] - m[6] * m[4]) * invDet,
-	//	-(m[0] * m[7] - m[6] * m[1]) * invDet,
-	//	 (m[0] * m[4] - m[3] * m[1]) * invDet
-	//};
 }
 
 inline void Matrix3::Scale(const Vector3& scale)
@@ -1154,6 +1128,14 @@ inline constexpr Matrix4::Matrix4(
 		x3, y3, z3, w3);
 }
 
+inline constexpr Matrix4::Matrix4(const Vector4& v0, const Vector4& v1, const Vector4& v2, const Vector4& v3)
+{
+	Set(v0.x, v0.y, v0.z, v0.w,
+		v1.x, v1.y, v1.z, v1.w,
+		v2.x, v2.y, v2.z, v2.w,
+		v3.x, v3.y, v3.z, v3.w);
+}
+
 inline constexpr Matrix4::Matrix4(const Matrix3& m)
 {
 	Set(m[0], m[1], m[2], 0.0f,
@@ -1195,56 +1177,39 @@ inline void Matrix4::Translate(const Vector3& pos)
 
 inline float Matrix4::GetDeterminant() const
 {
-	// TODO: рефакт
-	float m11 = m[0];
-	float m21 = m[1];
-	float m31 = m[2];
-	float m41 = m[3];
-	float m12 = m[4];
-	float m22 = m[5];
-	float m32 = m[6];
-	float m42 = m[7];
-	float m13 = m[8];
-	float m23 = m[9];
-	float m33 = m[10];
-	float m43 = m[11];
-	float m14 = m[12];
-	float m24 = m[13];
-	float m34 = m[14];
-	float m44 = m[15];
-	float determinant = 
-		  m14 * m23 * m32 * m41 - m13 * m24 * m32 * m41
-		- m14 * m22 * m33 * m41 + m12 * m24 * m33 * m41
-		+ m13 * m22 * m34 * m41 - m12 * m23 * m34 * m41
-		- m14 * m23 * m31 * m42 + m13 * m24 * m31 * m42
-		+ m14 * m21 * m33 * m42 - m11 * m24 * m33 * m42
-		- m13 * m21 * m34 * m42 + m11 * m23 * m34 * m42
-		+ m14 * m22 * m31 * m43 - m12 * m24 * m31 * m43
-		- m14 * m21 * m32 * m43 + m11 * m24 * m32 * m43
-		+ m12 * m21 * m34 * m43 - m11 * m22 * m34 * m43
-		- m13 * m22 * m31 * m44 + m12 * m23 * m31 * m44
-		+ m13 * m21 * m32 * m44 - m11 * m23 * m32 * m44
-		- m12 * m21 * m33 * m44 + m11 * m22 * m33 * m44;
-	return determinant;
+	const float SubFactor00 = m[10] * m[15] - m[14] * m[11];
+	const float SubFactor01 = m[ 9] * m[15] - m[13] * m[11];
+	const float SubFactor02 = m[ 9] * m[14] - m[13] * m[10];
+	const float SubFactor03 = m[ 8] * m[15] - m[12] * m[11];
+	const float SubFactor04 = m[ 8] * m[14] - m[12] * m[10];
+	const float SubFactor05 = m[ 8] * m[13] - m[12] * m[ 9];
+
+	const Vector4 DetCof(
+		+(m[5] * SubFactor00 - m[6] * SubFactor01 + m[7] * SubFactor02),
+		-(m[4] * SubFactor00 - m[6] * SubFactor03 + m[7] * SubFactor04),
+		+(m[4] * SubFactor01 - m[5] * SubFactor03 + m[7] * SubFactor05),
+		-(m[4] * SubFactor02 - m[5] * SubFactor04 + m[6] * SubFactor05));
+
+	return m[0] * DetCof[0] + m[1] * DetCof[1] + m[2] * DetCof[2] + m[3] * DetCof[3];
 }
 
 inline Matrix4 Matrix4::Transpose() const
 {
 	Matrix4 transposed;
-	transposed[0] = m[0];
-	transposed[1] = m[4];
-	transposed[2] = m[8];
-	transposed[3] = m[12];
-	transposed[4] = m[1];
-	transposed[5] = m[5];
-	transposed[6] = m[9];
-	transposed[7] = m[13];
-	transposed[8] = m[2];
-	transposed[9] = m[6];
+	transposed[ 0] = m[ 0];
+	transposed[ 1] = m[ 4];
+	transposed[ 2] = m[ 8];
+	transposed[ 3] = m[12];
+	transposed[ 4] = m[ 1];
+	transposed[ 5] = m[ 5];
+	transposed[ 6] = m[ 9];
+	transposed[ 7] = m[13];
+	transposed[ 8] = m[ 2];
+	transposed[ 9] = m[ 6];
 	transposed[10] = m[10];
 	transposed[11] = m[14];
-	transposed[12] = m[3];
-	transposed[13] = m[7];
+	transposed[12] = m[ 3];
+	transposed[13] = m[ 7];
 	transposed[14] = m[11];
 	transposed[15] = m[15];
 	return transposed;
@@ -1252,138 +1217,59 @@ inline Matrix4 Matrix4::Transpose() const
 
 inline Matrix4 Matrix4::Inverse() const
 {
-	float m11 = m[0];
-	float m21 = m[1];
-	float m31 = m[2];
-	float m41 = m[3];
-	float m12 = m[4];
-	float m22 = m[5];
-	float m32 = m[6];
-	float m42 = m[7];
-	float m13 = m[8];
-	float m23 = m[9];
-	float m33 = m[10];
-	float m43 = m[11];
-	float m14 = m[12];
-	float m24 = m[13];
-	float m34 = m[14];
-	float m44 = m[15];
-	Matrix4 inverse;
-	inverse[0] = m22 * m33 * m44
-		- m22 * m43 * m34
-		- m23 * m32 * m44
-		+ m23 * m42 * m34
-		+ m24 * m32 * m43
-		- m24 * m42 * m33;
-	inverse[4] = -m12 * m33 * m44
-		+ m12 * m43 * m34
-		+ m13 * m32 * m44
-		- m13 * m42 * m34
-		- m14 * m32 * m43
-		+ m14 * m42 * m33;
-	inverse[8] = m12 * m23 * m44
-		- m12 * m43 * m24
-		- m13 * m22 * m44
-		+ m13 * m42 * m24
-		+ m14 * m22 * m43
-		- m14 * m42 * m23;
-	inverse[12] = -m12 * m23 * m34
-		+ m12 * m33 * m24
-		+ m13 * m22 * m34
-		- m13 * m32 * m24
-		- m14 * m22 * m33
-		+ m14 * m32 * m23;
-	inverse[1] = -m21 * m33 * m44
-		+ m21 * m43 * m34
-		+ m23 * m31 * m44
-		- m23 * m41 * m34
-		- m24 * m31 * m43
-		+ m24 * m41 * m33;
-	inverse[5] = m11 * m33 * m44
-		- m11 * m43 * m34
-		- m13 * m31 * m44
-		+ m13 * m41 * m34
-		+ m14 * m31 * m43
-		- m14 * m41 * m33;
-	inverse[9] = -m11 * m23 * m44
-		+ m11 * m43 * m24
-		+ m13 * m21 * m44
-		- m13 * m41 * m24
-		- m14 * m21 * m43
-		+ m14 * m41 * m23;
-	inverse[13] = m11 * m23 * m34
-		- m11 * m33 * m24
-		- m13 * m21 * m34
-		+ m13 * m31 * m24
-		+ m14 * m21 * m33
-		- m14 * m31 * m23;
-	inverse[2] = m21 * m32 * m44
-		- m21 * m42 * m34
-		- m22 * m31 * m44
-		+ m22 * m41 * m34
-		+ m24 * m31 * m42
-		- m24 * m41 * m32;
-	inverse[6] = -m11 * m32 * m44
-		+ m11 * m42 * m34
-		+ m12 * m31 * m44
-		- m12 * m41 * m34
-		- m14 * m31 * m42
-		+ m14 * m41 * m32;
-	inverse[10] = m11 * m22 * m44
-		- m11 * m42 * m24
-		- m12 * m21 * m44
-		+ m12 * m41 * m24
-		+ m14 * m21 * m42
-		- m14 * m41 * m22;
-	inverse[14] = -m11 * m22 * m34
-		+ m11 * m32 * m24
-		+ m12 * m21 * m34
-		- m12 * m31 * m24
-		- m14 * m21 * m32
-		+ m14 * m31 * m22;
-	inverse[3] = -m21 * m32 * m43
-		+ m21 * m42 * m33
-		+ m22 * m31 * m43
-		- m22 * m41 * m33
-		- m23 * m31 * m42
-		+ m23 * m41 * m32;
-	inverse[7] = m11 * m32 * m43
-		- m11 * m42 * m33
-		- m12 * m31 * m43
-		+ m12 * m41 * m33
-		+ m13 * m31 * m42
-		- m13 * m41 * m32;
-	inverse[11] = -m11 * m22 * m43
-		+ m11 * m42 * m23
-		+ m12 * m21 * m43
-		- m12 * m41 * m23
-		- m13 * m21 * m42
-		+ m13 * m41 * m22;
-	inverse[15] = m11 * m22 * m33
-		- m11 * m32 * m23
-		- m12 * m21 * m33
-		+ m12 * m31 * m23
-		+ m13 * m21 * m32
-		- m13 * m31 * m22;
-	float inverted_determinant = 1.0f / (m11 * inverse[0] + m21 * inverse[4] + m31 * inverse[8] + m41 * inverse[12]);
-	Matrix4 result;
-	result[0] = inverse[0] * inverted_determinant;
-	result[1] = inverse[1] * inverted_determinant;
-	result[2] = inverse[2] * inverted_determinant;
-	result[3] = inverse[3] * inverted_determinant;
-	result[4] = inverse[4] * inverted_determinant;
-	result[5] = inverse[5] * inverted_determinant;
-	result[6] = inverse[6] * inverted_determinant;
-	result[7] = inverse[7] * inverted_determinant;
-	result[8] = inverse[8] * inverted_determinant;
-	result[9] = inverse[9] * inverted_determinant;
-	result[10] = inverse[10] * inverted_determinant;
-	result[11] = inverse[11] * inverted_determinant;
-	result[12] = inverse[12] * inverted_determinant;
-	result[13] = inverse[13] * inverted_determinant;
-	result[14] = inverse[14] * inverted_determinant;
-	result[15] = inverse[15] * inverted_determinant;
-	return result;
+	const float Coef00 = m[10] * m[15] - m[14] * m[11];
+	const float Coef02 = m[6] * m[15] - m[14] * m[7];
+	const float Coef03 = m[6] * m[11] - m[10] * m[7];
+
+	const float Coef04 = m[9] * m[15] - m[13] * m[11];
+	const float Coef06 = m[5] * m[15] - m[13] * m[7];
+	const float Coef07 = m[5] * m[11] - m[9] * m[7];
+
+	const float Coef08 = m[9] * m[14] - m[13] * m[10];
+	const float Coef10 = m[5] * m[14] - m[13] * m[6];
+	const float Coef11 = m[5] * m[10] - m[9] * m[6];
+
+	const float Coef12 = m[8] * m[15] - m[12] * m[11];
+	const float Coef14 = m[4] * m[15] - m[12] * m[7];
+	const float Coef15 = m[4] * m[11] - m[8] * m[7];
+
+	const float Coef16 = m[8] * m[14] - m[12] * m[10];
+	const float Coef18 = m[4] * m[14] - m[12] * m[6];
+	const float Coef19 = m[4] * m[10] - m[8] * m[6];
+
+	const float Coef20 = m[8] * m[13] - m[12] * m[9];
+	const float Coef22 = m[4] * m[13] - m[12] * m[5];
+	const float Coef23 = m[4] * m[9] - m[8] * m[5];
+
+	const Vector4 Fac0(Coef00, Coef00, Coef02, Coef03);
+	const Vector4 Fac1(Coef04, Coef04, Coef06, Coef07);
+	const Vector4 Fac2(Coef08, Coef08, Coef10, Coef11);
+	const Vector4 Fac3(Coef12, Coef12, Coef14, Coef15);
+	const Vector4 Fac4(Coef16, Coef16, Coef18, Coef19);
+	const Vector4 Fac5(Coef20, Coef20, Coef22, Coef23);
+
+	const Vector4 Vec0(m[4], m[0], m[0], m[0]);
+	const Vector4 Vec1(m[5], m[1], m[1], m[1]);
+	const Vector4 Vec2(m[6], m[2], m[2], m[2]);
+	const Vector4 Vec3(m[7], m[3], m[3], m[3]);
+
+	const Vector4 Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
+	const Vector4 Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
+	const Vector4 Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
+	const Vector4 Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
+
+	const Vector4 SignA(+1, -1, +1, -1);
+	const Vector4 SignB(-1, +1, -1, +1);
+	const Matrix4 Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
+
+	const Vector4 Row0(Inverse[0], Inverse[4], Inverse[8], Inverse[12]);
+
+	const Vector4 Dot0(m[0] * Row0);
+	const float Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
+
+	const float OneOverDeterminant = 1.0f / Dot1;
+
+	return Inverse * OneOverDeterminant;
 }
 
 inline Matrix4 Cofactor(const Matrix3& m0)

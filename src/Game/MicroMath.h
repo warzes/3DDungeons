@@ -14,6 +14,11 @@ Left handed
 //=============================================================================
 // Header
 //=============================================================================
+#if defined(_MSC_VER)
+#	pragma warning(push)
+#	pragma warning(disable : 4514)
+#	pragma warning(disable : 5264)
+#endif // _MSC_VER
 #include <math.h>
 
 //=============================================================================
@@ -544,6 +549,7 @@ public:
 		float x1, float y1, float z1, float w1,
 		float x2, float y2, float z2, float w2,
 		float x3, float y3, float z3, float w3);
+	constexpr Matrix4(const Vector4& v0, const Vector4& v1, const Vector4& v2, const Vector4& v3);
 	constexpr Matrix4(const Matrix3& m);
 
 	constexpr Matrix4& operator=(Matrix4&&) = default;
@@ -617,3 +623,6 @@ inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept;
 // Impl
 //=============================================================================
 #include "MicroMath.inl"
+#if defined(_MSC_VER)
+#	pragma warning(pop)
+#endif // _MSC_VER
