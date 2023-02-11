@@ -355,10 +355,13 @@ inline Vector4 operator+(const Vector4& Left, const Vector4& Right) noexcept;
 inline Vector4 operator*(float Left, const Vector4& Right) noexcept;
 inline Vector4 operator*(const Vector4& Left, float Right) noexcept;
 inline Vector4 operator*(const Vector4& Left, const Vector4& Right) noexcept;
-inline Vector4 operator*(const Matrix4& m, const Vector4& v) noexcept;
+inline Vector4 operator*(const Matrix4& Left, const Vector4& Right) noexcept;
+inline Vector4 operator*(const Vector4& Left, const Matrix4& Right) noexcept;
 inline Vector4 operator/(float Left, const Vector4& Right) noexcept;
 inline Vector4 operator/(const Vector4& Left, float Right) noexcept;
 inline Vector4 operator/(const Vector4& Left, const Vector4& Right) noexcept;
+inline Vector4 operator/(const Matrix4& Left, const Vector4& Right) noexcept;
+inline Vector4 operator/(const Vector4& Left, const Matrix4& Right) noexcept;
 
 inline Vector4& operator-=(Vector4& Left, float Right) noexcept;
 inline Vector4& operator-=(Vector4& Left, const Vector4& Right) noexcept;
@@ -520,25 +523,18 @@ inline Matrix3& operator/=(Matrix3& Left, const Matrix3& Right) noexcept;
 //=============================================================================
 // Matrix4
 //=============================================================================
-/*
-Matrix 4?4 representation:
-0/m11 4/m12  8/m13 12/m14
-1/m21 5/m22  9/m23 13/m24
-2/m31 6/m32 10/m33 14/m34
-3/m41 7/m42 11/m43 15/m44
-*/
 class Matrix4
 {
 public:
 	constexpr Matrix4() = default;
 	constexpr Matrix4(Matrix4&&) = default;
 	constexpr Matrix4(const Matrix4&) = default;
-	constexpr Matrix4(const float* f);
 	constexpr Matrix4(
-		float m11, float m21, float m31, float m41, 
-		float m12, float m22, float m32, float m42, 
-		float m13, float m23, float m33, float m43, 
-		float m14, float m24, float m34, float m44);
+		float x0, float y0, float z0, float w0,
+		float x1, float y1, float z1, float w1,
+		float x2, float y2, float z2, float w2,
+		float x3, float y3, float z3, float w3);
+	constexpr Matrix4(const Matrix3& m);
 
 	constexpr Matrix4& operator=(Matrix4&&) = default;
 	constexpr Matrix4& operator=(const Matrix4&) = default;
@@ -546,12 +542,11 @@ public:
 	constexpr float& operator[](size_t i) noexcept { return m[i]; }
 	constexpr const float operator[](size_t i) const noexcept { return m[i]; }
 
-	constexpr void Set(const float* f);
 	constexpr void Set(
-		float m11, float m21, float m31, float m41,
-		float m12, float m22, float m32, float m42,
-		float m13, float m23, float m33, float m43,
-		float m14, float m24, float m34, float m44);
+		float x0, float y0, float z0, float w0,
+		float x1, float y1, float z1, float w1,
+		float x2, float y2, float z2, float w2,
+		float x3, float y3, float z3, float w3);
 	constexpr void Set(const Matrix4& M);
 
 	void Scale(const Vector3& scale);
@@ -581,9 +576,32 @@ inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, float f);
 inline Matrix4 Perspective(float fov_y, float aspect, float zNear, float zFar); // левосторонее
 
-inline Matrix4 operator*(float f, const Matrix4 &m) noexcept;
-inline Matrix4 operator*(const Matrix4 &m, float f) noexcept;
+
+inline bool operator==(const Matrix4& Left, const Matrix4& Right) noexcept;
+inline bool operator!=(const Matrix4& Left, const Matrix4& Right) noexcept;
+
+inline Matrix4 operator-(const Matrix4& In) noexcept;
+inline Matrix4 operator-(float Left, const Matrix4& Right) noexcept;
+inline Matrix4 operator-(const Matrix4& Left, float Right) noexcept;
+inline Matrix4 operator-(const Matrix4& Left, const Matrix4& Right) noexcept;
+inline Matrix4 operator+(float Left, const Matrix4& Right) noexcept;
+inline Matrix4 operator+(const Matrix4& Left, float Right) noexcept;
+inline Matrix4 operator+(const Matrix4& Left, const Matrix4& Right) noexcept;
+inline Matrix4 operator*(float Left, const Matrix4& Right) noexcept;
+inline Matrix4 operator*(const Matrix4& Left, float Right) noexcept;
 inline Matrix4 operator*(const Matrix4& Left, const Matrix4& Right) noexcept;
+inline Matrix4 operator/(float Left, const Matrix4& Right) noexcept;
+inline Matrix4 operator/(const Matrix4& Left, float Right) noexcept;
+inline Matrix4 operator/(const Matrix4& Left, const Matrix4& Right) noexcept;
+
+inline Matrix4& operator-=(Matrix4& Left, float Right) noexcept;
+inline Matrix4& operator-=(Matrix4& Left, const Matrix4& Right) noexcept;
+inline Matrix4& operator+=(Matrix4& Left, float Right) noexcept;
+inline Matrix4& operator+=(Matrix4& Left, const Matrix4& Right) noexcept;
+inline Matrix4& operator*=(Matrix4& Left, float Right) noexcept;
+inline Matrix4& operator*=(Matrix4& Left, const Matrix4& Right) noexcept;
+inline Matrix4& operator/=(Matrix4& Left, float Right) noexcept;
+inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept;
 
 //=============================================================================
 // Impl

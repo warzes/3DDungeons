@@ -475,18 +475,38 @@ inline Vector4 operator+(const Vector4& Left, const Vector4& Right) noexcept { r
 inline Vector4 operator*(float Left, const Vector4& Right) noexcept          { return {   Left * Right.x,   Left * Right.y,   Left * Right.z,   Left * Right.w }; }
 inline Vector4 operator*(const Vector4& Left, float Right) noexcept          { return { Left.x * Right,   Left.y * Right,   Left.z * Right,   Left.w * Right   }; }
 inline Vector4 operator*(const Vector4& Left, const Vector4& Right) noexcept { return { Left.x * Right.x, Left.y * Right.y, Left.z * Right.z, Left.w * Right.w }; }
-inline Vector4 operator*(const Matrix4& m, const Vector4& v) noexcept
+inline Vector4 operator*(const Matrix4& Left, const Vector4& Right) noexcept
 {
 	return {
-		m[0] * v.x + m[4] * v.y + m[ 8] * v.z + m[12] * v.w,
-		m[1] * v.x + m[5] * v.y + m[ 9] * v.z + m[13] * v.w,
-		m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14] * v.w,
-		m[3] * v.x + m[7] * v.y + m[11] * v.z + m[15] * v.w
+		Left[0] * Right.x + Left[4] * Right.y + Left[ 8] * Right.z + Left[12] * Right.w,
+		Left[1] * Right.x + Left[5] * Right.y + Left[ 9] * Right.z + Left[13] * Right.w,
+		Left[2] * Right.x + Left[6] * Right.y + Left[10] * Right.z + Left[14] * Right.w,
+		Left[3] * Right.x + Left[7] * Right.y + Left[11] * Right.z + Left[15] * Right.w
 	};
 }
+inline Vector4 operator*(const Vector4& Left, const Matrix4& Right) noexcept
+{
+	return {
+			Right[ 0] * Left.x + Right[ 1] * Left.y + Right[ 2] * Left.z + Right[ 3] * Left.w,
+			Right[ 4] * Left.x + Right[ 5] * Left.y + Right[ 6] * Left.z + Right[ 7] * Left.w,
+			Right[ 8] * Left.x + Right[ 9] * Left.y + Right[10] * Left.z + Right[11] * Left.w,
+			Right[12] * Left.x + Right[13] * Left.y + Right[14] * Left.z + Right[15] * Left.w
+	};
+}
+
 inline Vector4 operator/(float Left, const Vector4& Right) noexcept          { return {   Left / Right.x,   Left / Right.y,   Left / Right.z,   Left / Right.w }; }
 inline Vector4 operator/(const Vector4& Left, float Right) noexcept          { return { Left.x / Right,   Left.y / Right,   Left.z / Right,   Left.w / Right   }; }
 inline Vector4 operator/(const Vector4& Left, const Vector4& Right) noexcept { return { Left.x / Right.x, Left.y / Right.y, Left.z / Right.z, Left.w / Right.w }; }
+
+inline Vector4 operator/(const Matrix4& Left, const Vector4& Right) noexcept
+{
+	return Left.Inverse() * Right;
+}
+
+inline Vector4 operator/(const Vector4& Left, const Matrix4& Right) noexcept
+{
+	return Left * Right.Inverse();
+}
 
 inline Vector4& operator-=(Vector4& Left, float Right) noexcept { return Left = Left - Right; }
 inline Vector4& operator-=(Vector4& Left, const Vector4& Right) noexcept { return Left = Left - Right; }
@@ -1106,53 +1126,36 @@ inline Matrix3& operator/=(Matrix3& Left, const Matrix3& Right) noexcept { retur
 // Matrix4 Impl
 //=============================================================================
 
-inline constexpr Matrix4::Matrix4(const float* f)
-{
-	Set(f);
-}
-
 inline constexpr Matrix4::Matrix4(
-	float m11, float m21, float m31, float m41,
-	float m12, float m22, float m32, float m42,
-	float m13, float m23, float m33, float m43,
-	float m14, float m24, float m34, float m44)
+	float x0, float y0, float z0, float w0,
+	float x1, float y1, float z1, float w1,
+	float x2, float y2, float z2, float w2,
+	float x3, float y3, float z3, float w3)
 {
-	Set(m11, m21, m31, m41, 
-		m12, m22, m32, m42, 
-		m13, m23, m33, m43, 
-		m14, m24, m34, m44);
+	Set(x0, y0, z0, w0, 
+		x1, y1, z1, w1, 
+		x2, y2, z2, w2, 
+		x3, y3, z3, w3);
 }
 
-inline constexpr void Matrix4::Set(const float* f)
+inline constexpr Matrix4::Matrix4(const Matrix3& m)
 {
-	m[ 0] = f[ 0]; m[ 1] = f[ 1]; m[ 2] = f[ 2]; m[ 3] = f[ 3];
-	m[ 4] = f[ 4]; m[ 5] = f[ 5]; m[ 6] = f[ 6]; m[ 7] = f[ 7];
-	m[ 8] = f[ 8]; m[ 9] = f[ 9]; m[10] = f[10]; m[11] = f[11];
-	m[12] = f[12]; m[13] = f[13]; m[14] = f[14]; m[15] = f[15];
+	Set(m[0], m[1], m[2], 0.0f,
+		m[3], m[4], m[5], 0.0f,
+		m[6], m[7], m[8], 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 inline constexpr void Matrix4::Set(
-	float m11, float m21, float m31, float m41,
-	float m12, float m22, float m32, float m42,
-	float m13, float m23, float m33, float m43,
-	float m14, float m24, float m34, float m44)
+	float x0, float y0, float z0, float w0,
+	float x1, float y1, float z1, float w1,
+	float x2, float y2, float z2, float w2,
+	float x3, float y3, float z3, float w3)
 {
-	m[0] = m11;
-	m[1] = m21;
-	m[2] = m31;
-	m[3] = m41;
-	m[4] = m12;
-	m[5] = m22;
-	m[6] = m32;
-	m[7] = m42;
-	m[8] = m13;
-	m[9] = m23;
-	m[10] = m33;
-	m[11] = m43;
-	m[12] = m14;
-	m[13] = m24;
-	m[14] = m34;
-	m[15] = m44;
+	m[ 0] = x0; m[ 1] = y0; m[ 2] = z0; m[ 3] = w0;
+	m[ 4] = x1; m[ 5] = y1; m[ 6] = z1; m[ 7] = w1;
+	m[ 8] = x2; m[ 9] = y2; m[10] = z2; m[11] = w2;
+	m[12] = x3; m[13] = y3; m[14] = z3; m[15] = w3;
 }
 
 inline constexpr void Matrix4::Set(const Matrix4& M)
@@ -1160,7 +1163,7 @@ inline constexpr void Matrix4::Set(const Matrix4& M)
 	*this = M;
 }
 
-inline void Matrix4::Scale(const Vector3 & scale)
+inline void Matrix4::Scale(const Vector3& scale)
 {
 	m[0] *= scale.x;
 	m[5] *= scale.y;
@@ -1717,52 +1720,165 @@ inline Matrix4 Perspective(float fov_y, float aspect, float zNear, float zFar)
 	return mat;
 }
 
-inline Matrix4 operator*(float f, const Matrix4& m) noexcept
+inline bool operator==(const Matrix4& Left, const Matrix4& Right) noexcept
 {
-	return m * f;
+	return (
+		Left[0] == Right[0] &&
+		Left[1] == Right[1] &&
+		Left[2] == Right[2] &&
+		Left[3] == Right[3] &&
+		Left[4] == Right[4] &&
+		Left[5] == Right[5] &&
+		Left[6] == Right[6] &&
+		Left[7] == Right[7] &&
+		Left[8] == Right[8] &&
+		Left[9] == Right[9] &&
+		Left[10] == Right[10] &&
+		Left[11] == Right[11] &&
+		Left[12] == Right[12] &&
+		Left[13] == Right[13] &&
+		Left[14] == Right[14] &&
+		Left[15] == Right[15]);
 }
 
-inline Matrix4 operator*(const Matrix4& m, float f) noexcept
+inline bool operator!=(const Matrix4& Left, const Matrix4& Right) noexcept
 {
-	// не нужно возвращать через конструктор, иначе поменяется порядок строк/столбцов. В будущем пофиксить
-	Matrix4 result;
-	result[0] = m[0] * f;
-	result[1] = m[1] * f;
-	result[2] = m[2] * f;
-	result[3] = m[3] * f;
-	result[4] = m[4] * f;
-	result[5] = m[5] * f;
-	result[6] = m[6] * f;
-	result[7] = m[7] * f;
-	result[8] = m[8] * f;
-	result[9] = m[9] * f;
-	result[10] = m[10] * f;
-	result[11] = m[11] * f;
-	result[12] = m[12] * f;
-	result[13] = m[13] * f;
-	result[14] = m[14] * f;
-	result[15] = m[15] * f;
-	return result;
+	return !(Left == Right);
 }
 
-inline Matrix4 operator*(const Matrix4& m0, const Matrix4& m1) noexcept
+inline Matrix4 operator-(const Matrix4& In) noexcept
 {
-	Matrix4 multiplied;
-	multiplied[0] = m0[0] * m1[0] + m0[4] * m1[1] + m0[8] * m1[2] + m0[12] * m1[3];
-	multiplied[1] = m0[1] * m1[0] + m0[5] * m1[1] + m0[9] * m1[2] + m0[13] * m1[3];
-	multiplied[2] = m0[2] * m1[0] + m0[6] * m1[1] + m0[10] * m1[2] + m0[14] * m1[3];
-	multiplied[3] = m0[3] * m1[0] + m0[7] * m1[1] + m0[11] * m1[2] + m0[15] * m1[3];
-	multiplied[4] = m0[0] * m1[4] + m0[4] * m1[5] + m0[8] * m1[6] + m0[12] * m1[7];
-	multiplied[5] = m0[1] * m1[4] + m0[5] * m1[5] + m0[9] * m1[6] + m0[13] * m1[7];
-	multiplied[6] = m0[2] * m1[4] + m0[6] * m1[5] + m0[10] * m1[6] + m0[14] * m1[7];
-	multiplied[7] = m0[3] * m1[4] + m0[7] * m1[5] + m0[11] * m1[6] + m0[15] * m1[7];
-	multiplied[8] = m0[0] * m1[8] + m0[4] * m1[9] + m0[8] * m1[10] + m0[12] * m1[11];
-	multiplied[9] = m0[1] * m1[8] + m0[5] * m1[9] + m0[9] * m1[10] + m0[13] * m1[11];
-	multiplied[10] = m0[2] * m1[8] + m0[6] * m1[9] + m0[10] * m1[10] + m0[14] * m1[11];
-	multiplied[11] = m0[3] * m1[8] + m0[7] * m1[9] + m0[11] * m1[10] + m0[15] * m1[11];
-	multiplied[12] = m0[0] * m1[12] + m0[4] * m1[13] + m0[8] * m1[14] + m0[12] * m1[15];
-	multiplied[13] = m0[1] * m1[12] + m0[5] * m1[13] + m0[9] * m1[14] + m0[13] * m1[15];
-	multiplied[14] = m0[2] * m1[12] + m0[6] * m1[13] + m0[10] * m1[14] + m0[14] * m1[15];
-	multiplied[15] = m0[3] * m1[12] + m0[7] * m1[13] + m0[11] * m1[14] + m0[15] * m1[15];
-	return multiplied;
+	return {
+		-In[ 0], -In[ 1], -In[ 2], -In[ 3],
+		-In[ 4], -In[ 5], -In[ 6], -In[ 7],
+		-In[ 8], -In[ 9], -In[10], -In[11],
+		-In[12], -In[13], -In[14], -In[15]
+	};
 }
+
+inline Matrix4 operator-(float Left, const Matrix4& Right) noexcept
+{
+	return {
+		Left - Right[ 0], Left - Right[ 1], Left - Right[ 2], Left - Right[ 3],
+		Left - Right[ 4], Left - Right[ 5], Left - Right[ 6], Left - Right[ 7],
+		Left - Right[ 8], Left - Right[ 9], Left - Right[10], Left - Right[11],
+		Left - Right[12], Left - Right[13], Left - Right[14], Left - Right[15]
+	};
+}
+
+inline Matrix4 operator-(const Matrix4& Left, float Right) noexcept
+{
+	return {
+		Left[ 0] - Right, Left[ 1] - Right, Left[ 2] - Right, Left[ 3] - Right,
+		Left[ 4] - Right, Left[ 5] - Right, Left[ 6] - Right, Left[ 7] - Right,
+		Left[ 8] - Right, Left[ 9] - Right, Left[10] - Right, Left[11] - Right,
+		Left[12] - Right, Left[13] - Right, Left[14] - Right, Left[15] - Right
+	};
+}
+
+inline Matrix4 operator-(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	return {
+		Left[ 0] - Right[ 0], Left[ 1] - Right[ 1], Left[ 2] - Right[ 2], Left[ 3] - Right[ 3],
+		Left[ 4] - Right[ 4], Left[ 5] - Right[ 5], Left[ 6] - Right[ 6], Left[ 7] - Right[ 7],
+		Left[ 8] - Right[ 8], Left[ 9] - Right[ 9], Left[10] - Right[10], Left[11] - Right[11],
+		Left[12] - Right[12], Left[13] - Right[13], Left[14] - Right[14], Left[15] - Right[15]
+	};
+}
+
+inline Matrix4 operator+(float Left, const Matrix4& Right) noexcept
+{
+	return Right + Left;
+}
+
+inline Matrix4 operator+(const Matrix4& Left, float Right) noexcept
+{
+	return {
+		Left[ 0] + Right, Left[ 1] + Right, Left[ 2] + Right, Left[ 3] + Right, 
+		Left[ 4] + Right, Left[ 5] + Right, Left[ 6] + Right, Left[ 7] + Right, 
+		Left[ 8] + Right, Left[ 9] + Right, Left[10] + Right, Left[11] + Right,
+		Left[12] + Right, Left[13] + Right, Left[14] + Right, Left[15] + Right
+	};
+}
+
+inline Matrix4 operator+(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	return {
+		Left[ 0] + Right[ 0], Left[ 1] + Right[ 1], Left[ 2] + Right[ 2], Left[ 3] + Right[ 3],
+		Left[ 4] + Right[ 4], Left[ 5] + Right[ 5], Left[ 6] + Right[ 6], Left[ 7] + Right[ 7],
+		Left[ 8] + Right[ 8], Left[ 9] + Right[ 9], Left[10] + Right[10], Left[11] + Right[11],
+		Left[12] + Right[12], Left[13] + Right[13], Left[14] + Right[14], Left[15] + Right[15]
+	};
+}
+
+inline Matrix4 operator*(float Left, const Matrix4& Right) noexcept
+{
+	return Right * Left;
+}
+
+inline Matrix4 operator*(const Matrix4& Left, float Right) noexcept
+{
+	return {
+		Left[ 0] * Right, Left[ 1] * Right, Left[ 2] *+ Right, Left[ 3] * Right,
+		Left[ 4] * Right, Left[ 5] * Right, Left[ 6] *+ Right, Left[ 7] * Right,
+		Left[ 8] * Right, Left[ 9] * Right, Left[10] *+ Right, Left[11] * Right,
+		Left[12] * Right, Left[13] * Right, Left[14] *+ Right, Left[15] * Right
+	};
+}
+
+inline Matrix4 operator*(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	return {
+		Left[0] * Right[ 0] + Left[4] * Right[ 1] + Left[ 8] * Right[ 2] + Left[12] * Right[ 3],
+		Left[1] * Right[ 0] + Left[5] * Right[ 1] + Left[ 9] * Right[ 2] + Left[13] * Right[ 3],
+		Left[2] * Right[ 0] + Left[6] * Right[ 1] + Left[10] * Right[ 2] + Left[14] * Right[ 3],
+		Left[3] * Right[ 0] + Left[7] * Right[ 1] + Left[11] * Right[ 2] + Left[15] * Right[ 3],
+		Left[0] * Right[ 4] + Left[4] * Right[ 5] + Left[ 8] * Right[ 6] + Left[12] * Right[ 7],
+		Left[1] * Right[ 4] + Left[5] * Right[ 5] + Left[ 9] * Right[ 6] + Left[13] * Right[ 7],
+		Left[2] * Right[ 4] + Left[6] * Right[ 5] + Left[10] * Right[ 6] + Left[14] * Right[ 7],
+		Left[3] * Right[ 4] + Left[7] * Right[ 5] + Left[11] * Right[ 6] + Left[15] * Right[ 7],
+		Left[0] * Right[ 8] + Left[4] * Right[ 9] + Left[ 8] * Right[10] + Left[12] * Right[11],
+		Left[1] * Right[ 8] + Left[5] * Right[ 9] + Left[ 9] * Right[10] + Left[13] * Right[11],
+		Left[2] * Right[ 8] + Left[6] * Right[ 9] + Left[10] * Right[10] + Left[14] * Right[11],
+		Left[3] * Right[ 8] + Left[7] * Right[ 9] + Left[11] * Right[10] + Left[15] * Right[11],
+		Left[0] * Right[12] + Left[4] * Right[13] + Left[ 8] * Right[14] + Left[12] * Right[15],
+		Left[1] * Right[12] + Left[5] * Right[13] + Left[ 9] * Right[14] + Left[13] * Right[15],
+		Left[2] * Right[12] + Left[6] * Right[13] + Left[10] * Right[14] + Left[14] * Right[15],
+		Left[3] * Right[12] + Left[7] * Right[13] + Left[11] * Right[14] + Left[15] * Right[15]
+	};
+}
+
+inline Matrix4 operator/(float Left, const Matrix4& Right) noexcept
+{
+	return {
+		Left / Right[ 0], Left / Right[ 1], Left / Right[ 2], Left / Right[ 3],
+		Left / Right[ 4], Left / Right[ 5], Left / Right[ 6], Left / Right[ 7],
+		Left / Right[ 8], Left / Right[ 9], Left / Right[10], Left / Right[11],
+		Left / Right[12], Left / Right[13], Left / Right[14], Left / Right[15]
+	};
+}
+
+inline Matrix4 operator/(const Matrix4& Left, float Right) noexcept
+{
+	return {
+		Left[ 0] / Right, Left[ 1] / Right, Left[ 2] / Right, Left[ 3] / Right,
+		Left[ 4] / Right, Left[ 5] / Right, Left[ 6] / Right, Left[ 7] / Right,
+		Left[ 8] / Right, Left[ 9] / Right, Left[10] / Right, Left[11] / Right,
+		Left[12] / Right, Left[13] / Right, Left[14] / Right, Left[15] / Right
+	};
+}
+
+inline Matrix4 operator/(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	Matrix4 m1_copy(Left);
+	return m1_copy /= Right;
+}
+
+inline Matrix4& operator-=(Matrix4& Left, float Right) noexcept { return Left = Left - Right; }
+inline Matrix4& operator-=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left - Right; }
+inline Matrix4& operator+=(Matrix4& Left, float Right) noexcept { return Left = Left + Right; }
+inline Matrix4& operator+=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left + Right; }
+inline Matrix4& operator*=(Matrix4& Left, float Right) noexcept { return Left = Left * Right; }
+inline Matrix4& operator*=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right; }
+inline Matrix4& operator/=(Matrix4& Left, float Right) noexcept { return Left = Left / Right; }
+inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right.Inverse(); }
