@@ -86,8 +86,8 @@ public:
 class CObject
 {
 public:
-	Matrix3 NormalMatrix;
-	Matrix4 ModelMatrix;
+	Matrix3_old NormalMatrix;
+	Matrix4_old ModelMatrix;
 	Texture2D Texture;
 	MemoryBuffer Buffer;
 	GLuint VBO;
@@ -103,7 +103,7 @@ public:
 	void Destroy();
 	void InitVBO(int VertexOffset, int Stride);
 	void PrepareTriangles();
-	void SetModelMatrix(const Matrix4& ModelMatrix);
+	void SetModelMatrix(const Matrix4_old& ModelMatrix);
 
 private:
 	void SetDefaults();
@@ -210,19 +210,19 @@ void CObject::PrepareTriangles()
 	Max += RADIUS;
 }
 
-void CObject::SetModelMatrix(const Matrix4& ModelMatrix)
+void CObject::SetModelMatrix(const Matrix4_old& ModelMatrix)
 {
 	this->ModelMatrix = ModelMatrix;
 
-	NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
+	NormalMatrix = Matrix3_old(ModelMatrix).Inverse().Transpose();
 
 	PrepareTriangles();
 }
 
 void CObject::SetDefaults()
 {
-	NormalMatrix = Matrix3();
-	ModelMatrix = Matrix4();
+	NormalMatrix = Matrix3_old();
+	ModelMatrix = Matrix4_old();
 
 	VBO = 0;
 
@@ -234,9 +234,9 @@ void CObject::SetDefaults()
 	Triangles = NULL;
 }
 
-Matrix3 NormalMatrix;
-Matrix4 ModelMatrix, ProjectionMatrix, ModelViewProjectionMatrix;
-Matrix4 ViewProjectionMatrix;
+Matrix3_old NormalMatrix;
+Matrix4_old ModelMatrix, ProjectionMatrix, ModelViewProjectionMatrix;
+Matrix4_old ViewProjectionMatrix;
 
 ICamera* cam = new FlyingCamera;
 int LastX = 0;
@@ -336,7 +336,7 @@ extern Vector2 CubeTexCoords[6];
 extern Vector3 CubeNormals[6];
 extern Vector3 CubeVertices[36];
 
-int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubDivAround, int SubDivTube, const Matrix4& ModelMatrix);
+int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubDivAround, int SubDivTube, const Matrix4_old& ModelMatrix);
 
 std::string lightingVertexShaderText = R"(
 #version 330
@@ -591,7 +591,7 @@ void ExampleInit()
 
 	// init tori --------------------------------------------------------------------------------------------------------------
 
-	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4());
+	GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4_old());
 	//GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4::Rotate(Vector3(0.0f, 1.0f, 0.0f), 90.0f));
 	//GenerateTorus(Objects[2].Buffer, 1.0f, 0.25f, 32, 16, Matrix4::Rotate(Vector3(1.0f, 0.0f, 0.0f), 90.0f));
 
@@ -758,9 +758,9 @@ Vector3 CubeVertices[36] =
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
-int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubDivAround, int SubDivTube, const Matrix4& ModelMatrix)
+int GenerateTorus(MemoryBuffer& Buffer, float Radius, float TubeRadius, int SubDivAround, int SubDivTube, const Matrix4_old& ModelMatrix)
 {
-	Matrix3 NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
+	Matrix3_old NormalMatrix = Matrix3_old(ModelMatrix).Inverse().Transpose();
 
 	int VerticesCount = 0;
 

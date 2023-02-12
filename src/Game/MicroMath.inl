@@ -99,16 +99,12 @@ inline Vector2 Vector2::GetNormalize() const
 	return { x * invLen, y * invLen };
 }
 
-inline bool Equals(const Vector2& v1, const Vector2& v2, float epsilon) noexcept 
+inline bool Equals(const Vector2& v1, const Vector2& v2, float epsilon) noexcept
 {
-	if( v1 == v2 ) return true;
-	return Equals(v1.x, v2.x, epsilon)
-		&& Equals(v1.y, v2.y, epsilon);
+	if (v1 == v2) return true;
+	return ::Equals(v1.x, v2.x, epsilon) 
+		&& ::Equals(v1.y, v2.y, epsilon);
 }
-inline Vector2 Min(const Vector2& v1, const Vector2& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y) }; }
-inline Vector2 Max(const Vector2& v1, const Vector2& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y) }; }
-inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x) { return a + (b - a) * x; }
-inline Vector2 Mix(const Vector2& u, const Vector2& v, float a) { return u * (1.0f - a) + v * a; }
 
 inline float Distance(const Vector2& v1, const Vector2& v2) { return (v2 - v1).GetLength(); }
 inline float DotProduct(const Vector2& v1, const Vector2& v2) { return v1.x * v2.x + v1.y * v2.y; }
@@ -124,6 +120,19 @@ inline Vector2 Refract(const Vector2& i, const Vector2& normal, float eta)
 	const float k = 1.0f - eta * eta * (1.0f - dotValue * dotValue);
 	return (k >= 0.0f) ? (eta * i - (eta * dotValue + sqrtf(k)) * normal) : Vector2(0.0f);
 }
+
+//=============================================================================
+// OLD
+
+
+inline Vector2 Min(const Vector2& v1, const Vector2& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y) }; }
+inline Vector2 Max(const Vector2& v1, const Vector2& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y) }; }
+inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x) { return a + (b - a) * x; }
+inline Vector2 Mix(const Vector2& u, const Vector2& v, float a) { return u * (1.0f - a) + v * a; }
+
+
+
+
 
 inline Vector2 Project(const Vector2& v1, const Vector2& v2)
 {
@@ -233,6 +242,10 @@ inline const Vector3 Vector3::Down    = { 0.0f,-1.0f, 0.0f };
 inline const Vector3 Vector3::Forward = { 0.0f, 0.0f, 1.0f };
 inline const Vector3 Vector3::Back    = { 0.0f, 0.0f,-1.0f };
 
+constexpr Vector3::Vector3(const Vector4& v) : x(v.x), y(v.y), z(v.z)
+{
+}
+
 inline float Vector3::GetLength() const { return sqrtf(x * x + y * y + z * z); }
 inline float Vector3::GetLengthSquared() const { return x * x + y * y + z * z; }
 inline Vector3 Vector3::GetNormalize() const
@@ -243,19 +256,16 @@ inline Vector3 Vector3::GetNormalize() const
 
 inline bool Equals(const Vector3& v1, const Vector3& v2, float epsilon) noexcept
 {
-	if( v1 == v2 ) return true;
-	return Equals(v1.x, v2.x, epsilon)
-		&& Equals(v1.y, v2.y, epsilon)
-		&& Equals(v1.z, v2.z, epsilon);
+	if (v1 == v2) return true;
+	return ::Equals(v1.x, v2.x, epsilon)
+		&& ::Equals(v1.y, v2.y, epsilon)
+		&& ::Equals(v1.z, v2.z, epsilon);
 }
-inline Vector3 Min(const Vector3& v1, const Vector3& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z) }; }
-inline Vector3 Max(const Vector3& v1, const Vector3& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z) }; }
-inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x) { return a + (b - a) * x; }
-inline Vector3 Mix(const Vector3& u, const Vector3& v, float t) { return u * (1.0f - t) + v * t; }
 
 inline float Distance(const Vector3& v1, const Vector3& v2) { return (v2 - v1).GetLength(); }
 inline float DotProduct(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; }
-inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2) 
+
+inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2)
 {
 	return {
 		v1.y * v2.z - v1.z * v2.y,
@@ -275,6 +285,18 @@ inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta)
 	const float k = 1.0f - eta * eta * (1.0f - dotValue * dotValue);
 	return (k >= 0.0f) ? (eta * i - (eta * dotValue + sqrtf(k)) * normal) : Vector3(0.0f);
 }
+
+//=============================================================================
+// OLD
+
+inline Vector3 Min(const Vector3& v1, const Vector3& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z) }; }
+inline Vector3 Max(const Vector3& v1, const Vector3& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z) }; }
+inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x) { return a + (b - a) * x; }
+inline Vector3 Mix(const Vector3& u, const Vector3& v, float t) { return u * (1.0f - t) + v * t; }
+
+
+
+
 
 inline Vector3 Project(const Vector3& v0, const Vector3& v1)
 {
@@ -365,6 +387,7 @@ inline Vector3 operator+(const Vector3& Left, const Vector3& Right) noexcept { r
 inline Vector3 operator*(float Left, const Vector3& Right) noexcept          { return {   Left * Right.x,   Left * Right.y,   Left * Right.z }; }
 inline Vector3 operator*(const Vector3& Left, float Right) noexcept          { return { Left.x * Right,   Left.y * Right,   Left.z * Right   }; }
 inline Vector3 operator*(const Vector3& Left, const Vector3& Right) noexcept { return { Left.x * Right.x, Left.y * Right.y, Left.z * Right.z }; }
+
 inline Vector3 operator*(const Quaternion& Left, const Vector3& Right) noexcept
 {
 	const Vector3 QuatVector(Left.x, Left.y, Left.z);
@@ -382,18 +405,18 @@ inline Vector3 operator*(const Vector3& Left, const Quaternion& Right) noexcept
 inline Vector3 operator*(const Matrix3& Left, const Vector3& Right) noexcept
 {
 	return {
-		Left[0] * Right.x + Left[3] * Right.y + Left[6] * Right.z,
-		Left[1] * Right.x + Left[4] * Right.y + Left[7] * Right.z,
-		Left[2] * Right.x + Left[5] * Right.y + Left[8] * Right.z
+		Left[0][0] * Right.x + Left[1][0] * Right.y + Left[2][0] * Right.z,
+		Left[0][1] * Right.x + Left[1][1] * Right.y + Left[2][1] * Right.z,
+		Left[0][2] * Right.x + Left[1][2] * Right.y + Left[2][2] * Right.z
 	};
 }
 
 inline Vector3 operator*(const Vector3& Left, const Matrix3& Right) noexcept
 {
 	return {
-		Right[0] * Left.x + Right[1] * Left.y + Right[2] * Left.z,
-		Right[3] * Left.x + Right[4] * Left.y + Right[5] * Left.z,
-		Right[6] * Left.x + Right[7] * Left.y + Right[8] * Left.z
+		Right[0][0] * Left.x + Right[0][1] * Left.y + Right[0][2] * Left.z,
+		Right[1][0] * Left.x + Right[1][1] * Left.y + Right[1][2] * Left.z,
+		Right[2][0] * Left.x + Right[2][1] * Left.y + Right[2][2] * Left.z
 	};
 }
 
@@ -431,19 +454,26 @@ inline Vector4 Vector4::GetNormalize() const
 	const float invLen = 1.0f / GetLength();
 	return { x * invLen, y * invLen, z * invLen, w * invLen };
 }
+
 inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon) noexcept
 {
-	if( v1 == v2 ) return true;
-	return Equals(v1.x, v2.x, epsilon)
-		&& Equals(v1.y, v2.y, epsilon)
-		&& Equals(v1.z, v2.z, epsilon)
-		&& Equals(v1.w, v2.w, epsilon);
+	if (v1 == v2) return true;
+	return ::Equals(v1.x, v2.x, epsilon)
+		&& ::Equals(v1.y, v2.y, epsilon)
+		&& ::Equals(v1.z, v2.z, epsilon)
+		&& ::Equals(v1.w, v2.w, epsilon);
 }
+
+inline float DotProduct(const Vector4& v1, const Vector4& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w; }
+
+//=============================================================================
+// OLD
+
 inline Vector4 Min(const Vector4& v1, const Vector4& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z), Min(v1.w, v2.w) }; }
 inline Vector4 Max(const Vector4& v1, const Vector4& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z), Max(v1.w, v2.w) }; }
 inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x) { return a + (b - a) * x; }
 inline Vector4 Mix(const Vector4& u, const Vector4& v, float a) { return u * (1.0f - a) + v * a; }
-inline float DotProduct(const Vector4& v1, const Vector4& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w; }
+
 
 inline void Abs(Vector4& v)
 {
@@ -504,20 +534,18 @@ inline Vector4 operator*(const Vector4& Left, const Quaternion& Right) noexcept
 inline Vector4 operator*(const Matrix4& Left, const Vector4& Right) noexcept
 {
 	return {
-		Left[0] * Right.x + Left[4] * Right.y + Left[ 8] * Right.z + Left[12] * Right.w,
-		Left[1] * Right.x + Left[5] * Right.y + Left[ 9] * Right.z + Left[13] * Right.w,
-		Left[2] * Right.x + Left[6] * Right.y + Left[10] * Right.z + Left[14] * Right.w,
-		Left[3] * Right.x + Left[7] * Right.y + Left[11] * Right.z + Left[15] * Right.w
-	};
+		Left[0][0] * Right[0] + Left[1][0] * Right[1] + Left[2][0] * Right[2] + Left[3][0] * Right[3],
+		Left[0][1] * Right[0] + Left[1][1] * Right[1] + Left[2][1] * Right[2] + Left[3][1] * Right[3],
+		Left[0][2] * Right[0] + Left[1][2] * Right[1] + Left[2][2] * Right[2] + Left[3][2] * Right[3],
+		Left[0][3] * Right[0] + Left[1][3] * Right[1] + Left[2][3] * Right[2] + Left[3][3] * Right[3] };
 }
 inline Vector4 operator*(const Vector4& Left, const Matrix4& Right) noexcept
 {
 	return {
-			Right[ 0] * Left.x + Right[ 1] * Left.y + Right[ 2] * Left.z + Right[ 3] * Left.w,
-			Right[ 4] * Left.x + Right[ 5] * Left.y + Right[ 6] * Left.z + Right[ 7] * Left.w,
-			Right[ 8] * Left.x + Right[ 9] * Left.y + Right[10] * Left.z + Right[11] * Left.w,
-			Right[12] * Left.x + Right[13] * Left.y + Right[14] * Left.z + Right[15] * Left.w
-	};
+		Right[0][0] * Left[0] + Right[0][1] * Left[1] + Right[0][2] * Left[2] + Right[0][3] * Left[3],
+		Right[1][0] * Left[0] + Right[1][1] * Left[1] + Right[1][2] * Left[2] + Right[1][3] * Left[3],
+		Right[2][0] * Left[0] + Right[2][1] * Left[1] + Right[2][2] * Left[2] + Right[2][3] * Left[3],
+		Right[3][0] * Left[0] + Right[3][1] * Left[1] + Right[3][2] * Left[2] + Right[3][3] * Left[3] };
 }
 
 inline Vector4 operator/(float Left, const Vector4& Right) noexcept          { return {   Left / Right.x,   Left / Right.y,   Left / Right.z,   Left / Right.w }; }
@@ -547,30 +575,18 @@ inline Vector4& operator/=(Vector4& Left, const Vector4& Right) noexcept { retur
 // Quaternion Impl
 //=============================================================================
 
-const inline Quaternion Quaternion::Identity = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-inline Quaternion::Quaternion(float angle, const Vector3& axis)
-{
-	FromAngleAxis(angle, axis);
-}
-
-inline Quaternion::Quaternion(float ax, float ay, float az)
-{
-	FromEulerAngles(ax, ay, az);
-}
+const inline Quaternion Quaternion::Identity = { 1.0f, 0.0f, 0.0f, 0.0f };
 
 inline Quaternion::Quaternion(const Vector3& u, const Vector3& v)
 {
-	const float norm_u_norm_v = sqrtf(DotProduct(u, u) * DotProduct(v, v));
-	float real_part = norm_u_norm_v + DotProduct(u, v);
+	// http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+	const float normUnormV = sqrtf(DotProduct(u, u) * DotProduct(v, v));
+	float realPart = normUnormV + DotProduct(u, v);
 	Vector3 t;
-	if (real_part < 1.e-6f * norm_u_norm_v)
+	if (realPart < 1.e-6f * normUnormV)
 	{
-		// If u and v are exactly opposite, rotate 180 degrees
-		// around an arbitrary orthogonal axis. Axis normalisation
-		// can happen later, when we normalise the quaternion.
-		real_part = 0.0f;
-
+		// If u and v are exactly opposite, rotate 180 degrees around an arbitrary orthogonal axis. Axis normalisation can happen later, when we normalise the quaternion.
+		realPart = 0.0f;
 		t = fabsf(u.x) > fabsf(u.z) ? Vector3(-u.y, u.x, 0.0f) : Vector3(0.0f, -u.z, u.y);
 	}
 	else
@@ -578,24 +594,139 @@ inline Quaternion::Quaternion(const Vector3& u, const Vector3& v)
 		// Otherwise, build quaternion the standard way.
 		t = CrossProduct(u, v);
 	}
-	*this = Quaternion(t.x, t.y, t.z, real_part).GetNormalize(); // TODO: не ошибка ли тут - real_part это w или x?
+	*this = Quaternion(realPart, t.x, t.y, t.z).GetNormalize();
+}
+
+inline Quaternion::Quaternion(const Vector3& eulerAngle)
+{
+	const float x_ = eulerAngle.x * 0.5f;
+	const float y_ = eulerAngle.y * 0.5f;
+	const float z_ = eulerAngle.z * 0.5f;
+	const float cosX = cosf(x_);
+	const float cosY = cosf(y_);
+	const float cosZ = cosf(z_);
+	const float sinX = sinf(x_);
+	const float sinY = sinf(y_);
+	const float sinZ = sinf(z_);
+
+	w = cosX * cosY * cosZ + sinX * sinY * sinZ;
+	x = sinX * cosY * cosZ - cosX * sinY * sinZ;
+	y = cosX * sinY * cosZ + sinX * cosY * sinZ;
+	z = cosX * cosY * sinZ - sinX * sinY * cosZ;
+}
+
+inline Quaternion::Quaternion(const Matrix3& m)
+{
+	*this = CastToQuaternion(m);
 }
 
 inline Quaternion::Quaternion(const Matrix4& m)
 {
-	FromMatrix(m);
+	*this = CastToQuaternion(m);
 }
 
 inline Quaternion::operator Matrix3() const
 {
-	return ToMatrix3();
+	return CastToMatrix3(*this);
 }
 
 inline Quaternion::operator Matrix4() const
 {
-	return ToMatrix4();
+	return CastToMatrix4(*this);
 }
 
+inline float Quaternion::GetLength() const { return sqrtf(w * w + x * x + y * y + z * z); }
+inline float Quaternion::GetLengthSquared() const { return w * w + x * x + y * y + z * z; }
+
+inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) noexcept
+{
+	if (v1 == v2) return true;
+	return ::Equals(v1.w, v2.w, epsilon)
+		&& ::Equals(v1.x, v2.x, epsilon)
+		&& ::Equals(v1.y, v2.y, epsilon)
+		&& ::Equals(v1.z, v2.z, epsilon);
+}
+
+inline Quaternion CastToQuaternion(const Matrix3& m)
+{
+	const float fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
+	const float fourYSquaredMinus1 = m[1][1] - m[0][0] - m[2][2];
+	const float fourZSquaredMinus1 = m[2][2] - m[0][0] - m[1][1];
+	const float fourWSquaredMinus1 = m[0][0] + m[1][1] + m[2][2];
+
+	int biggestIndex = 0;
+	float fourBiggestSquaredMinus1 = fourWSquaredMinus1;
+	if (fourXSquaredMinus1 > fourBiggestSquaredMinus1)
+	{
+		fourBiggestSquaredMinus1 = fourXSquaredMinus1;
+		biggestIndex = 1;
+	}
+	if (fourYSquaredMinus1 > fourBiggestSquaredMinus1)
+	{
+		fourBiggestSquaredMinus1 = fourYSquaredMinus1;
+		biggestIndex = 2;
+	}
+	if (fourZSquaredMinus1 > fourBiggestSquaredMinus1)
+	{
+		fourBiggestSquaredMinus1 = fourZSquaredMinus1;
+		biggestIndex = 3;
+	}
+
+	const float biggestVal = sqrtf(fourBiggestSquaredMinus1 + 1.0f) * 0.5f;
+	const float mult = 0.25f / biggestVal;
+
+	switch (biggestIndex)
+	{
+	case 0: return {biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
+	case 1: return {(m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult};
+	case 2: return {(m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult};
+	case 3: return {(m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal};
+	default:
+		assert(false);
+		return Quaternion::Identity;
+	}
+}
+
+inline Quaternion CastToQuaternion(const Matrix4& m)
+{
+	return CastToQuaternion(Matrix3(m));
+}
+
+inline float DotProduct(const Quaternion& q1, const Quaternion& q2) { return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z; }
+
+inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept { return Left.w == Right.w && Left.x == Right.x && Left.y == Right.y && Left.z == Right.z; }
+inline bool operator!=(const Quaternion& Left, const Quaternion& Right) noexcept { return !(Left == Right); }
+
+inline Quaternion operator-(const Quaternion& q) noexcept { return { -q.w , -q.x, -q.y, -q.z }; }
+inline Quaternion operator-(const Quaternion& Left, const Quaternion& Right) noexcept { return { Left.w - Right.w, Left.x - Right.x, Left.y - Right.y, Left.z - Right.z }; }
+inline Quaternion operator+(const Quaternion& Left, const Quaternion& Right) noexcept { return { Left.w + Right.w, Left.x + Right.x, Left.y + Right.y, Left.z + Right.z }; }
+inline Quaternion operator*(float Left, const Quaternion& Right) noexcept { return { Left * Right.w, Left * Right.x, Left * Right.y, Left * Right.z }; }
+inline Quaternion operator*(const Quaternion& Left, float Right) noexcept { return { Left.w * Right, Left.x * Right, Left.y * Right, Left.z * Right }; }
+inline Quaternion operator*(const Quaternion& Left, const Quaternion& Right) noexcept
+{
+	return {
+		Left.w * Right.w - Left.x * Right.x - Left.y * Right.y - Left.z * Right.z,
+		Left.w * Right.x + Left.x * Right.w + Left.y * Right.z - Left.z * Right.y,
+		Left.w * Right.y + Left.y * Right.w + Left.z * Right.x - Left.x * Right.z,
+		Left.w * Right.z + Left.z * Right.w + Left.x * Right.y - Left.y * Right.x
+	};
+}
+inline Quaternion operator/(const Quaternion& Left, float Right) noexcept { return { Left.w / Right, Left.x / Right, Left.y / Right, Left.z / Right }; }
+
+inline Quaternion& operator-=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left - Right; }
+inline Quaternion& operator+=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left + Right; }
+inline Quaternion& operator*=(Quaternion& Left, float Right) noexcept { return Left = Left * Right; }
+inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left * Right; }
+inline Quaternion& operator/=(Quaternion& Left, float Right) noexcept { return Left = Left / Right; }
+
+
+//=============================================================================
+// OLD
+
+//inline Quaternion::Quaternion(float angle, const Vector3& axis)
+//{
+//	FromAngleAxis(angle, axis);
+//}
 inline void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
 {
 	Vector3 tmp = axis;
@@ -617,25 +748,7 @@ inline void Quaternion::FromAngleAxis(float angle, const Vector3& axis)
 	w = cosf(half);
 }
 
-inline void Quaternion::FromEulerAngles(float x_, float y_, float z_)
-{
-	x_ *= 0.5f;
-	y_ *= 0.5f;
-	z_ *= 0.5f;
-	const float cosX = cosf(x_);
-	const float cosY = cosf(y_);
-	const float cosZ = cosf(z_);
-	const float sinX = sinf(x_);
-	const float sinY = sinf(y_);
-	const float sinZ = sinf(z_);
-
-	x = sinX * cosY * cosZ - cosX * sinY * sinZ;
-	y = cosX * sinY * cosZ + sinX * cosY * sinZ;
-	z = cosX * cosY * sinZ - sinX * sinY * cosZ;
-	w = cosX * cosY * cosZ + sinX * sinY * sinZ;
-}
-
-inline void Quaternion::FromMatrix(const Matrix4& m0)
+inline void Quaternion::FromMatrix(const Matrix4_old& m0)
 {
 	float scale = m0[0] + m0[5] + m0[10];
 	if( scale > 0.0f )
@@ -676,8 +789,7 @@ inline void Quaternion::FromMatrix(const Matrix4& m0)
 	}
 }
 
-inline float Quaternion::GetLength() const { return sqrtf(x * x + y * y + z * z + w * w); }
-inline float Quaternion::GetLengthSquared() const { return x * x + y * y + z * z + w * w; }
+
 inline Quaternion Quaternion::GetNormalize() const
 {
 	const float len = GetLength();
@@ -760,15 +872,6 @@ inline float Quaternion::RollAngle() const
 	return EulerAngles().z;
 }
 
-inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) noexcept
-{
-	if( v1 == v2 ) return true;
-	return Equals(v1.x, v2.x, epsilon) 
-		&& Equals(v1.y, v2.y, epsilon) 
-		&& Equals(v1.z, v2.z, epsilon) 
-		&& Equals(v1.w, v2.w, epsilon);
-}
-
 inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a)
 {
 	const float cosTheta = DotProduct(x, y);
@@ -827,7 +930,7 @@ inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a)
 	}
 }
 
-inline float DotProduct(const Quaternion& q1, const Quaternion& q2) { return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w; }
+
 
 inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2)
 {
@@ -839,32 +942,6 @@ inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2)
 	};
 }
 
-inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }
-inline bool operator!=(const Quaternion& Left, const Quaternion& Right) noexcept { return !(Left == Right); }
-
-inline Quaternion operator-(const Quaternion& In) noexcept                            { return { -In.x, -In.y, -In.z, -In.w }; }
-inline Quaternion operator-(const Quaternion& Left, const Quaternion& Right) noexcept { return { Left.x - Right.x, Left.y - Right.y, Left.z - Right.z, Left.w - Right.w }; }
-inline Quaternion operator+(const Quaternion& Left, const Quaternion& Right) noexcept { return { Left.x + Right.x, Left.y + Right.y, Left.z + Right.z, Left.w + Right.w }; }
-inline Quaternion operator*(float Left, const Quaternion& Right) noexcept             { return {   Left * Right.x,   Left * Right.y,   Left * Right.z,   Left * Right.w }; }
-inline Quaternion operator*(const Quaternion& Left, float Right) noexcept             { return { Left.x * Right,   Left.y * Right,   Left.z * Right,   Left.w * Right   }; }
-inline Quaternion operator*(const Quaternion& Left, const Quaternion& Right) noexcept 
-{ 
-	return {
-		Left.w * Right.x + Left.x * Right.w + Left.y * Right.z - Left.z * Right.y,
-		Left.w * Right.y + Left.y * Right.w + Left.z * Right.x - Left.x * Right.z,
-		Left.w * Right.z + Left.z * Right.w + Left.x * Right.y - Left.y * Right.x,
-		Left.w * Right.w - Left.x * Right.x - Left.y * Right.y - Left.z * Right.z
-	};
-}
-inline Quaternion operator/(const Quaternion& Left, float Right) noexcept { return { Left.x / Right,   Left.y / Right,   Left.z / Right,   Left.w / Right }; }
-
-inline Quaternion operator/(const Quaternion& Left, float Right) noexcept;
-
-inline Quaternion& operator-=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left - Right; }
-inline Quaternion& operator+=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left + Right; }
-inline Quaternion& operator*=(Quaternion& Left, float Right) noexcept { return Left = Left * Right; }
-inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcept { return Left = Left * Right; }
-inline Quaternion& operator/=(Quaternion& Left, float Right) noexcept { return Left = Left / Right; }
 
 //=============================================================================
 // Matrix3 Impl
@@ -873,164 +950,62 @@ inline Quaternion& operator/=(Quaternion& Left, float Right) noexcept { return L
 inline constexpr Matrix3::Matrix3(
 	float x0, float y0, float z0,
 	float x1, float y1, float z1,
-	float x2, float y2, float z2)
+	float x2, float y2, float z2) 
+	: value{ {x0, y0, z0}, {x1, y1, z1}, {x2, y2, z2} }
 {
-	Set(x0, y0, z0, x1, y1, z1, x2, y2, z2);
 }
 
-inline Matrix3::Matrix3(const Matrix4& m)
+inline Matrix3::Matrix3(const Matrix4& m) : value{ m[0], m[1], m[2] }
 {
-	Set(m[0], m[1], m[2], 
-		m[4], m[5], m[6], 
-		m[8], m[9], m[10]);
-}
-
-inline constexpr void Matrix3::Set(
-	float x0, float y0, float z0,
-	float x1, float y1, float z1,
-	float x2, float y2, float z2)
-{
-	m[0] = x0; m[1] = y0; m[2] = z0;
-	m[3] = x1; m[4] = y1; m[5] = z1;
-	m[6] = x2; m[7] = y2; m[8] = z2;
-}
-
-inline constexpr void Matrix3::Set(const Matrix3& M)
-{
-	*this = M;
 }
 
 inline float Matrix3::GetDeterminant() const
 {
 	return
-		+ m[0] * (m[4] * m[8] - m[7] * m[5])
-		- m[3] * (m[1] * m[8] - m[7] * m[2])
-		+ m[6] * (m[1] * m[5] - m[4] * m[2]);
-}
-
-inline Matrix3 Matrix3::Transpose() const
-{
-	Matrix3 transposed;
-	transposed[0] = m[0];
-	transposed[1] = m[3];
-	transposed[2] = m[6];
-	transposed[3] = m[1];
-	transposed[4] = m[4];
-	transposed[5] = m[7];
-	transposed[6] = m[2];
-	transposed[7] = m[5];
-	transposed[8] = m[8];
-	return transposed;
+		+ value[0][0] * (value[1][1] * value[2][2] - value[2][1] * value[1][2])
+		- value[1][0] * (value[0][1] * value[2][2] - value[2][1] * value[0][2])
+		+ value[2][0] * (value[0][1] * value[1][2] - value[1][1] * value[0][2]);
 }
 
 inline Matrix3 Matrix3::Inverse() const
 {
 	const float OneOverDeterminant = 1.0f / (
-		+ m[0] * (m[4] * m[8] - m[7] * m[5])
-		- m[3] * (m[1] * m[8] - m[7] * m[2])
-		+ m[6] * (m[1] * m[5] - m[4] * m[2]));
-
+		+ value[0][0] * (value[1][1] * value[2][2] - value[2][1] * value[1][2])
+		- value[1][0] * (value[0][1] * value[2][2] - value[2][1] * value[0][2])
+		+ value[2][0] * (value[0][1] * value[1][2] - value[1][1] * value[0][2]));
 	Matrix3 Inverse;
-	Inverse[0] = +(m[4] * m[8] - m[7] * m[5]) * OneOverDeterminant;
-	Inverse[3] = -(m[3] * m[8] - m[6] * m[5]) * OneOverDeterminant;
-	Inverse[6] = +(m[3] * m[7] - m[6] * m[4]) * OneOverDeterminant;
-	Inverse[1] = -(m[1] * m[8] - m[7] * m[2]) * OneOverDeterminant;
-	Inverse[4] = +(m[0] * m[8] - m[6] * m[2]) * OneOverDeterminant;
-	Inverse[7] = -(m[0] * m[7] - m[6] * m[1]) * OneOverDeterminant;
-	Inverse[2] = +(m[1] * m[5] - m[4] * m[2]) * OneOverDeterminant;
-	Inverse[5] = -(m[0] * m[5] - m[3] * m[2]) * OneOverDeterminant;
-	Inverse[8] = +(m[0] * m[4] - m[3] * m[1]) * OneOverDeterminant;
+	Inverse[0][0] = +(value[1][1] * value[2][2] - value[2][1] * value[1][2]) * OneOverDeterminant;
+	Inverse[1][0] = -(value[1][0] * value[2][2] - value[2][0] * value[1][2]) * OneOverDeterminant;
+	Inverse[2][0] = +(value[1][0] * value[2][1] - value[2][0] * value[1][1]) * OneOverDeterminant;
+	Inverse[0][1] = -(value[0][1] * value[2][2] - value[2][1] * value[0][2]) * OneOverDeterminant;
+	Inverse[1][1] = +(value[0][0] * value[2][2] - value[2][0] * value[0][2]) * OneOverDeterminant;
+	Inverse[2][1] = -(value[0][0] * value[2][1] - value[2][0] * value[0][1]) * OneOverDeterminant;
+	Inverse[0][2] = +(value[0][1] * value[1][2] - value[1][1] * value[0][2]) * OneOverDeterminant;
+	Inverse[1][2] = -(value[0][0] * value[1][2] - value[1][0] * value[0][2]) * OneOverDeterminant;
+	Inverse[2][2] = +(value[0][0] * value[1][1] - value[1][0] * value[0][1]) * OneOverDeterminant;
 	return Inverse;
 }
 
-inline void Matrix3::Scale(const Vector3& scale)
+inline Matrix3 Matrix3::Transpose() const
 {
-	m[0] *= scale.x;
-	m[4] *= scale.y;
-	m[8] *= scale.z;
-}
+	Matrix3 Result;
+	Result[0][0] = value[0][0];
+	Result[0][1] = value[1][0];
+	Result[0][2] = value[2][0];
 
-inline Matrix3 Matrix3Scale(const Vector3& scale)
-{
-	Matrix3 ret;
-	ret[0] = scale.x; ret[3] = 0.0f;    ret[6] = 0.0f;
-	ret[1] = 0.0f;    ret[4] = scale.y; ret[7] = 0.0f;
-	ret[2] = 0.0f;    ret[5] = 0.0f;    ret[8] = scale.z;
-	return ret;
-}
+	Result[1][0] = value[0][1];
+	Result[1][1] = value[1][1];
+	Result[1][2] = value[2][1];
 
-inline Matrix3 Matrix3RotationX(float angle)
-{
-	const float c = cosf(angle);
-	const float s = sinf(angle);
-
-	Matrix3 ret;
-	ret[0] = 1.0f; ret[3] = 0.0f; ret[6] = 0.0f;
-	ret[1] = 0.0f; ret[4] = c;    ret[7] = -s;
-	ret[2] = 0.0f; ret[5] = s;    ret[8] = c;
-	return ret;
-}
-
-inline Matrix3 Matrix3RotationY(float angle)
-{
-	const float c = cosf(angle);
-	const float s = sinf(angle);
-
-	Matrix3 ret;
-	ret[0] = c;    ret[3] = 0.0f; ret[6] = s;
-	ret[1] = 0.0f; ret[4] = 1.0f; ret[7] = 0.0f;
-	ret[2] = -s;   ret[5] = 0.0f; ret[8] = c;
-	return ret;
-}
-
-inline Matrix3 Matrix3RotationZ(float angle)
-{
-	const float c = cosf(angle);
-	const float s = sinf(angle);
-
-	Matrix3 ret;
-	ret[0] = c;    ret[3] = -s;   ret[6] = 0.0f;
-	ret[1] = s;    ret[4] = c;    ret[7] = 0.0f;
-	ret[2] = 0.0f; ret[5] = 0.0f; ret[8] = 1.0f;
-	return ret;
-}
-
-inline Matrix3 Matrix3Rotation(const Quaternion& q)
-{
-	const float xx = q[0] * q[0];
-	const float yy = q[1] * q[1];
-	const float zz = q[2] * q[2];
-	const float xy = q[0] * q[1];
-	const float zw = q[2] * q[3];
-	const float xz = q[8] * q[0];
-	const float yw = q[1] * q[3];
-	const float yz = q[1] * q[2];
-	const float xw = q[0] * q[3];
-	Matrix3 ret;
-	ret[0] = 1.0f - 2.0f * (yy - zz);
-	ret[1] = 2.0f * (xy + zw);
-	ret[2] = 2.0f * (xz - yw);
-	ret[3] = 2.0f * (xy - zw);
-	ret[4] = 1.0f - 2.0f * (xx - zz);
-	ret[5] = 2.0f * (yz + xw);
-	ret[6] = 2.0f * (xz + yw);
-	ret[7] = 2.0f * (yz - xw);
-	ret[8] = 1.0f - 2.0f * (xx - yy);
-	return ret;
+	Result[2][0] = value[0][2];
+	Result[2][1] = value[1][2];
+	Result[2][2] = value[2][2];
+	return Result;
 }
 
 inline bool operator==(const Matrix3& Left, const Matrix3& Right) noexcept
 {
-	return (
-		Left[0] == Right[0] &&
-		Left[1] == Right[1] &&
-		Left[2] == Right[2] &&
-		Left[3] == Right[3] &&
-		Left[4] == Right[4] &&
-		Left[5] == Right[5] &&
-		Left[6] == Right[6] &&
-		Left[7] == Right[7] &&
-		Left[8] == Right[8]);
+	return (Left[0] == Right[0] && Left[1] == Right[1] && Left[2] == Right[2]);
 }
 
 inline bool operator!=(const Matrix3& Left, const Matrix3& Right) noexcept
@@ -1038,40 +1013,24 @@ inline bool operator!=(const Matrix3& Left, const Matrix3& Right) noexcept
 	return !(Left == Right);
 }
 
-inline Matrix3 operator-(const Matrix3& In) noexcept
+inline Matrix3 operator-(const Matrix3& m) noexcept
 {
-	return {
-		-In[0], -In[1], -In[2],
-		-In[3], -In[4], -In[5],
-		-In[6], -In[7], -In[8]
-	};
+	return {-m[0], -m[1], -m[2] };
 }
 
 inline Matrix3 operator-(float Left, const Matrix3& Right) noexcept
 {
-	return {
-		Left - Right[0], Left - Right[1], Left - Right[2],
-		Left - Right[3], Left - Right[4], Left - Right[5],
-		Left - Right[6], Left - Right[7], Left - Right[8]
-	};
+	return { Left - Right[0], Left - Right[1], Left - Right[2] };
 }
 
 inline Matrix3 operator-(const Matrix3& Left, float Right) noexcept
 {
-	return {
-		Left[0] - Right, Left[1] - Right, Left[2] - Right,
-		Left[3] - Right, Left[4] - Right, Left[5] - Right,
-		Left[6] - Right, Left[7] - Right, Left[8] - Right
-	};
+	return { Left[0] - Right, Left[1] - Right, Left[2] - Right };
 }
 
 inline Matrix3 operator-(const Matrix3& Left, const Matrix3& Right) noexcept
 {
-	return {
-		Left[0] - Right[0], Left[1] - Right[1], Left[2] - Right[2],
-		Left[3] - Right[3], Left[4] - Right[4], Left[5] - Right[5],
-		Left[6] - Right[6], Left[7] - Right[7], Left[8] - Right[8]
-	};
+	return { Left[0] - Right[0], Left[1] - Right[1], Left[2] - Right[2] };
 }
 
 inline Matrix3 operator+(float Left, const Matrix3& Right) noexcept
@@ -1081,20 +1040,12 @@ inline Matrix3 operator+(float Left, const Matrix3& Right) noexcept
 
 inline Matrix3 operator+(const Matrix3& Left, float Right) noexcept
 {
-	return {
-		Left[0] + Right, Left[1] + Right, Left[2] + Right,
-		Left[3] + Right, Left[4] + Right, Left[5] + Right,
-		Left[6] + Right, Left[7] + Right, Left[8] + Right
-	};
+	return { Left[0] + Right, Left[1] + Right, Left[2] + Right };
 }
 
 inline Matrix3 operator+(const Matrix3& Left, const Matrix3& Right) noexcept
 {
-	return {
-		Left[0] + Right[0], Left[1] + Right[1], Left[2] + Right[2],
-		Left[3] + Right[3], Left[4] + Right[4], Left[5] + Right[5],
-		Left[6] + Right[6], Left[7] + Right[7], Left[8] + Right[8]
-	};
+	return { Left[0] + Right[0], Left[1] + Right[1], Left[2] + Right[2] };
 }
 
 inline Matrix3 operator*(float Left, const Matrix3& Right) noexcept
@@ -1104,44 +1055,53 @@ inline Matrix3 operator*(float Left, const Matrix3& Right) noexcept
 
 inline Matrix3 operator*(const Matrix3& Left, float Right) noexcept
 {
-	return {
-		Left[0] * Right, Left[1] * Right, Left[2] * Right,
-		Left[3] * Right, Left[4] * Right, Left[5] * Right,
-		Left[6] * Right, Left[7] * Right, Left[8] * Right
-	};
+	return { Left[0] * Right, Left[1] * Right, Left[2] * Right };
 }
 
 inline Matrix3 operator*(const Matrix3& Left, const Matrix3& Right) noexcept
 {
-	return {
-		Left[0] * Right[0] + Left[3] * Right[1] + Left[6] * Right[2],
-		Left[1] * Right[0] + Left[4] * Right[1] + Left[7] * Right[2],
-		Left[2] * Right[0] + Left[5] * Right[1] + Left[8] * Right[2],
-		Left[0] * Right[3] + Left[3] * Right[4] + Left[6] * Right[5],
-		Left[1] * Right[3] + Left[4] * Right[4] + Left[7] * Right[5],
-		Left[2] * Right[3] + Left[5] * Right[4] + Left[8] * Right[5],
-		Left[0] * Right[6] + Left[3] * Right[7] + Left[6] * Right[8],
-		Left[1] * Right[6] + Left[4] * Right[7] + Left[7] * Right[8],
-		Left[2] * Right[6] + Left[5] * Right[7] + Left[8] * Right[8]
-	};
+	// TODO: убрать лишние операции
+	const float SrcA00 = Left[0][0];
+	const float SrcA01 = Left[0][1];
+	const float SrcA02 = Left[0][2];
+	const float SrcA10 = Left[1][0];
+	const float SrcA11 = Left[1][1];
+	const float SrcA12 = Left[1][2];
+	const float SrcA20 = Left[2][0];
+	const float SrcA21 = Left[2][1];
+	const float SrcA22 = Left[2][2];
+
+	const float SrcB00 = Right[0][0];
+	const float SrcB01 = Right[0][1];
+	const float SrcB02 = Right[0][2];
+	const float SrcB10 = Right[1][0];
+	const float SrcB11 = Right[1][1];
+	const float SrcB12 = Right[1][2];
+	const float SrcB20 = Right[2][0];
+	const float SrcB21 = Right[2][1];
+	const float SrcB22 = Right[2][2];
+
+	Matrix3 Result;
+	Result[0][0] = SrcA00 * SrcB00 + SrcA10 * SrcB01 + SrcA20 * SrcB02;
+	Result[0][1] = SrcA01 * SrcB00 + SrcA11 * SrcB01 + SrcA21 * SrcB02;
+	Result[0][2] = SrcA02 * SrcB00 + SrcA12 * SrcB01 + SrcA22 * SrcB02;
+	Result[1][0] = SrcA00 * SrcB10 + SrcA10 * SrcB11 + SrcA20 * SrcB12;
+	Result[1][1] = SrcA01 * SrcB10 + SrcA11 * SrcB11 + SrcA21 * SrcB12;
+	Result[1][2] = SrcA02 * SrcB10 + SrcA12 * SrcB11 + SrcA22 * SrcB12;
+	Result[2][0] = SrcA00 * SrcB20 + SrcA10 * SrcB21 + SrcA20 * SrcB22;
+	Result[2][1] = SrcA01 * SrcB20 + SrcA11 * SrcB21 + SrcA21 * SrcB22;
+	Result[2][2] = SrcA02 * SrcB20 + SrcA12 * SrcB21 + SrcA22 * SrcB22;
+	return Result;
 }
 
 inline Matrix3 operator/(float Left, const Matrix3& Right) noexcept
 {
-	return {
-		Left / Right[0], Left / Right[1], Left / Right[2],
-		Left / Right[3], Left / Right[4], Left / Right[5],
-		Left / Right[6], Left / Right[7], Left / Right[8]
-	};
+	return { Left / Right[0], Left / Right[1], Left / Right[2] };
 }
 
 inline Matrix3 operator/(const Matrix3& Left, float Right) noexcept
 {
-	return {
-		Left[0] / Right, Left[1] / Right, Left[2] / Right,
-		Left[3] / Right, Left[4] / Right, Left[5] / Right,
-		Left[6] / Right, Left[7] / Right, Left[8] / Right
-	};
+	return { Left[0] / Right, Left[1] / Right, Left[2] / Right };
 }
 
 inline Matrix3 operator/(const Matrix3& Left, const Matrix3& Right) noexcept
@@ -1159,12 +1119,527 @@ inline Matrix3& operator*=(Matrix3& Left, const Matrix3& Right) noexcept { retur
 inline Matrix3& operator/=(Matrix3& Left, float Right) noexcept { return Left = Left / Right; }
 inline Matrix3& operator/=(Matrix3& Left, const Matrix3& Right) noexcept { return Left = Left * Right.Inverse(); }
 
-
 //=============================================================================
 // Matrix4 Impl
 //=============================================================================
 
 inline constexpr Matrix4::Matrix4(
+	float x0, float y0, float z0, float w0,
+	float x1, float y1, float z1, float w1,
+	float x2, float y2, float z2, float w2,
+	float x3, float y3, float z3, float w3) 
+	: value{ {x0, y0, z0, w0}, {x1, y1, z1, w1}, {x2, y2, z2, w2}, {x3, y3, z3, w3} }
+{
+}
+
+inline constexpr Matrix4::Matrix4(const Matrix3& m) : value{ {m[0], 0.0f}, {m[1], 0.0f}, {m[2], 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f} }
+{
+}
+
+inline float Matrix4::GetDeterminant() const
+{
+	const float SubFactor00 = value[2][2] * value[3][3] - value[3][2] * value[2][3];
+	const float SubFactor01 = value[2][1] * value[3][3] - value[3][1] * value[2][3];
+	const float SubFactor02 = value[2][1] * value[3][2] - value[3][1] * value[2][2];
+	const float SubFactor03 = value[2][0] * value[3][3] - value[3][0] * value[2][3];
+	const float SubFactor04 = value[2][0] * value[3][2] - value[3][0] * value[2][2];
+	const float SubFactor05 = value[2][0] * value[3][1] - value[3][0] * value[2][1];
+
+	const Vector4 DetCof(
+		+(value[1][1] * SubFactor00 - value[1][2] * SubFactor01 + value[1][3] * SubFactor02),
+		-(value[1][0] * SubFactor00 - value[1][2] * SubFactor03 + value[1][3] * SubFactor04),
+		+(value[1][0] * SubFactor01 - value[1][1] * SubFactor03 + value[1][3] * SubFactor05),
+		-(value[1][0] * SubFactor02 - value[1][1] * SubFactor04 + value[1][2] * SubFactor05));
+
+	return
+		value[0][0] * DetCof[0] + value[0][1] * DetCof[1] +
+		value[0][2] * DetCof[2] + value[0][3] * DetCof[3];
+
+}
+
+inline Matrix4 Matrix4::Inverse() const
+{
+	const float Coef00 = value[2][2] * value[3][3] - value[3][2] * value[2][3];
+	const float Coef02 = value[1][2] * value[3][3] - value[3][2] * value[1][3];
+	const float Coef03 = value[1][2] * value[2][3] - value[2][2] * value[1][3];
+
+	const float Coef04 = value[2][1] * value[3][3] - value[3][1] * value[2][3];
+	const float Coef06 = value[1][1] * value[3][3] - value[3][1] * value[1][3];
+	const float Coef07 = value[1][1] * value[2][3] - value[2][1] * value[1][3];
+
+	const float Coef08 = value[2][1] * value[3][2] - value[3][1] * value[2][2];
+	const float Coef10 = value[1][1] * value[3][2] - value[3][1] * value[1][2];
+	const float Coef11 = value[1][1] * value[2][2] - value[2][1] * value[1][2];
+
+	const float Coef12 = value[2][0] * value[3][3] - value[3][0] * value[2][3];
+	const float Coef14 = value[1][0] * value[3][3] - value[3][0] * value[1][3];
+	const float Coef15 = value[1][0] * value[2][3] - value[2][0] * value[1][3];
+
+	const float Coef16 = value[2][0] * value[3][2] - value[3][0] * value[2][2];
+	const float Coef18 = value[1][0] * value[3][2] - value[3][0] * value[1][2];
+	const float Coef19 = value[1][0] * value[2][2] - value[2][0] * value[1][2];
+
+	const float Coef20 = value[2][0] * value[3][1] - value[3][0] * value[2][1];
+	const float Coef22 = value[1][0] * value[3][1] - value[3][0] * value[1][1];
+	const float Coef23 = value[1][0] * value[2][1] - value[2][0] * value[1][1];
+
+	const Vector4 Fac0(Coef00, Coef00, Coef02, Coef03);
+	const Vector4 Fac1(Coef04, Coef04, Coef06, Coef07);
+	const Vector4 Fac2(Coef08, Coef08, Coef10, Coef11);
+	const Vector4 Fac3(Coef12, Coef12, Coef14, Coef15);
+	const Vector4 Fac4(Coef16, Coef16, Coef18, Coef19);
+	const Vector4 Fac5(Coef20, Coef20, Coef22, Coef23);
+
+	const Vector4 Vec0(value[1][0], value[0][0], value[0][0], value[0][0]);
+	const Vector4 Vec1(value[1][1], value[0][1], value[0][1], value[0][1]);
+	const Vector4 Vec2(value[1][2], value[0][2], value[0][2], value[0][2]);
+	const Vector4 Vec3(value[1][3], value[0][3], value[0][3], value[0][3]);
+
+	const Vector4 Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
+	const Vector4 Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
+	const Vector4 Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
+	const Vector4 Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
+
+	const Vector4 SignA(+1.0f, -1.0f, +1.0f, -1.0f);
+	const Vector4 SignB(-1.0f, +1.0f, -1.0f, +1.0f);
+
+	const Matrix4 inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
+
+	const Vector4 Row0(inverse[0][0], inverse[1][0], inverse[2][0], inverse[3][0]);
+
+	const Vector4 Dot0(value[0] * Row0);
+	const float Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
+
+	const float OneOverDeterminant = 1.0f / Dot1;
+
+	return inverse * OneOverDeterminant;
+}
+
+inline Matrix4 Matrix4::Transpose() const
+{
+	Matrix4 Result;
+	Result[0][0] = value[0][0];
+	Result[0][1] = value[1][0];
+	Result[0][2] = value[2][0];
+	Result[0][3] = value[3][0];
+
+	Result[1][0] = value[0][1];
+	Result[1][1] = value[1][1];
+	Result[1][2] = value[2][1];
+	Result[1][3] = value[3][1];
+
+	Result[2][0] = value[0][2];
+	Result[2][1] = value[1][2];
+	Result[2][2] = value[2][2];
+	Result[2][3] = value[3][2];
+
+	Result[3][0] = value[0][3];
+	Result[3][1] = value[1][3];
+	Result[3][2] = value[2][3];
+	Result[3][3] = value[3][3];
+	return Result;
+}
+
+inline bool operator==(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	return ( Left[0] == Right[0] && Left[1] == Right[1] && Left[2] == Right[2] && Left[3] == Right[3] );
+}
+
+inline bool operator!=(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	return !(Left == Right);
+}
+
+inline Matrix4 operator-(const Matrix4& m) noexcept
+{
+	return { -m[0], -m[1], -m[2], -m[3] };
+}
+
+inline Matrix4 operator-(float Left, const Matrix4& Right) noexcept
+{
+	return { Left - Right[0], Left - Right[1], Left - Right[2], Left - Right[3] };
+}
+
+inline Matrix4 operator-(const Matrix4& Left, float Right) noexcept
+{
+	return { Left[0] - Right, Left[1] - Right, Left[2] - Right, Left[3] - Right };
+}
+
+inline Matrix4 operator-(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	return { Left[0] - Right[0], Left[1] - Right[1], Left[2] - Right[2], Left[3] - Right[3] };
+}
+
+inline Matrix4 operator+(float Left, const Matrix4& Right) noexcept
+{
+	return Right + Left;
+}
+
+inline Matrix4 operator+(const Matrix4& Left, float Right) noexcept
+{
+	return { Left[0] + Right, Left[1] + Right, Left[2] + Right, Left[3] + Right };
+}
+
+inline Matrix4 operator+(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	return { Left[0] + Right[0], Left[1] + Right[1], Left[2] + Right[2], Left[3] + Right[3] };
+}
+
+inline Matrix4 operator*(float Left, const Matrix4& Right) noexcept
+{
+	return Right * Left;
+}
+
+inline Matrix4 operator*(const Matrix4& Left, float Right) noexcept
+{
+	return { Left[0] * Right, Left[1] * Right, Left[2] * +Right, Left[3] * Right };
+}
+
+inline Matrix4 operator*(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	// TODO: убрать лишние операции
+	const Vector4& SrcA0 = Left[0];
+	const Vector4& SrcA1 = Left[1];
+	const Vector4& SrcA2 = Left[2];
+	const Vector4& SrcA3 = Left[3];
+	const Vector4& SrcB0 = Right[0];
+	const Vector4& SrcB1 = Right[1];
+	const Vector4& SrcB2 = Right[2];
+	const Vector4& SrcB3 = Right[3];
+
+	Matrix4 Result;
+	Result[0] = SrcA0 * SrcB0[0] + SrcA1 * SrcB0[1] + SrcA2 * SrcB0[2] + SrcA3 * SrcB0[3];
+	Result[1] = SrcA0 * SrcB1[0] + SrcA1 * SrcB1[1] + SrcA2 * SrcB1[2] + SrcA3 * SrcB1[3];
+	Result[2] = SrcA0 * SrcB2[0] + SrcA1 * SrcB2[1] + SrcA2 * SrcB2[2] + SrcA3 * SrcB2[3];
+	Result[3] = SrcA0 * SrcB3[0] + SrcA1 * SrcB3[1] + SrcA2 * SrcB3[2] + SrcA3 * SrcB3[3];
+	return Result;
+}
+
+inline Matrix4 operator/(float Left, const Matrix4& Right) noexcept
+{
+	return { Left / Right[0], Left / Right[1], Left / Right[2], Left / Right[3] };
+}
+
+inline Matrix4 operator/(const Matrix4& Left, float Right) noexcept
+{
+	return { Left[0] / Right, Left[1] / Right, Left[2] / Right, Left[3] / Right };
+}
+
+inline Matrix4 operator/(const Matrix4& Left, const Matrix4& Right) noexcept
+{
+	Matrix4 m1_copy(Left);
+	return m1_copy /= Right;
+}
+
+inline Matrix4& operator-=(Matrix4& Left, float Right) noexcept { return Left = Left - Right; }
+inline Matrix4& operator-=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left - Right; }
+inline Matrix4& operator+=(Matrix4& Left, float Right) noexcept { return Left = Left + Right; }
+inline Matrix4& operator+=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left + Right; }
+inline Matrix4& operator*=(Matrix4& Left, float Right) noexcept { return Left = Left * Right; }
+inline Matrix4& operator*=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right; }
+inline Matrix4& operator/=(Matrix4& Left, float Right) noexcept { return Left = Left / Right; }
+inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right.Inverse(); }
+
+
+//=============================================================================
+// Matrix3Old Impl
+//=============================================================================
+
+inline constexpr Matrix3_old::Matrix3_old(
+	float x0, float y0, float z0,
+	float x1, float y1, float z1,
+	float x2, float y2, float z2)
+{
+	Set(x0, y0, z0, x1, y1, z1, x2, y2, z2);
+}
+
+inline Matrix3_old::Matrix3_old(const Matrix4_old& m)
+{
+	Set(m[0], m[1], m[2], 
+		m[4], m[5], m[6], 
+		m[8], m[9], m[10]);
+}
+
+inline constexpr void Matrix3_old::Set(
+	float x0, float y0, float z0,
+	float x1, float y1, float z1,
+	float x2, float y2, float z2)
+{
+	m[0] = x0; m[1] = y0; m[2] = z0;
+	m[3] = x1; m[4] = y1; m[5] = z1;
+	m[6] = x2; m[7] = y2; m[8] = z2;
+}
+
+inline constexpr void Matrix3_old::Set(const Matrix3_old& M)
+{
+	*this = M;
+}
+
+inline float Matrix3_old::GetDeterminant() const
+{
+	return
+		+ m[0] * (m[4] * m[8] - m[7] * m[5])
+		- m[3] * (m[1] * m[8] - m[7] * m[2])
+		+ m[6] * (m[1] * m[5] - m[4] * m[2]);
+}
+
+inline Matrix3_old Matrix3_old::Transpose() const
+{
+	Matrix3_old transposed;
+	transposed[0] = m[0];
+	transposed[1] = m[3];
+	transposed[2] = m[6];
+	transposed[3] = m[1];
+	transposed[4] = m[4];
+	transposed[5] = m[7];
+	transposed[6] = m[2];
+	transposed[7] = m[5];
+	transposed[8] = m[8];
+	return transposed;
+}
+
+inline Matrix3_old Matrix3_old::Inverse() const
+{
+	const float OneOverDeterminant = 1.0f / (
+		+ m[0] * (m[4] * m[8] - m[7] * m[5])
+		- m[3] * (m[1] * m[8] - m[7] * m[2])
+		+ m[6] * (m[1] * m[5] - m[4] * m[2]));
+
+	Matrix3_old Inverse;
+	Inverse[0] = +(m[4] * m[8] - m[7] * m[5]) * OneOverDeterminant;
+	Inverse[3] = -(m[3] * m[8] - m[6] * m[5]) * OneOverDeterminant;
+	Inverse[6] = +(m[3] * m[7] - m[6] * m[4]) * OneOverDeterminant;
+	Inverse[1] = -(m[1] * m[8] - m[7] * m[2]) * OneOverDeterminant;
+	Inverse[4] = +(m[0] * m[8] - m[6] * m[2]) * OneOverDeterminant;
+	Inverse[7] = -(m[0] * m[7] - m[6] * m[1]) * OneOverDeterminant;
+	Inverse[2] = +(m[1] * m[5] - m[4] * m[2]) * OneOverDeterminant;
+	Inverse[5] = -(m[0] * m[5] - m[3] * m[2]) * OneOverDeterminant;
+	Inverse[8] = +(m[0] * m[4] - m[3] * m[1]) * OneOverDeterminant;
+	return Inverse;
+}
+
+inline void Matrix3_old::Scale(const Vector3& scale)
+{
+	m[0] *= scale.x;
+	m[4] *= scale.y;
+	m[8] *= scale.z;
+}
+
+inline Matrix3_old Matrix3Scale(const Vector3& scale)
+{
+	Matrix3_old ret;
+	ret[0] = scale.x; ret[3] = 0.0f;    ret[6] = 0.0f;
+	ret[1] = 0.0f;    ret[4] = scale.y; ret[7] = 0.0f;
+	ret[2] = 0.0f;    ret[5] = 0.0f;    ret[8] = scale.z;
+	return ret;
+}
+
+inline Matrix3_old Matrix3RotationX(float angle)
+{
+	const float c = cosf(angle);
+	const float s = sinf(angle);
+
+	Matrix3_old ret;
+	ret[0] = 1.0f; ret[3] = 0.0f; ret[6] = 0.0f;
+	ret[1] = 0.0f; ret[4] = c;    ret[7] = -s;
+	ret[2] = 0.0f; ret[5] = s;    ret[8] = c;
+	return ret;
+}
+
+inline Matrix3_old Matrix3RotationY(float angle)
+{
+	const float c = cosf(angle);
+	const float s = sinf(angle);
+
+	Matrix3_old ret;
+	ret[0] = c;    ret[3] = 0.0f; ret[6] = s;
+	ret[1] = 0.0f; ret[4] = 1.0f; ret[7] = 0.0f;
+	ret[2] = -s;   ret[5] = 0.0f; ret[8] = c;
+	return ret;
+}
+
+inline Matrix3_old Matrix3RotationZ(float angle)
+{
+	const float c = cosf(angle);
+	const float s = sinf(angle);
+
+	Matrix3_old ret;
+	ret[0] = c;    ret[3] = -s;   ret[6] = 0.0f;
+	ret[1] = s;    ret[4] = c;    ret[7] = 0.0f;
+	ret[2] = 0.0f; ret[5] = 0.0f; ret[8] = 1.0f;
+	return ret;
+}
+
+inline Matrix3_old Matrix3Rotation(const Quaternion& q)
+{
+	const float xx = q[0] * q[0];
+	const float yy = q[1] * q[1];
+	const float zz = q[2] * q[2];
+	const float xy = q[0] * q[1];
+	const float zw = q[2] * q[3];
+	const float xz = q[8] * q[0];
+	const float yw = q[1] * q[3];
+	const float yz = q[1] * q[2];
+	const float xw = q[0] * q[3];
+	Matrix3_old ret;
+	ret[0] = 1.0f - 2.0f * (yy - zz);
+	ret[1] = 2.0f * (xy + zw);
+	ret[2] = 2.0f * (xz - yw);
+	ret[3] = 2.0f * (xy - zw);
+	ret[4] = 1.0f - 2.0f * (xx - zz);
+	ret[5] = 2.0f * (yz + xw);
+	ret[6] = 2.0f * (xz + yw);
+	ret[7] = 2.0f * (yz - xw);
+	ret[8] = 1.0f - 2.0f * (xx - yy);
+	return ret;
+}
+
+inline bool operator==(const Matrix3_old& Left, const Matrix3_old& Right) noexcept
+{
+	return (
+		Left[0] == Right[0] &&
+		Left[1] == Right[1] &&
+		Left[2] == Right[2] &&
+		Left[3] == Right[3] &&
+		Left[4] == Right[4] &&
+		Left[5] == Right[5] &&
+		Left[6] == Right[6] &&
+		Left[7] == Right[7] &&
+		Left[8] == Right[8]);
+}
+
+inline bool operator!=(const Matrix3_old& Left, const Matrix3_old& Right) noexcept
+{
+	return !(Left == Right);
+}
+
+inline Matrix3_old operator-(const Matrix3_old& In) noexcept
+{
+	return {
+		-In[0], -In[1], -In[2],
+		-In[3], -In[4], -In[5],
+		-In[6], -In[7], -In[8]
+	};
+}
+
+inline Matrix3_old operator-(float Left, const Matrix3_old& Right) noexcept
+{
+	return {
+		Left - Right[0], Left - Right[1], Left - Right[2],
+		Left - Right[3], Left - Right[4], Left - Right[5],
+		Left - Right[6], Left - Right[7], Left - Right[8]
+	};
+}
+
+inline Matrix3_old operator-(const Matrix3_old& Left, float Right) noexcept
+{
+	return {
+		Left[0] - Right, Left[1] - Right, Left[2] - Right,
+		Left[3] - Right, Left[4] - Right, Left[5] - Right,
+		Left[6] - Right, Left[7] - Right, Left[8] - Right
+	};
+}
+
+inline Matrix3_old operator-(const Matrix3_old& Left, const Matrix3_old& Right) noexcept
+{
+	return {
+		Left[0] - Right[0], Left[1] - Right[1], Left[2] - Right[2],
+		Left[3] - Right[3], Left[4] - Right[4], Left[5] - Right[5],
+		Left[6] - Right[6], Left[7] - Right[7], Left[8] - Right[8]
+	};
+}
+
+inline Matrix3_old operator+(float Left, const Matrix3_old& Right) noexcept
+{
+	return Right + Left;
+}
+
+inline Matrix3_old operator+(const Matrix3_old& Left, float Right) noexcept
+{
+	return {
+		Left[0] + Right, Left[1] + Right, Left[2] + Right,
+		Left[3] + Right, Left[4] + Right, Left[5] + Right,
+		Left[6] + Right, Left[7] + Right, Left[8] + Right
+	};
+}
+
+inline Matrix3_old operator+(const Matrix3_old& Left, const Matrix3_old& Right) noexcept
+{
+	return {
+		Left[0] + Right[0], Left[1] + Right[1], Left[2] + Right[2],
+		Left[3] + Right[3], Left[4] + Right[4], Left[5] + Right[5],
+		Left[6] + Right[6], Left[7] + Right[7], Left[8] + Right[8]
+	};
+}
+
+inline Matrix3_old operator*(float Left, const Matrix3_old& Right) noexcept
+{
+	return Right * Left;
+}
+
+inline Matrix3_old operator*(const Matrix3_old& Left, float Right) noexcept
+{
+	return {
+		Left[0] * Right, Left[1] * Right, Left[2] * Right,
+		Left[3] * Right, Left[4] * Right, Left[5] * Right,
+		Left[6] * Right, Left[7] * Right, Left[8] * Right
+	};
+}
+
+inline Matrix3_old operator*(const Matrix3_old& Left, const Matrix3_old& Right) noexcept
+{
+	return {
+		Left[0] * Right[0] + Left[3] * Right[1] + Left[6] * Right[2],
+		Left[1] * Right[0] + Left[4] * Right[1] + Left[7] * Right[2],
+		Left[2] * Right[0] + Left[5] * Right[1] + Left[8] * Right[2],
+		Left[0] * Right[3] + Left[3] * Right[4] + Left[6] * Right[5],
+		Left[1] * Right[3] + Left[4] * Right[4] + Left[7] * Right[5],
+		Left[2] * Right[3] + Left[5] * Right[4] + Left[8] * Right[5],
+		Left[0] * Right[6] + Left[3] * Right[7] + Left[6] * Right[8],
+		Left[1] * Right[6] + Left[4] * Right[7] + Left[7] * Right[8],
+		Left[2] * Right[6] + Left[5] * Right[7] + Left[8] * Right[8]
+	};
+}
+
+inline Matrix3_old operator/(float Left, const Matrix3_old& Right) noexcept
+{
+	return {
+		Left / Right[0], Left / Right[1], Left / Right[2],
+		Left / Right[3], Left / Right[4], Left / Right[5],
+		Left / Right[6], Left / Right[7], Left / Right[8]
+	};
+}
+
+inline Matrix3_old operator/(const Matrix3_old& Left, float Right) noexcept
+{
+	return {
+		Left[0] / Right, Left[1] / Right, Left[2] / Right,
+		Left[3] / Right, Left[4] / Right, Left[5] / Right,
+		Left[6] / Right, Left[7] / Right, Left[8] / Right
+	};
+}
+
+inline Matrix3_old operator/(const Matrix3_old& Left, const Matrix3_old& Right) noexcept
+{
+	Matrix3_old m1_copy(Left);
+	return m1_copy /= Right;
+}
+
+inline Matrix3_old& operator-=(Matrix3_old& Left, float Right) noexcept { return Left = Left - Right; }
+inline Matrix3_old& operator-=(Matrix3_old& Left, const Matrix3_old& Right) noexcept { return Left = Left - Right; }
+inline Matrix3_old& operator+=(Matrix3_old& Left, float Right) noexcept { return Left = Left + Right; }
+inline Matrix3_old& operator+=(Matrix3_old& Left, const Matrix3_old& Right) noexcept { return Left = Left + Right; }
+inline Matrix3_old& operator*=(Matrix3_old& Left, float Right) noexcept { return Left = Left * Right; }
+inline Matrix3_old& operator*=(Matrix3_old& Left, const Matrix3_old& Right) noexcept { return Left = Left * Right; }
+inline Matrix3_old& operator/=(Matrix3_old& Left, float Right) noexcept { return Left = Left / Right; }
+inline Matrix3_old& operator/=(Matrix3_old& Left, const Matrix3_old& Right) noexcept { return Left = Left * Right.Inverse(); }
+
+
+//=============================================================================
+// Matrix4Old Impl
+//=============================================================================
+
+inline constexpr Matrix4_old::Matrix4_old(
 	float x0, float y0, float z0, float w0,
 	float x1, float y1, float z1, float w1,
 	float x2, float y2, float z2, float w2,
@@ -1176,7 +1651,7 @@ inline constexpr Matrix4::Matrix4(
 		x3, y3, z3, w3);
 }
 
-inline constexpr Matrix4::Matrix4(const Vector4& v0, const Vector4& v1, const Vector4& v2, const Vector4& v3)
+inline constexpr Matrix4_old::Matrix4_old(const Vector4& v0, const Vector4& v1, const Vector4& v2, const Vector4& v3)
 {
 	Set(v0.x, v0.y, v0.z, v0.w,
 		v1.x, v1.y, v1.z, v1.w,
@@ -1184,7 +1659,7 @@ inline constexpr Matrix4::Matrix4(const Vector4& v0, const Vector4& v1, const Ve
 		v3.x, v3.y, v3.z, v3.w);
 }
 
-inline constexpr Matrix4::Matrix4(const Matrix3& m)
+inline constexpr Matrix4_old::Matrix4_old(const Matrix3_old& m)
 {
 	Set(m[0], m[1], m[2], 0.0f,
 		m[3], m[4], m[5], 0.0f,
@@ -1192,7 +1667,7 @@ inline constexpr Matrix4::Matrix4(const Matrix3& m)
 		0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-inline constexpr void Matrix4::Set(
+inline constexpr void Matrix4_old::Set(
 	float x0, float y0, float z0, float w0,
 	float x1, float y1, float z1, float w1,
 	float x2, float y2, float z2, float w2,
@@ -1204,26 +1679,26 @@ inline constexpr void Matrix4::Set(
 	m[12] = x3; m[13] = y3; m[14] = z3; m[15] = w3;
 }
 
-inline constexpr void Matrix4::Set(const Matrix4& M)
+inline constexpr void Matrix4_old::Set(const Matrix4_old& M)
 {
 	*this = M;
 }
 
-inline void Matrix4::Scale(const Vector3& scale)
+inline void Matrix4_old::Scale(const Vector3& scale)
 {
 	m[0] *= scale.x;
 	m[5] *= scale.y;
 	m[10] *= scale.z;
 }
 
-inline void Matrix4::Translate(const Vector3& pos)
+inline void Matrix4_old::Translate(const Vector3& pos)
 {
 	m[12] += pos.x;
 	m[13] += pos.y;
 	m[14] += pos.z;
 }
 
-inline float Matrix4::GetDeterminant() const
+inline float Matrix4_old::GetDeterminant() const
 {
 	const float SubFactor00 = m[10] * m[15] - m[14] * m[11];
 	const float SubFactor01 = m[ 9] * m[15] - m[13] * m[11];
@@ -1241,9 +1716,9 @@ inline float Matrix4::GetDeterminant() const
 	return m[0] * DetCof[0] + m[1] * DetCof[1] + m[2] * DetCof[2] + m[3] * DetCof[3];
 }
 
-inline Matrix4 Matrix4::Transpose() const
+inline Matrix4_old Matrix4_old::Transpose() const
 {
-	Matrix4 transposed;
+	Matrix4_old transposed;
 	transposed[ 0] = m[ 0];
 	transposed[ 1] = m[ 4];
 	transposed[ 2] = m[ 8];
@@ -1263,7 +1738,7 @@ inline Matrix4 Matrix4::Transpose() const
 	return transposed;
 }
 
-inline Matrix4 Matrix4::Inverse() const
+inline Matrix4_old Matrix4_old::Inverse() const
 {
 	const float Coef00 = m[10] * m[15] - m[14] * m[11];
 	const float Coef02 = m[6] * m[15] - m[14] * m[7];
@@ -1308,7 +1783,7 @@ inline Matrix4 Matrix4::Inverse() const
 
 	const Vector4 SignA(+1, -1, +1, -1);
 	const Vector4 SignB(-1, +1, -1, +1);
-	const Matrix4 Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
+	const Matrix4_old Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
 
 	const Vector4 Row0(Inverse[0], Inverse[4], Inverse[8], Inverse[12]);
 
@@ -1320,10 +1795,10 @@ inline Matrix4 Matrix4::Inverse() const
 	return Inverse * OneOverDeterminant;
 }
 
-inline Matrix4 Cofactor(const Matrix3& m0)
+inline Matrix4_old Cofactor(const Matrix3_old& m0)
 {
-	Matrix4 cofactor;
-	Matrix3 minor;
+	Matrix4_old cofactor;
+	Matrix3_old minor;
 	minor[0] = m0[5];
 	minor[1] = m0[6];
 	minor[2] = m0[7];
@@ -1487,9 +1962,9 @@ inline Matrix4 Cofactor(const Matrix3& m0)
 	return cofactor;
 }
 
-inline Matrix4 Matrix4Scale(const Vector3& scale)
+inline Matrix4_old Matrix4Scale(const Vector3& scale)
 {
-	Matrix4 mat;
+	Matrix4_old mat;
 	mat[0] = scale.x; mat[4] = 0.0f;    mat[ 8] = 0.0f;    mat[12] = 0.0f;
 	mat[1] = 0.0f;    mat[5] = scale.y; mat[ 9] = 0.0f;    mat[13] = 0.0f;
 	mat[2] = 0.0f;    mat[6] = 0.0f;    mat[10] = scale.z; mat[14] = 0.0f;
@@ -1497,12 +1972,12 @@ inline Matrix4 Matrix4Scale(const Vector3& scale)
 	return mat;
 }
 
-inline Matrix4 Matrix4RotationX(float angle)
+inline Matrix4_old Matrix4RotationX(float angle)
 {
 	const float c = cosf(angle);
 	const float s = sinf(angle);
 
-	Matrix4 ret;
+	Matrix4_old ret;
 	ret[0] = 1.0f; ret[4] = 0.0f; ret[ 8] = 0.0f; ret[12] = 0.0f;
 	ret[1] = 0.0f; ret[5] = c;    ret[ 9] = -s;   ret[13] = 0.0f;
 	ret[2] = 0.0f; ret[6] = s;    ret[10] = c;    ret[14] = 0.0f;
@@ -1510,12 +1985,12 @@ inline Matrix4 Matrix4RotationX(float angle)
 	return ret;
 }
 
-inline Matrix4 Matrix4RotationY(float angle)
+inline Matrix4_old Matrix4RotationY(float angle)
 {
 	const float s = sinf(angle);
 	const float c = cosf(angle);
 
-	Matrix4 mat;
+	Matrix4_old mat;
 	mat[0] = c;    mat[4] = 0.0f; mat[ 8] = s;    mat[12] = 0.0f;
 	mat[1] = 0.0f; mat[5] = 1.0f; mat[ 9] = 0.0f; mat[13] = 0.0f;
 	mat[2] = -s;   mat[6] = 0.0f; mat[10] = c;    mat[14] = 0.0f;
@@ -1523,12 +1998,12 @@ inline Matrix4 Matrix4RotationY(float angle)
 	return mat;
 }
 
-inline Matrix4 Matrix4RotationZ(float angle)
+inline Matrix4_old Matrix4RotationZ(float angle)
 {
 	const float s = sinf(angle);
 	const float c = cosf(angle);
 
-	Matrix4 mat;
+	Matrix4_old mat;
 	mat[0] = c;    mat[4] = -s;   mat[ 8] = 0.0f; mat[12] = 0.0f;
 	mat[1] = s;    mat[5] = c;    mat[ 9] = 0.0f; mat[13] = 0.0f;
 	mat[2] = 0.0f; mat[6] = 0.0f; mat[10] = 1.0f; mat[14] = 0.0f;
@@ -1536,7 +2011,7 @@ inline Matrix4 Matrix4RotationZ(float angle)
 	return mat;
 }
 
-inline Matrix4 Matrix4Rotation(const Vector3& axis, float angle)
+inline Matrix4_old Matrix4Rotation(const Vector3& axis, float angle)
 {
 	const float s = sinf(angle);
 	const float c = cosf(angle);
@@ -1551,7 +2026,7 @@ inline Matrix4 Matrix4Rotation(const Vector3& axis, float angle)
 	const float l = xx + yy + zz;
 	const float sqrt_l = sqrtf(l);
 
-	Matrix4 mat;
+	Matrix4_old mat;
 	mat[0] = (xx + (yy + zz) * c) / l;
 	mat[1] = (xy * one_c + axis.z * sqrt_l * s) / l;
 	mat[2] = (xz * one_c - axis.y * sqrt_l * s) / l;
@@ -1571,7 +2046,7 @@ inline Matrix4 Matrix4Rotation(const Vector3& axis, float angle)
 	return mat;
 }
 
-inline Matrix4 Matrix4Rotation(const Quaternion& q0)
+inline Matrix4_old Matrix4Rotation(const Quaternion& q0)
 {
 	const float xx = q0[0] * q0[0];
 	const float yy = q0[1] * q0[1];
@@ -1582,7 +2057,7 @@ inline Matrix4 Matrix4Rotation(const Quaternion& q0)
 	const float yw = q0[1] * q0[3];
 	const float yz = q0[1] * q0[2];
 	const float xw = q0[0] * q0[3];
-	Matrix4 mat;
+	Matrix4_old mat;
 	mat[0] = 1.0f - 2.0f * (yy + zz);
 	mat[1] = 2.0f * (xy + zw);
 	mat[2] = 2.0f * (xz - yw);
@@ -1602,9 +2077,9 @@ inline Matrix4 Matrix4Rotation(const Quaternion& q0)
 	return mat;
 }
 
-inline Matrix4 Matrix4Translate(const Vector3 & v)
+inline Matrix4_old Matrix4Translate(const Vector3 & v)
 {
-	Matrix4 mat;
+	Matrix4_old mat;
 	mat[0] = 1.0f; mat[4] = 0.0f; mat[ 8] = 0.0f; mat[12] = v.x;
 	mat[1] = 0.0f; mat[5] = 1.0f; mat[ 9] = 0.0f; mat[13] = v.y;
 	mat[2] = 0.0f; mat[6] = 0.0f; mat[10] = 1.0f; mat[14] = v.z;
@@ -1612,12 +2087,12 @@ inline Matrix4 Matrix4Translate(const Vector3 & v)
 	return mat;
 }
 
-inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
+inline Matrix4_old LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 {
 	Vector3 forward = (dir - eye).GetNormalize();
 	Vector3 side = CrossProduct(up, forward).GetNormalize();
 	Vector3 lookUp = CrossProduct(forward, side);
-	Matrix4 m0;
+	Matrix4_old m0;
 	m0[0] = side.x;    m0[4] = side.y;    m0[ 8] = side.z;    m0[12] = -DotProduct(side, eye);
 	m0[1] = lookUp.x;  m0[5] = lookUp.y;  m0[ 9] = lookUp.z;  m0[13] = -DotProduct(lookUp, eye); // TODO: проверить
 	m0[2] = forward.x; m0[6] = forward.y; m0[10] = forward.z; m0[14] = -DotProduct(forward, eye);
@@ -1625,9 +2100,9 @@ inline Matrix4 LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up)
 	return m0;
 }
 
-inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, float f)
+inline Matrix4_old Ortho(float left, float right, float bottom, float top, float n, float f)
 {
-	Matrix4 result;
+	Matrix4_old result;
 	result[0] = 2.0f / (right - left);
 	result[1] = 0.0f;
 	result[2] = 0.0f;
@@ -1647,10 +2122,10 @@ inline Matrix4 Ortho(float left, float right, float bottom, float top, float n, 
 	return result;
 }
 
-inline Matrix4 Perspective(float fov_y, float aspect, float zNear, float zFar)
+inline Matrix4_old Perspective(float fov_y, float aspect, float zNear, float zFar)
 {
 	const float tanHalfFovY = tanf(fov_y * 0.5f);
-	Matrix4 mat;
+	Matrix4_old mat;
 	mat[ 0] = 1.0f / (aspect * tanHalfFovY);
 	mat[ 1] = 0.0f;
 	mat[ 2] = 0.0f;
@@ -1670,7 +2145,7 @@ inline Matrix4 Perspective(float fov_y, float aspect, float zNear, float zFar)
 	return mat;
 }
 
-inline bool operator==(const Matrix4& Left, const Matrix4& Right) noexcept
+inline bool operator==(const Matrix4_old& Left, const Matrix4_old& Right) noexcept
 {
 	return (
 		Left[0] == Right[0] &&
@@ -1691,12 +2166,12 @@ inline bool operator==(const Matrix4& Left, const Matrix4& Right) noexcept
 		Left[15] == Right[15]);
 }
 
-inline bool operator!=(const Matrix4& Left, const Matrix4& Right) noexcept
+inline bool operator!=(const Matrix4_old& Left, const Matrix4_old& Right) noexcept
 {
 	return !(Left == Right);
 }
 
-inline Matrix4 operator-(const Matrix4& In) noexcept
+inline Matrix4_old operator-(const Matrix4_old& In) noexcept
 {
 	return {
 		-In[ 0], -In[ 1], -In[ 2], -In[ 3],
@@ -1706,7 +2181,7 @@ inline Matrix4 operator-(const Matrix4& In) noexcept
 	};
 }
 
-inline Matrix4 operator-(float Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator-(float Left, const Matrix4_old& Right) noexcept
 {
 	return {
 		Left - Right[ 0], Left - Right[ 1], Left - Right[ 2], Left - Right[ 3],
@@ -1716,7 +2191,7 @@ inline Matrix4 operator-(float Left, const Matrix4& Right) noexcept
 	};
 }
 
-inline Matrix4 operator-(const Matrix4& Left, float Right) noexcept
+inline Matrix4_old operator-(const Matrix4_old& Left, float Right) noexcept
 {
 	return {
 		Left[ 0] - Right, Left[ 1] - Right, Left[ 2] - Right, Left[ 3] - Right,
@@ -1726,7 +2201,7 @@ inline Matrix4 operator-(const Matrix4& Left, float Right) noexcept
 	};
 }
 
-inline Matrix4 operator-(const Matrix4& Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator-(const Matrix4_old& Left, const Matrix4_old& Right) noexcept
 {
 	return {
 		Left[ 0] - Right[ 0], Left[ 1] - Right[ 1], Left[ 2] - Right[ 2], Left[ 3] - Right[ 3],
@@ -1736,12 +2211,12 @@ inline Matrix4 operator-(const Matrix4& Left, const Matrix4& Right) noexcept
 	};
 }
 
-inline Matrix4 operator+(float Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator+(float Left, const Matrix4_old& Right) noexcept
 {
 	return Right + Left;
 }
 
-inline Matrix4 operator+(const Matrix4& Left, float Right) noexcept
+inline Matrix4_old operator+(const Matrix4_old& Left, float Right) noexcept
 {
 	return {
 		Left[ 0] + Right, Left[ 1] + Right, Left[ 2] + Right, Left[ 3] + Right, 
@@ -1751,7 +2226,7 @@ inline Matrix4 operator+(const Matrix4& Left, float Right) noexcept
 	};
 }
 
-inline Matrix4 operator+(const Matrix4& Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator+(const Matrix4_old& Left, const Matrix4_old& Right) noexcept
 {
 	return {
 		Left[ 0] + Right[ 0], Left[ 1] + Right[ 1], Left[ 2] + Right[ 2], Left[ 3] + Right[ 3],
@@ -1761,12 +2236,12 @@ inline Matrix4 operator+(const Matrix4& Left, const Matrix4& Right) noexcept
 	};
 }
 
-inline Matrix4 operator*(float Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator*(float Left, const Matrix4_old& Right) noexcept
 {
 	return Right * Left;
 }
 
-inline Matrix4 operator*(const Matrix4& Left, float Right) noexcept
+inline Matrix4_old operator*(const Matrix4_old& Left, float Right) noexcept
 {
 	return {
 		Left[ 0] * Right, Left[ 1] * Right, Left[ 2] *+ Right, Left[ 3] * Right,
@@ -1776,7 +2251,7 @@ inline Matrix4 operator*(const Matrix4& Left, float Right) noexcept
 	};
 }
 
-inline Matrix4 operator*(const Matrix4& Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator*(const Matrix4_old& Left, const Matrix4_old& Right) noexcept
 {
 	return {
 		Left[0] * Right[ 0] + Left[4] * Right[ 1] + Left[ 8] * Right[ 2] + Left[12] * Right[ 3],
@@ -1798,7 +2273,7 @@ inline Matrix4 operator*(const Matrix4& Left, const Matrix4& Right) noexcept
 	};
 }
 
-inline Matrix4 operator/(float Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator/(float Left, const Matrix4_old& Right) noexcept
 {
 	return {
 		Left / Right[ 0], Left / Right[ 1], Left / Right[ 2], Left / Right[ 3],
@@ -1808,7 +2283,7 @@ inline Matrix4 operator/(float Left, const Matrix4& Right) noexcept
 	};
 }
 
-inline Matrix4 operator/(const Matrix4& Left, float Right) noexcept
+inline Matrix4_old operator/(const Matrix4_old& Left, float Right) noexcept
 {
 	return {
 		Left[ 0] / Right, Left[ 1] / Right, Left[ 2] / Right, Left[ 3] / Right,
@@ -1818,17 +2293,17 @@ inline Matrix4 operator/(const Matrix4& Left, float Right) noexcept
 	};
 }
 
-inline Matrix4 operator/(const Matrix4& Left, const Matrix4& Right) noexcept
+inline Matrix4_old operator/(const Matrix4_old& Left, const Matrix4_old& Right) noexcept
 {
-	Matrix4 m1_copy(Left);
+	Matrix4_old m1_copy(Left);
 	return m1_copy /= Right;
 }
 
-inline Matrix4& operator-=(Matrix4& Left, float Right) noexcept { return Left = Left - Right; }
-inline Matrix4& operator-=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left - Right; }
-inline Matrix4& operator+=(Matrix4& Left, float Right) noexcept { return Left = Left + Right; }
-inline Matrix4& operator+=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left + Right; }
-inline Matrix4& operator*=(Matrix4& Left, float Right) noexcept { return Left = Left * Right; }
-inline Matrix4& operator*=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right; }
-inline Matrix4& operator/=(Matrix4& Left, float Right) noexcept { return Left = Left / Right; }
-inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right.Inverse(); }
+inline Matrix4_old& operator-=(Matrix4_old& Left, float Right) noexcept { return Left = Left - Right; }
+inline Matrix4_old& operator-=(Matrix4_old& Left, const Matrix4_old& Right) noexcept { return Left = Left - Right; }
+inline Matrix4_old& operator+=(Matrix4_old& Left, float Right) noexcept { return Left = Left + Right; }
+inline Matrix4_old& operator+=(Matrix4_old& Left, const Matrix4_old& Right) noexcept { return Left = Left + Right; }
+inline Matrix4_old& operator*=(Matrix4_old& Left, float Right) noexcept { return Left = Left * Right; }
+inline Matrix4_old& operator*=(Matrix4_old& Left, const Matrix4_old& Right) noexcept { return Left = Left * Right; }
+inline Matrix4_old& operator/=(Matrix4_old& Left, float Right) noexcept { return Left = Left / Right; }
+inline Matrix4_old& operator/=(Matrix4_old& Left, const Matrix4_old& Right) noexcept { return Left = Left * Right.Inverse(); }

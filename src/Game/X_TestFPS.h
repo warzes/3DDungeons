@@ -942,7 +942,7 @@ void ExampleInit()
 	Vector3 LightDirection = Vector3(0.467757f, 0.424200f, -0.775409f);
 	shader.SetUniform(shader.GetUniformLocation("Light.Direction"), LightDirection);
 	
-	shader.SetUniform(uniformNormalMatrix, Matrix3().Inverse().Transpose()); // пока единичную, а так оно такое  NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
+	shader.SetUniform(uniformNormalMatrix, Matrix3_old().Inverse().Transpose()); // пока единичную, а так оно такое  NormalMatrix = Matrix3(ModelMatrix).Inverse().Transpose();
 
 	texture.Create("../data/textures/1mx1m.png");
 
@@ -1044,9 +1044,9 @@ void ExampleFrame()
 	cam.SetPosition(entity->position + Vector3(0.0f, boundingEllipse.y-0.2f, 0.0f));
 #endif
 
-	Matrix4 view = cam.GetViewMatrix();
-	Matrix4 perpective = Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 100000.f);
-	Matrix4 world1;
+	Matrix4_old view = cam.GetViewMatrix();
+	Matrix4_old perpective = Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 100000.f);
+	Matrix4_old world1;
 
 	shader.Bind();
 	shader.SetUniform(uniformViewMatrix, view);

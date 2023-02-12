@@ -121,13 +121,13 @@ void ExampleFrame()
 	bool MoveCamera = cam.OnKeys(Keys, 0.01f, Movement);
 	if (MoveCamera) cam.Move(Movement);
 
-	Matrix4 view = cam.GetViewMatrix();
-	Matrix4 perpective = Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 1000.f);
-	Matrix4 world1;
-	Matrix4 world2 = Matrix4Translate({ 3.0f, 0.2f, 0.4f });
-	Matrix4 PV = perpective * view;
+	Matrix4_old view = cam.GetViewMatrix();
+	Matrix4_old perpective = Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4_old world1;
+	Matrix4_old world2 = Matrix4Translate({ 3.0f, 0.2f, 0.4f });
+	Matrix4_old PV = perpective * view;
 
-	Matrix4 lk2 = LookAt(Vector3(0.0f, 3.0f, -6.0f), Vector3(0.0f), Vector3(0.0f, 1.0f, 0.0f));
+	Matrix4_old lk2 = LookAt(Vector3(0.0f, 3.0f, -6.0f), Vector3(0.0f), Vector3(0.0f, 1.0f, 0.0f));
 
 	shader.Bind();
 	shader.SetUniform(uniformViewMatrix, view);

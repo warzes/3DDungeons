@@ -240,13 +240,13 @@ void ShaderProgram::SetUniform(int uniformId, const Vector3& v) const
 	glUniform3fv(uniformId, 1, &(v.x));
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Matrix3& m) const
+void ShaderProgram::SetUniform(int uniformId, const Matrix3_old& m) const
 {
 	assert(state::CurrentShaderProgram == m_id);
 	glUniformMatrix3fv(uniformId, 1, GL_FALSE, m.m);
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Matrix4& m) const
+void ShaderProgram::SetUniform(int uniformId, const Matrix4_old& m) const
 {
 	assert(state::CurrentShaderProgram == m_id);
 	glUniformMatrix4fv(uniformId, 1, GL_FALSE, m.m);

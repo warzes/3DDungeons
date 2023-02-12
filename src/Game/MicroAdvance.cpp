@@ -674,7 +674,7 @@ void DebugDraw::DrawBoid(const Vector3& position, Vector3 dir)
 	DrawLine(right, front, clr);
 }
 //-----------------------------------------------------------------------------
-void DebugDraw::Flush(const Matrix4& ViewProj)
+void DebugDraw::Flush(const Matrix4_old& ViewProj)
 {
 	if (Points.empty() && Lines.empty())
 		return;
