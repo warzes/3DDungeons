@@ -26,11 +26,12 @@ Left handed
 //=============================================================================
 // Constant definitions
 //=============================================================================
-constexpr const float    EPSILON = 1.0e-6f;
+constexpr const float    EPSILON = 1.0e-6f; // TODO: заменить на std::numeric_limits<float>::epsilon()
 constexpr const float    PI = 3.14159265358979323846f;
 constexpr const float    HALF_PI = PI * 0.5f;
 constexpr const float    DEG2RAD = PI / 180.0f;
 constexpr const float    RAD2DEG = 180.0f / PI;
+constexpr const float    CosOneOverTwo = float(0.877582561890372716130286068203503191);
 
 class Color;
 class Point2;
@@ -56,8 +57,10 @@ inline constexpr float Min(float a, float b) noexcept;
 inline constexpr int   Max(int a, int b) noexcept;
 inline constexpr float Max(float a, float b) noexcept;
 inline constexpr float Clamp(float value, float min, float max) noexcept;
-inline constexpr float Lerp(float a, float b, float f) noexcept; // Linear interpolation between two float values.
-inline constexpr float Mix(float u, float v, float a) noexcept;
+inline constexpr float Lerp(float x, float y, float f) noexcept; // Linear interpolation between two float values.
+inline constexpr float Mix(float x, float y, float a) noexcept;
+
+inline float InverseSqrt(float x); // TODO: удалить
 
 //=============================================================================
 // Color
@@ -197,13 +200,10 @@ inline Vector2& operator/=(Vector2& Left, const Vector2& Right) noexcept;
 
 //=============================================================================
 // OLD
-
 inline Vector2 Min(const Vector2& v1, const Vector2& v2);
 inline Vector2 Max(const Vector2& v1, const Vector2& v2);
 inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x);
 inline Vector2 Mix(const Vector2& u, const Vector2& v, float a);
-
-
 inline Vector2 Project(const Vector2& v1, const Vector2& v2);
 inline Vector2 Slide(const Vector2& v, const Vector2& normal);
 inline Vector2 Tangent(const Vector2& v);
@@ -214,8 +214,6 @@ inline void Abs(Vector2& v);
 inline void Floor(Vector2& v);
 inline void Ceil(Vector2& v);
 inline void Round(Vector2& v);
-
-
 
 //=============================================================================
 // Vector3
@@ -300,7 +298,6 @@ inline Vector3 Min(const Vector3& v1, const Vector3& v2);
 inline Vector3 Max(const Vector3& v1, const Vector3& v2);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
 inline Vector3 Mix(const Vector3& u, const Vector3& v, float t);
-
 inline Vector3 Project(const Vector3& v1, const Vector3& v2);
 inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v); // TODO: удалить?
 // Return the angle between this vector and another vector in degrees.
@@ -384,12 +381,10 @@ inline Vector4& operator/=(Vector4& Left, const Vector4& Right) noexcept;
 
 //=============================================================================
 // OLD
-
 inline Vector4 Min(const Vector4& v1, const Vector4& v2);
 inline Vector4 Max(const Vector4& v1, const Vector4& v2);
 inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x);
 inline Vector4 Mix(const Vector4& u, const Vector4& v, float a);
-
 inline void Abs(Vector4& v);
 inline void Floor(Vector4& v);
 inline void Ceil(Vector4& v);
@@ -422,30 +417,10 @@ public:
 	explicit operator Matrix3() const;
 	explicit operator Matrix4() const;
 
+	Quaternion Conjugate() const { return { w, -x, -y, -z }; }
+
 	float GetLength() const;
 	float GetLengthSquared() const;
-
-	float w = 1.0f;
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
-
-
-
-
-	// OLD
-	//Quaternion(float angle, const Vector3& axis); // Construct from an angle and axis.
-
-
-	Matrix3 ToMatrix3() const;
-	Matrix4 ToMatrix4() const;
-
-	// Define from an angle and axis.
-	void FromAngleAxis(float angle, const Vector3& axis); // TODO: проверить
-	void FromMatrix(const Matrix4_old& m0);
-
-	Quaternion Conjugate() const { return { -x, -y, -z, w }; }
-
 	Quaternion GetNormalize() const;
 	Quaternion Inverse() const;
 
@@ -454,14 +429,28 @@ public:
 	// Returns the q rotation axis.
 	Vector3 GetAxis() const;
 
-	// Return Euler angles
+	// Returns euler angles, pitch as x, yaw as y, roll as z.
 	Vector3 EulerAngles() const;
-	// Return yaw angle
+	// Returns yaw value of euler angles expressed in radians.
 	float YawAngle() const;
-	// Return pitch angle
+	// Returns pitch value of euler angles expressed in radians.
 	float PitchAngle() const;
-	// Return roll angle
+	// Returns roll value of euler angles expressed in radians.
 	float RollAngle() const;
+
+	float w = 1.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+
+
+	// OLD
+	Matrix3 ToMatrix3() const;
+	Matrix4 ToMatrix4() const;
+
+	// Define from an angle and axis.
+	void FromAngleAxis(float angle, const Vector3& axis); // TODO: проверить
+	void FromMatrix(const Matrix4_old& m0);
 };
 
 inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon = EPSILON) noexcept;
@@ -470,6 +459,36 @@ inline Quaternion CastToQuaternion(const Matrix3& m);
 inline Quaternion CastToQuaternion(const Matrix4& m);
 
 inline float DotProduct(const Quaternion& q1, const Quaternion& q2);
+inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2);
+
+// Rotates a quaternion from a vector of 3 components axis and an angle.
+inline Quaternion Rotate(const Quaternion& q, float angle, const Vector3& axis);
+// Build a quaternion from an angle and a normalized axis.
+inline Quaternion AngleAxis(float angle, const Vector3& axis);
+
+// Build a look at quaternion based on the default handedness. Left-handed look at quaternion.
+inline Quaternion QuatLookAt(const Vector3& direction, const Vector3& up);
+
+
+
+
+
+// Spherical linear interpolation of two quaternions.
+// a - Interpolation factor. The interpolation is defined beyond the range [0, 1].
+// For short path spherical linear interpolation, use the SLerp function.
+inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a);
+// Linear interpolation of two quaternions.
+// a - Interpolation factor. The interpolation is defined in the range [0, 1].
+inline Quaternion Lerp(const Quaternion& x, const Quaternion& y, float a);
+// Spherical linear interpolation of two quaternions.
+// a - Interpolation factor. The interpolation is defined beyond the range [0, 1].
+// The interpolation always take the short path and the rotation is performed at constant speed.
+inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a);
+// Spherical linear interpolation of two quaternions with multiple spins over rotation axis.
+// The interpolation always take the short path when the spin count is positive and long path when count is negative. Rotation is performed at constant speed.
+// a - Interpolation factor. The interpolation is defined beyond the range [0, 1].
+// k - Additional spin count. If Value is negative interpolation will be on "long" path.
+inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a, float k);
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept;
 inline bool operator!=(const Quaternion& Left, const Quaternion& Right) noexcept;
@@ -487,22 +506,6 @@ inline Quaternion& operator+=(Quaternion& Left, const Quaternion& Right) noexcep
 inline Quaternion& operator*=(Quaternion& Left, float Right) noexcept;
 inline Quaternion& operator*=(Quaternion& Left, const Quaternion& Right) noexcept;
 inline Quaternion& operator/=(Quaternion& Left, float Right) noexcept;
-
-
-//=============================================================================
-// OLD
-
-// Spherical linear interpolation of two quaternions.
-// a - Interpolation factor. The interpolation is defined beyond the range [0, 1].
-inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a);
-// Linear interpolation of two quaternions.
-inline Quaternion Lerp(const Quaternion& x, const Quaternion& y, float a);
-// Spherical linear interpolation of two quaternions.
-inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a);
-
-inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2);
-
-
 
 //=============================================================================
 // Matrix3
@@ -525,6 +528,9 @@ public:
 
 	constexpr Vector3& operator[](size_t i) noexcept { return value[i]; }
 	constexpr const Vector3& operator[](size_t i) const noexcept { return value[i]; }
+
+	float* DataPtr() { return &(value[0].x); }
+	const float* DataPtr() const { return &(value[0].x); }
 
 	float GetDeterminant() const;
 	Matrix3 Inverse() const;
@@ -587,6 +593,9 @@ public:
 
 	constexpr Vector4& operator[](size_t i) noexcept { return value[i]; }
 	constexpr const Vector4& operator[](size_t i) const noexcept { return value[i]; }
+
+	float* DataPtr() { return &(value[0].x); }
+	const float* DataPtr() const { return &(value[0].x); }
 
 	float GetDeterminant() const;
 	Matrix4 Inverse() const;

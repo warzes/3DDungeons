@@ -34,9 +34,14 @@ inline constexpr float Lerp(float a, float b, float f) noexcept
 	return a + f * (b - a);
 }
 
-inline constexpr float Mix(float u, float v, float a) noexcept
+inline constexpr float Mix(float x, float y, float a) noexcept
 {
-	return u * (1.0f - a) + v * a; 
+	return x * (1.0f - a) + y * a;
+}
+
+inline float InverseSqrt(float x)
+{
+	return 1.0f / sqrt(x);
 }
 
 //=============================================================================
@@ -635,8 +640,76 @@ inline Quaternion::operator Matrix4() const
 	return CastToMatrix4(*this);
 }
 
-inline float Quaternion::GetLength() const { return sqrtf(w * w + x * x + y * y + z * z); }
+inline float Quaternion::GetLength() const { return sqrt(w * w + x * x + y * y + z * z); }
 inline float Quaternion::GetLengthSquared() const { return w * w + x * x + y * y + z * z; }
+
+inline Quaternion Quaternion::GetNormalize() const
+{
+	const float len = GetLength();
+	if (len <= 0.0f) return Quaternion::Identity;
+	const float oneOverLen = 1.0f / len;
+	return { w * oneOverLen, x * oneOverLen, y * oneOverLen, z * oneOverLen };
+}
+
+inline Quaternion Quaternion::Inverse() const
+{
+	return Conjugate() / DotProduct(*this, *this);
+}
+
+inline float Quaternion::GetAngle() const
+{
+	if (fabsf(w) > CosOneOverTwo)
+	{
+		const float a = asin(sqrt(x * x + y * y + z * z)) * 2.0f;
+		if (w < 0.0f)
+			return PI * 2.0f - a;
+		return a;
+	}
+
+	return acos(w) * 2.0f;
+}
+
+inline Vector3 Quaternion::GetAxis() const
+{
+	const float tmp1 = 1.0f - w * w;
+	if (tmp1 <= 0.0f)
+		return { 0.0f, 0.0f, 1.0f };
+	const float tmp2 = 1.0f / sqrt(tmp1);
+	return { x * tmp2, y * tmp2, z * tmp2 };
+}
+
+inline Vector3 Quaternion::EulerAngles() const
+{
+	return Vector3(PitchAngle(), YawAngle(), RollAngle());
+}
+
+inline float Quaternion::YawAngle() const
+{
+	return asin(Clamp(-2.0f * (x * z - w * y), -1.0f, 1.0f));
+}
+
+inline float Quaternion::PitchAngle() const
+{
+	//return (atan(2 * (y * z + w * x), w * w - x * x - y * y + z * z));
+	const float y = 2.0f * (y * z + w * x);
+	const float x = w * w - x * x - y * y + z * z;
+
+	if (Equals(Vector2(x, y), Vector2(0.0f), std::numeric_limits<float>::epsilon())) //avoid atan2(0,0) - handle singularity - Matiis
+		return 2.0f * atan2(x, w);
+
+	return atan2(y, x);
+}
+
+inline float Quaternion::RollAngle() const
+{
+	const float y = 2.0f * (x * y + w * z);
+	const float x = w * w + x * x - y * y - z * z;
+
+	if (Equals(Vector2(x, y), Vector2(0.0f), std::numeric_limits<float>::epsilon())) //avoid atan2(0,0) - handle singularity - Matiis
+		return 0.0f;
+
+	return atan2(y, x);
+}
 
 inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) noexcept
 {
@@ -693,6 +766,144 @@ inline Quaternion CastToQuaternion(const Matrix4& m)
 }
 
 inline float DotProduct(const Quaternion& q1, const Quaternion& q2) { return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z; }
+
+inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2)
+{
+	return {
+		q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z,
+		q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
+		q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z,
+		q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x};
+}
+
+inline Quaternion Rotate(const Quaternion& q, float angle, const Vector3& axis)
+{
+	Vector3 tmp = axis;
+
+	// Axis of rotation must be normalised
+	const float len = tmp.GetLength();
+	if (fabsf(len - 1.0f) > 0.001f)
+	{
+		const float oneOverLen = 1.0f / len;
+		tmp.x *= oneOverLen;
+		tmp.y *= oneOverLen;
+		tmp.z *= oneOverLen;
+	}
+
+	const float halfAndgle = angle * 0.5f;
+	const float Sin = sin(halfAndgle);
+	return q * Quaternion(cos(halfAndgle), tmp.x * Sin, tmp.y * Sin, tmp.z * Sin);
+}
+
+inline Quaternion AngleAxis(float angle, const Vector3& axis)
+{
+	const float halfAndgle = angle * 0.5f;
+	const float Sin = sin(halfAndgle);
+	return Quaternion(cos(halfAndgle), axis * Sin);
+}
+
+inline Quaternion QuatLookAt(const Vector3& direction, const Vector3& up)
+{
+	Matrix3 Result;
+	Result[2] = direction;
+	const Vector3& Right = CrossProduct(up, Result[2]);
+	Result[0] = Right * InverseSqrt(Max(0.00001f, DotProduct(Right, Right)));
+	Result[1] = CrossProduct(Result[2], Result[0]);
+
+	return CastToQuaternion(Result);
+}
+
+inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a)
+{
+	const float cosTheta = DotProduct(x, y);
+	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+	if (cosTheta > 1.0f - std::numeric_limits<float>::epsilon())
+	{
+		// Linear interpolation
+		return {
+			Mix(x.w, y.w, a),
+			Mix(x.x, y.x, a),
+			Mix(x.y, y.y, a),
+			Mix(x.z, y.z, a) };
+	}
+	else
+	{
+		const float angle = acosf(cosTheta);
+		return (sin((1.0f - a) * angle) * x + sin(a * angle) * y) / sin(angle);
+	}
+}
+
+inline Quaternion Lerp(const Quaternion& x, const Quaternion& y, float a)
+{
+	// Lerp is only defined in [0, 1]
+	assert(a >= 0.0f);
+	assert(a <= 1.0f);
+	return x * (1.0f - a) + (y * a);
+}
+
+inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a)
+{
+	Quaternion z = y;
+
+	float cosTheta = DotProduct(x, y);
+
+	// If cosTheta < 0, the interpolation will take the long way around the sphere.
+	// To fix this, one quat must be negated.
+	if (cosTheta < 0.0f)
+	{
+		z = -y;
+		cosTheta = -cosTheta;
+	}
+
+	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+	if (cosTheta > 1.0f - std::numeric_limits<float>::epsilon())
+	{
+		// Linear interpolation
+		return { 
+			Mix(x.w, z.w, a),
+			Mix(x.x, z.x, a),
+			Mix(x.y, z.y, a),
+			Mix(x.z, z.z, a) };
+	}
+	else
+	{
+		const float angle = acos(cosTheta);
+		return (sin((1.0f - a) * angle) * x + sin(a * angle) * z) / sin(angle);
+	}
+}
+
+inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a, float k)
+{
+	Quaternion z = y;
+
+	float cosTheta = DotProduct(x, y);
+
+	// If cosTheta < 0, the interpolation will take the long way around the sphere.
+	// To fix this, one quat must be negated.
+	if (cosTheta < 0.0f)
+	{
+		z = -y;
+		cosTheta = -cosTheta;
+	}
+
+	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+	if (cosTheta > 1.0f - std::numeric_limits<float>::epsilon())
+	{
+		// Linear interpolation
+		return {
+			Mix(x.w, z.w, a),
+			Mix(x.x, z.x, a),
+			Mix(x.y, z.y, a),
+			Mix(x.z, z.z, a) };
+	}
+	else
+	{
+		// Graphics Gems III, page 96
+		const float angle = acos(cosTheta);
+		const float phi = angle + k * PI;
+		return (sin(angle - a * phi) * x + sin(a * phi) * z) / sin(angle);
+	}
+}
 
 inline bool operator==(const Quaternion& Left, const Quaternion& Right) noexcept { return Left.w == Right.w && Left.x == Right.x && Left.y == Right.y && Left.z == Right.z; }
 inline bool operator!=(const Quaternion& Left, const Quaternion& Right) noexcept { return !(Left == Right); }
@@ -789,160 +1000,6 @@ inline void Quaternion::FromMatrix(const Matrix4_old& m0)
 	}
 }
 
-
-inline Quaternion Quaternion::GetNormalize() const
-{
-	const float len = GetLength();
-	if (len <= 0.0f) return Quaternion::Identity;
-	const float oneOverLen = 1.0f / len;
-	return { x * oneOverLen, y * oneOverLen, z * oneOverLen, w * oneOverLen };
-}
-
-inline Quaternion Quaternion::Inverse() const
-{
-	return Conjugate() / DotProduct(*this, *this);
-}
-
-inline float Quaternion::GetAngle() const
-{
-	if (fabsf(w) > float(0.877582561890372716130286068203503191)/*cos_one_over_two*/)
-	{
-		const float a = asinf(sqrtf(x * x + y * y + z * z)) * 2.0f;
-		if (w < 0.0f)
-			return PI * 2.0f - a;
-		return a;
-	}
-
-	return acosf(w) * 2.0f;
-}
-
-inline Vector3 Quaternion::GetAxis() const
-{
-	const float tmp1 = 1.0f - w * w;
-	if (tmp1 <= 0.0f)
-		return { 0.0f, 0.0f, 1.0f };
-	const float tmp2 = 1.0f / sqrtf(tmp1);
-	return { x * tmp2, y * tmp2, z * tmp2 };
-}
-
-inline Vector3 Quaternion::EulerAngles() const
-{
-	// Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
-	// Order of rotations: Z first, then X, then Y
-	const float check = 2.0f * (w * x - y * z);
-
-	if( check < -0.995f )
-	{
-		return Vector3(
-			-90.0f*DEG2RAD,
-			0.0f,
-			-atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z))
-		);
-	}
-	else if( check > 0.995f )
-	{
-		return Vector3(
-			90.0f * DEG2RAD,
-			0.0f,
-			atan2f(2.0f * (x * z - w * y), 1.0f - 2.0f * (y * y + z * z))
-		);
-	}
-	else
-	{
-		return Vector3(
-			asinf(check),
-			atan2f(2.0f * (x * z + w * y), 1.0f - 2.0f * (x * x + y * y)),
-			atan2f(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z))
-		);
-	}
-}
-
-inline float Quaternion::YawAngle() const
-{
-	return EulerAngles().y;
-}
-
-inline float Quaternion::PitchAngle() const
-{
-	return EulerAngles().x;
-}
-
-inline float Quaternion::RollAngle() const
-{
-	return EulerAngles().z;
-}
-
-inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a)
-{
-	const float cosTheta = DotProduct(x, y);
-	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
-	if (cosTheta > 1.0f - std::numeric_limits<float>::epsilon())
-	{
-		// Linear interpolation
-		return Quaternion(
-			Mix(x.x, y.x, a),
-			Mix(x.y, y.y, a),
-			Mix(x.z, y.z, a),
-			Mix(x.w, y.w, a)
-		);
-	}
-	else
-	{
-		const float angle = acosf(cosTheta);
-		return (sinf((1.0f - a) * angle) * x + sinf(a * angle) * y) / sinf(angle);
-	}
-}
-
-inline Quaternion Lerp(const Quaternion& x, const Quaternion& y, float a)
-{
-	return x * (1.0f - a) + (y * a);
-}
-
-inline Quaternion SLerp(const Quaternion& x, const Quaternion& y, float a)
-{
-	Quaternion z = y;
-
-	float cosTheta = DotProduct(x, y);
-
-	// If cosTheta < 0, the interpolation will take the long way around the sphere.
-	// To fix this, one quat must be negated.
-	if (cosTheta < 0.0f)
-	{
-		z = -y;
-		cosTheta = -cosTheta;
-	}
-
-	// Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
-	if (cosTheta > 1.0f - std::numeric_limits<float>::epsilon())
-	{
-		// Linear interpolation
-		return Quaternion(
-			Mix(x.x, z.x, a),
-			Mix(x.y, z.y, a),
-			Mix(x.z, z.z, a),
-			Mix(x.w, z.w, a)
-		);
-	}
-	else
-	{
-		const float angle = acosf(cosTheta);
-		return (sinf((1.0f - a) * angle) * x + sinf(a * angle) * z) / sinf(angle);
-	}
-}
-
-
-
-inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2)
-{
-	return {
-		q1.w* q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
-		q1.w* q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z,
-		q1.w* q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x,
-		q1.w* q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z
-	};
-}
-
-
 //=============================================================================
 // Matrix3 Impl
 //=============================================================================
@@ -1000,6 +1057,33 @@ inline Matrix3 Matrix3::Transpose() const
 	Result[2][0] = value[0][2];
 	Result[2][1] = value[1][2];
 	Result[2][2] = value[2][2];
+	return Result;
+}
+
+inline Matrix3 CastToMatrix3(const Quaternion& q)
+{
+	Matrix3 Result/* = Matrix3::Identity*/;
+	const float qxx(q.x * q.x);
+	const float qyy(q.y * q.y);
+	const float qzz(q.z * q.z);
+	const float qxz(q.x * q.z);
+	const float qxy(q.x * q.y);
+	const float qyz(q.y * q.z);
+	const float qwx(q.w * q.x);
+	const float qwy(q.w * q.y);
+	const float qwz(q.w * q.z);
+
+	Result[0][0] = 1.0f - 2.0f * (qyy + qzz);
+	Result[0][1] = 2.0f * (qxy + qwz);
+	Result[0][2] = 2.0f * (qxz - qwy);
+
+	Result[1][0] = 2.0f * (qxy - qwz);
+	Result[1][1] = 1.0f - 2.0f * (qxx + qzz);
+	Result[1][2] = 2.0f * (qyz + qwx);
+
+	Result[2][0] = 2.0f * (qxz + qwy);
+	Result[2][1] = 2.0f * (qyz - qwx);
+	Result[2][2] = 1.0f - 2.0f * (qxx + qyy);
 	return Result;
 }
 
@@ -1238,6 +1322,11 @@ inline Matrix4 Matrix4::Transpose() const
 	Result[3][2] = value[2][3];
 	Result[3][3] = value[3][3];
 	return Result;
+}
+
+inline Matrix4 CastToMatrix4(const Quaternion& q)
+{
+	return Matrix4(Matrix3(q));
 }
 
 inline bool operator==(const Matrix4& Left, const Matrix4& Right) noexcept
