@@ -190,7 +190,7 @@
     <ClInclude Include="02_QuadTexture.h" />
     <ClInclude Include="03_ObjModel.h" />
     <ClInclude Include="AppConfig.h" />
-    <ClInclude Include="ExampleDemo.h" />
+    <ClInclude Include="DCGameApp.h" />
     <ClInclude Include="MicroAdvance.h" />
     <ClInclude Include="MicroCollisions.h" />
     <ClInclude Include="MicroGeometry.h" />

@@ -1,8 +1,5 @@
-#include "AppConfig.h"
 #include "MicroEngine.h"
-#if START_EXAMPLE
-#include "ExampleDemo.h"
-#endif
+#include "AppConfig.h"
 
 //повторить вот это 
 //https://gpvoid.itch.io/rogue3d - механика боя
@@ -45,6 +42,28 @@ int main(
 			AppSystemEndFrame();
 		}
 		ExampleClose();
+	}
+	AppSystemDestroy();
+#elif START_GAME
+	AppSystemCreateInfo createInfo;
+	createInfo.window.Vsync = true;
+	createInfo.window.Width = 1600;
+	createInfo.window.Height = 900;
+	if (AppSystemCreate(createInfo))
+	{
+		GameAppInit();
+		while (!IsAppExitRequested())
+		{
+			AppSystemBeginFrame();
+
+			if (IsKeyDown(27/*VK_ESCAPE*/))
+				AppExitRequest();
+
+			GameAppFrame();
+
+			AppSystemEndFrame();
+}
+		GameAppClose();
 	}
 	AppSystemDestroy();
 #else
