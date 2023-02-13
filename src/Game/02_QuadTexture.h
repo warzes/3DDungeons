@@ -88,7 +88,7 @@ void ExampleFrame()
 {
 	texture.Bind();
 	shader.Bind();
-	Matrix4_old mat = Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
+	Matrix4 mat = Matrix4::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 1000.f);
 	shader.SetUniform(uniformProjectionMatrix, mat);
 	vao.Draw();
 }

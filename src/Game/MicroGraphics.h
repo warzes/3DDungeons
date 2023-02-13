@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "MicroMath.h"
-#include "MicroMathOld.h"
 #include "MicroRender.h"
 
 class Texture2D;
@@ -108,7 +107,7 @@ public:
 	virtual bool OnKeys(short Keys, float FrameTime, Vector3& Movement) = 0;
 	virtual void OnMouseMove(int dx, int dy) = 0;
 
-	const Matrix4_old& GetViewMatrix() const { return m_viewMatrix; }
+	const Matrix4& GetViewMatrix() const { return m_viewMatrix; }
 
 	Vector3 x = Vector3::Right;
 	Vector3 y = Vector3::Up;
@@ -118,7 +117,7 @@ public:
 protected:
 	virtual void calculateViewMatrix();
 
-	Matrix4_old m_viewMatrix;
+	Matrix4 m_viewMatrix;
 
 	float m_speed = 2.5f;
 	float m_sensitivity = 0.025f;

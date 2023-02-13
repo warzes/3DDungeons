@@ -177,9 +177,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LiliCollision.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="mathc.c" />
     <ClCompile Include="MicroAdvance.cpp" />
     <ClCompile Include="MicroEngine.cpp" />
     <ClCompile Include="MicroGraphics.cpp" />
@@ -193,15 +191,12 @@
     <ClInclude Include="03_ObjModel.h" />
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="ExampleDemo.h" />
-    <ClInclude Include="HandmadeMath.h" />
-    <ClInclude Include="LiliCollision.h" />
-    <ClInclude Include="mathc.h" />
     <ClInclude Include="MicroAdvance.h" />
+    <ClInclude Include="MicroCollisions.h" />
     <ClInclude Include="MicroGeometry.h" />
     <ClInclude Include="MicroEngine.h" />
     <ClInclude Include="MicroGraphics.h" />
     <ClInclude Include="MicroMath.h" />
-    <ClInclude Include="MicroMathOld.h" />
     <ClInclude Include="MicroOpenGLLoader.h" />
     <ClInclude Include="MicroRender.h" />
     <ClInclude Include="UnitTestMath.h" />
@@ -210,9 +205,9 @@
     <ClInclude Include="X_TestFPS.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="MicroCollisions.inl" />
     <None Include="MicroGeometry.inl" />
     <None Include="MicroMath.inl" />
-    <None Include="MicroMathOld.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

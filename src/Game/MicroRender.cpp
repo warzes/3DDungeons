@@ -16,7 +16,6 @@
 
 #include "MicroRender.h"
 #include "MicroMath.h"
-#include "MicroMathOld.h"
 
 #if defined(_MSC_VER)
 #	pragma warning(pop)
@@ -240,16 +239,16 @@ void ShaderProgram::SetUniform(int uniformId, const Vector3& v) const
 	glUniform3fv(uniformId, 1, &(v.x));
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Matrix3_old& m) const
+void ShaderProgram::SetUniform(int uniformId, const Matrix3& m) const
 {
 	assert(state::CurrentShaderProgram == m_id);
-	glUniformMatrix3fv(uniformId, 1, GL_FALSE, m.m);
+	glUniformMatrix3fv(uniformId, 1, GL_FALSE, m.DataPtr());
 }
 //-----------------------------------------------------------------------------
-void ShaderProgram::SetUniform(int uniformId, const Matrix4_old& m) const
+void ShaderProgram::SetUniform(int uniformId, const Matrix4& m) const
 {
 	assert(state::CurrentShaderProgram == m_id);
-	glUniformMatrix4fv(uniformId, 1, GL_FALSE, m.m);
+	glUniformMatrix4fv(uniformId, 1, GL_FALSE, m.DataPtr());
 }
 //-----------------------------------------------------------------------------
 std::vector<ShaderAttribInfo> ShaderProgram::GetAttribInfo() const

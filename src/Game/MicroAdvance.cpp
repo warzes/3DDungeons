@@ -92,7 +92,7 @@ void ResourceCacheSystem::Clear()
 		it->second.Destroy();
 	FileTextures2D.clear();
 
-	for (auto it = FileModel.begin(); it != FileModel.end(); ++it)
+	for( auto it = FileModel.begin(); it != FileModel.end(); ++it )
 		it->second.Destroy();
 	FileModel.clear();
 }
@@ -674,7 +674,7 @@ void DebugDraw::DrawBoid(const Vector3& position, Vector3 dir)
 	DrawLine(right, front, clr);
 }
 //-----------------------------------------------------------------------------
-void DebugDraw::Flush(const Matrix4_old& ViewProj)
+void DebugDraw::Flush(const Matrix4& ViewProj)
 {
 	if (Points.empty() && Lines.empty())
 		return;

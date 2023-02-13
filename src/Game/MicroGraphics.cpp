@@ -336,10 +336,11 @@ void ICamera::SetPosition(const Vector3& Movement)
 //-----------------------------------------------------------------------------
 void ICamera::calculateViewMatrix()
 {
-	m_viewMatrix[0] = x.x;  m_viewMatrix[4] = x.y;  m_viewMatrix[8] = x.z;   m_viewMatrix[12] = -DotProduct(x, position);
-	m_viewMatrix[1] = y.x;  m_viewMatrix[5] = y.y;  m_viewMatrix[9] = y.z;   m_viewMatrix[13] = -DotProduct(y, position);
-	m_viewMatrix[2] = z.x;  m_viewMatrix[6] = z.y;  m_viewMatrix[10] = z.z;  m_viewMatrix[14] = -DotProduct(z, position);
-	m_viewMatrix[3] = 0.0f; m_viewMatrix[7] = 0.0f; m_viewMatrix[11] = 0.0f; m_viewMatrix[15] = 1.0f;
+	// TODO: улучшить
+	m_viewMatrix[0] = { x.x, y.x, z.x, 0.0f };
+	m_viewMatrix[1] = { x.y, y.y, z.y, 0.0f };
+	m_viewMatrix[2] = { x.z, y.z, z.z, 0.0f };
+	m_viewMatrix[3] = { -DotProduct(x, position), -DotProduct(y, position), -DotProduct(z, position), 1.0f };
 }
 //-----------------------------------------------------------------------------
 bool FlyingCamera::OnKeys(short Keys, float FrameTime, Vector3& Movement)
@@ -368,7 +369,7 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 {
 	if (dx != 0)
 	{
-		const float DeltaX = (float)dx * m_sensitivity * -1;
+		const float DeltaX = (float)dx * m_sensitivity;
 
 		x = Rotate(x, DeltaX, Vector3::Up);
 		y = Rotate(y, DeltaX, Vector3::Up);
@@ -377,7 +378,7 @@ void FlyingCamera::OnMouseMove(int dx, int dy)
 
 	if (dy != 0)
 	{
-		const float DeltaY = (float)dy * m_sensitivity * -1;
+		const float DeltaY = (float)dy * m_sensitivity;
 
 		y = Rotate(y, DeltaY, x);
 		z = Rotate(z, DeltaY, x);

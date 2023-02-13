@@ -19,8 +19,8 @@
 
 class Vector2;
 class Vector3;
-class Matrix3_old;
-class Matrix4_old;
+class Matrix3;
+class Matrix4;
 
 //=============================================================================
 // Render Config
@@ -162,8 +162,8 @@ public:
 	void SetUniform(int uniformId, float value) const;
 	void SetUniform(int uniformId, const Vector2& v) const;
 	void SetUniform(int uniformId, const Vector3& v) const;
-	void SetUniform(int uniformId, const Matrix3_old& m) const;
-	void SetUniform(int uniformId, const Matrix4_old& m) const;
+	void SetUniform(int uniformId, const Matrix3& m) const;
+	void SetUniform(int uniformId, const Matrix4& m) const;
 
 	[[nodiscard]] bool IsValid() const { return m_id > 0; }
 

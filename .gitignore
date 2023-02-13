@@ -10,3 +10,4 @@ Thumbs.db
 /bin/x64/Game_Debug.*
 /bin/x64/Game_Release.*
 /bin/Log.txt
+/bin/data/mesh/packages/

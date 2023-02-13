@@ -18,18 +18,9 @@
     <ClCompile Include="MicroOpenGLLoader.cpp">
       <Filter>MicroEngine\utils</Filter>
     </ClCompile>
-    <ClCompile Include="mathc.c">
-      <Filter>MicroEngine\temp</Filter>
-    </ClCompile>
-    <ClCompile Include="LiliCollision.cpp">
-      <Filter>MicroEngine\TempCollide</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
-    <ClInclude Include="MicroMathOld.h">
-      <Filter>MicroEngine</Filter>
-    </ClInclude>
     <ClInclude Include="MicroEngine.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
@@ -70,17 +61,11 @@
     <ClInclude Include="UnitTestMath.h">
       <Filter>MicroEngine\UnitTest</Filter>
     </ClInclude>
-    <ClInclude Include="mathc.h">
-      <Filter>MicroEngine\temp</Filter>
-    </ClInclude>
-    <ClInclude Include="HandmadeMath.h">
-      <Filter>MicroEngine\temp</Filter>
-    </ClInclude>
-    <ClInclude Include="LiliCollision.h">
-      <Filter>MicroEngine\TempCollide</Filter>
-    </ClInclude>
     <ClInclude Include="X_TestFPS.h">
       <Filter>ExampleDemo</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroCollisions.h">
+      <Filter>MicroEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -99,24 +84,18 @@
     <Filter Include="MicroEngine\utils">
       <UniqueIdentifier>{f9feb1f4-25b5-4689-a3c4-c9342d8d26e6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\temp">
-      <UniqueIdentifier>{beadbbc5-651b-4164-a9ec-26b3a241bb75}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MicroEngine\UnitTest">
       <UniqueIdentifier>{7efbbe1e-7004-4640-a200-ce9cfc8aea12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\TempCollide">
-      <UniqueIdentifier>{3c3467f3-56b3-4049-a29b-237e68305e6d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MicroMathOld.inl">
-      <Filter>MicroEngine</Filter>
-    </None>
     <None Include="MicroGeometry.inl">
       <Filter>MicroEngine</Filter>
     </None>
     <None Include="MicroMath.inl">
+      <Filter>MicroEngine</Filter>
+    </None>
+    <None Include="MicroCollisions.inl">
       <Filter>MicroEngine</Filter>
     </None>
   </ItemGroup>

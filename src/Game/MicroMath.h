@@ -41,8 +41,6 @@ class Vector4;
 class Quaternion;
 class Matrix3;
 class Matrix4;
-class Matrix3_old;
-class Matrix4_old;
 
 //=============================================================================
 // Core functions
@@ -471,11 +469,6 @@ public:
 	float x = 0.0f;
 	float y = 0.0f;
 	float z = 0.0f;
-
-	// OLD
-	// Define from an angle and axis.
-	void FromAngleAxis(float angle, const Vector3& axis); // TODO: проверить
-	void FromMatrix(const Matrix4_old& m0);
 };
 
 inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon = EPSILON) noexcept;
@@ -710,162 +703,6 @@ inline Matrix4& operator*=(Matrix4& Left, float Right) noexcept;
 inline Matrix4& operator*=(Matrix4& Left, const Matrix4& Right) noexcept;
 inline Matrix4& operator/=(Matrix4& Left, float Right) noexcept;
 inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept;
-
-
-//=============================================================================
-// Matrix3 old
-//=============================================================================
-class Matrix3_old
-{
-public:
-	constexpr Matrix3_old() = default;
-	constexpr Matrix3_old(Matrix3_old&&) = default;
-	constexpr Matrix3_old(const Matrix3_old&) = default;
-	constexpr Matrix3_old(
-		float x0, float y0, float z0,
-		float x1, float y1, float z1,
-		float x2, float y2, float z2);
-	Matrix3_old(const Matrix4_old& m);
-
-	constexpr Matrix3_old& operator=(Matrix3_old&&) = default;
-	constexpr Matrix3_old& operator=(const Matrix3_old&) = default;
-
-	constexpr float& operator[](size_t i) noexcept { return m[i]; }
-	constexpr const float operator[](size_t i) const noexcept { return m[i]; }
-
-	constexpr void Set(
-		float x0, float y0, float z0,
-		float x1, float y1, float z1,
-		float x2, float y2, float z2);
-	constexpr void Set(const Matrix3_old& M);
-
-	float GetDeterminant() const;
-
-	Matrix3_old Transpose() const;
-	Matrix3_old Inverse() const;
-
-	void Scale(const Vector3& scale);
-
-	float m[9] = {  1.0f, 0.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 0.0f, 1.0f };
-};
-
-inline Matrix3_old Matrix3Scale(const Vector3& scale);
-inline Matrix3_old Matrix3RotationX(float angle);
-inline Matrix3_old Matrix3RotationY(float angle);
-inline Matrix3_old Matrix3RotationZ(float angle);
-inline Matrix3_old Matrix3Rotation(const Quaternion& q);
-
-inline bool operator==(const Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-inline bool operator!=(const Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-
-inline Matrix3_old operator-(const Matrix3_old& In) noexcept;
-inline Matrix3_old operator-(float Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old operator-(const Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old operator-(const Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old operator+(float Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old operator+(const Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old operator+(const Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old operator*(float Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old operator*(const Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old operator*(const Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old operator/(float Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old operator/(const Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old operator/(const Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-
-inline Matrix3_old& operator-=(Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old& operator-=(Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old& operator+=(Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old& operator+=(Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old& operator*=(Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old& operator*=(Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-inline Matrix3_old& operator/=(Matrix3_old& Left, float Right) noexcept;
-inline Matrix3_old& operator/=(Matrix3_old& Left, const Matrix3_old& Right) noexcept;
-
-//=============================================================================
-// Matrix4 old
-//=============================================================================
-class Matrix4_old
-{
-public:
-	constexpr Matrix4_old() = default;
-	constexpr Matrix4_old(Matrix4_old&&) = default;
-	constexpr Matrix4_old(const Matrix4_old&) = default;
-	constexpr Matrix4_old(
-		float x0, float y0, float z0, float w0,
-		float x1, float y1, float z1, float w1,
-		float x2, float y2, float z2, float w2,
-		float x3, float y3, float z3, float w3);
-	constexpr Matrix4_old(const Vector4& v0, const Vector4& v1, const Vector4& v2, const Vector4& v3);
-	constexpr Matrix4_old(const Matrix3_old& m);
-
-	constexpr Matrix4_old& operator=(Matrix4_old&&) = default;
-	constexpr Matrix4_old& operator=(const Matrix4_old&) = default;
-
-	constexpr float& operator[](size_t i) noexcept { return m[i]; }
-	constexpr const float operator[](size_t i) const noexcept { return m[i]; }
-
-	constexpr void Set(
-		float x0, float y0, float z0, float w0,
-		float x1, float y1, float z1, float w1,
-		float x2, float y2, float z2, float w2,
-		float x3, float y3, float z3, float w3);
-	constexpr void Set(const Matrix4_old& M);
-
-	void Scale(const Vector3& scale);
-	void Translate(const Vector3& pos);
-
-	float GetDeterminant() const;
-
-	Matrix4_old Transpose() const;
-	Matrix4_old Inverse() const;
-
-	float m[16] = { 1.0f, 0.0f, 0.0f, 0.0f,
-					0.0f, 1.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 1.0f, 0.0f,
-					0.0f, 0.0f, 0.0f, 1.0f };
-};
-
-inline Matrix4_old Cofactor(const Matrix3_old&m);
-inline Matrix4_old Matrix4Scale(const Vector3& scale);
-inline Matrix4_old Matrix4RotationX(float angle);
-inline Matrix4_old Matrix4RotationY(float angle);
-inline Matrix4_old Matrix4RotationZ(float angle);
-inline Matrix4_old Matrix4Rotation(const Vector3& axis, float angle);
-inline Matrix4_old Matrix4Rotation(const Quaternion& q);
-inline Matrix4_old Matrix4Translate(const Vector3& v);
-
-inline Matrix4_old LookAt(const Vector3& eye, const Vector3& dir, const Vector3& up); // левосторонее
-inline Matrix4_old Ortho(float left, float right, float bottom, float top, float n, float f);
-inline Matrix4_old Perspective(float fov_y, float aspect, float zNear, float zFar); // левосторонее
-
-
-inline bool operator==(const Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-inline bool operator!=(const Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-
-inline Matrix4_old operator-(const Matrix4_old& In) noexcept;
-inline Matrix4_old operator-(float Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old operator-(const Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old operator-(const Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old operator+(float Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old operator+(const Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old operator+(const Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old operator*(float Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old operator*(const Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old operator*(const Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old operator/(float Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old operator/(const Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old operator/(const Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-
-inline Matrix4_old& operator-=(Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old& operator-=(Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old& operator+=(Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old& operator+=(Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old& operator*=(Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old& operator*=(Matrix4_old& Left, const Matrix4_old& Right) noexcept;
-inline Matrix4_old& operator/=(Matrix4_old& Left, float Right) noexcept;
-inline Matrix4_old& operator/=(Matrix4_old& Left, const Matrix4_old& Right) noexcept;
 
 //=============================================================================
 // Impl
