@@ -39,11 +39,6 @@ inline constexpr float Mix(float x, float y, float a) noexcept
 	return x * (1.0f - a) + y * a;
 }
 
-inline float InverseSqrt(float x)
-{
-	return 1.0f / sqrt(x);
-}
-
 //=============================================================================
 // Color Impl
 //=============================================================================
@@ -126,19 +121,13 @@ inline Vector2 Refract(const Vector2& i, const Vector2& normal, float eta)
 	return (k >= 0.0f) ? (eta * i - (eta * dotValue + sqrtf(k)) * normal) : Vector2(0.0f);
 }
 
-//=============================================================================
-// OLD
-
-
 inline Vector2 Min(const Vector2& v1, const Vector2& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y) }; }
 inline Vector2 Max(const Vector2& v1, const Vector2& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y) }; }
 inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x) { return a + (b - a) * x; }
-inline Vector2 Mix(const Vector2& u, const Vector2& v, float a) { return u * (1.0f - a) + v * a; }
+inline Vector2 Mix(const Vector2& x, const Vector2& y, float a) { return x * (1.0f - a) + y * a; }
 
-
-
-
-
+//=============================================================================
+// OLD
 inline Vector2 Project(const Vector2& v1, const Vector2& v2)
 {
 	const float d = DotProduct(v2, v2);
@@ -291,18 +280,13 @@ inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta)
 	return (k >= 0.0f) ? (eta * i - (eta * dotValue + sqrtf(k)) * normal) : Vector3(0.0f);
 }
 
-//=============================================================================
-// OLD
-
 inline Vector3 Min(const Vector3& v1, const Vector3& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z) }; }
 inline Vector3 Max(const Vector3& v1, const Vector3& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z) }; }
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x) { return a + (b - a) * x; }
-inline Vector3 Mix(const Vector3& u, const Vector3& v, float t) { return u * (1.0f - t) + v * t; }
+inline Vector3 Mix(const Vector3& x, const Vector3& y, float t) { return x * (1.0f - t) + y * t; }
 
-
-
-
-
+//=============================================================================
+// OLD
 inline Vector3 Project(const Vector3& v0, const Vector3& v1)
 {
 	const float d = DotProduct(v1, v1);
@@ -471,15 +455,13 @@ inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon) noexcept
 
 inline float DotProduct(const Vector4& v1, const Vector4& v2) { return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w; }
 
-//=============================================================================
-// OLD
-
 inline Vector4 Min(const Vector4& v1, const Vector4& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z), Min(v1.w, v2.w) }; }
 inline Vector4 Max(const Vector4& v1, const Vector4& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z), Max(v1.w, v2.w) }; }
 inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x) { return a + (b - a) * x; }
-inline Vector4 Mix(const Vector4& u, const Vector4& v, float a) { return u * (1.0f - a) + v * a; }
+inline Vector4 Mix(const Vector4& x, const Vector4& y, float a) { return x * (1.0f - a) + y * a; }
 
-
+//=============================================================================
+// OLD
 inline void Abs(Vector4& v)
 {
 	v.x = fabsf(v.x);
@@ -807,7 +789,7 @@ inline Quaternion QuatLookAt(const Vector3& direction, const Vector3& up)
 	Matrix3 Result;
 	Result[2] = direction;
 	const Vector3& Right = CrossProduct(up, Result[2]);
-	Result[0] = Right * InverseSqrt(Max(0.00001f, DotProduct(Right, Right)));
+	Result[0] = Right * 1.0f / sqrt(Max(0.00001f, DotProduct(Right, Right)));
 	Result[1] = CrossProduct(Result[2], Result[0]);
 
 	return CastToQuaternion(Result);
@@ -1004,6 +986,12 @@ inline void Quaternion::FromMatrix(const Matrix4_old& m0)
 // Matrix3 Impl
 //=============================================================================
 
+const inline Matrix3 Matrix3::Identity = { 
+	1.0f, 0.0f, 0.0f, 
+	0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f
+};
+
 inline constexpr Matrix3::Matrix3(
 	float x0, float y0, float z0,
 	float x1, float y1, float z1,
@@ -1062,7 +1050,7 @@ inline Matrix3 Matrix3::Transpose() const
 
 inline Matrix3 CastToMatrix3(const Quaternion& q)
 {
-	Matrix3 Result/* = Matrix3::Identity*/;
+	Matrix3 Result = Matrix3::Identity;
 	const float qxx(q.x * q.x);
 	const float qyy(q.y * q.y);
 	const float qzz(q.z * q.z);
@@ -1207,6 +1195,20 @@ inline Matrix3& operator/=(Matrix3& Left, const Matrix3& Right) noexcept { retur
 // Matrix4 Impl
 //=============================================================================
 
+const inline Matrix4 Matrix4::Zero = {
+	0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 0.0f,
+};
+
+const inline Matrix4 Matrix4::Identity = {
+	1.0f, 0.0f, 0.0f, 0.0f,
+	0.0f, 1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 0.0f, 1.0f,
+};
+
 inline constexpr Matrix4::Matrix4(
 	float x0, float y0, float z0, float w0,
 	float x1, float y1, float z1, float w1,
@@ -1322,6 +1324,197 @@ inline Matrix4 Matrix4::Transpose() const
 	Result[3][2] = value[2][3];
 	Result[3][3] = value[3][3];
 	return Result;
+}
+
+inline Matrix4 Matrix4::Translate(const Matrix4 & m, const Vector3 & v)
+{
+	Matrix4 Result(m);
+	Result[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
+	return Result;
+}
+
+inline Matrix4 Matrix4::Rotate(const Matrix4& m, float angle, const Vector3& v)
+{
+	const float c = cos(angle);
+	const float s = sin(angle);
+
+	Vector3 axis(v.GetNormalize());
+	Vector3 temp((1.0f - c) * axis);
+
+	Matrix4 Rotate;
+	Rotate[0][0] = c + temp[0] * axis[0];
+	Rotate[0][1] = temp[0] * axis[1] + s * axis[2];
+	Rotate[0][2] = temp[0] * axis[2] - s * axis[1];
+
+	Rotate[1][0] = temp[1] * axis[0] - s * axis[2];
+	Rotate[1][1] = c + temp[1] * axis[1];
+	Rotate[1][2] = temp[1] * axis[2] + s * axis[0];
+
+	Rotate[2][0] = temp[2] * axis[0] + s * axis[1];
+	Rotate[2][1] = temp[2] * axis[1] - s * axis[0];
+	Rotate[2][2] = c + temp[2] * axis[2];
+
+	Matrix4 Result;
+	Result[0] = m[0] * Rotate[0][0] + m[1] * Rotate[0][1] + m[2] * Rotate[0][2];
+	Result[1] = m[0] * Rotate[1][0] + m[1] * Rotate[1][1] + m[2] * Rotate[1][2];
+	Result[2] = m[0] * Rotate[2][0] + m[1] * Rotate[2][1] + m[2] * Rotate[2][2];
+	Result[3] = m[3];
+	return Result;
+}
+
+inline Matrix4 Matrix4::Scale(const Matrix4& m, const Vector3& v)
+{
+	Matrix4 Result;
+	Result[0] = m[0] * v[0];
+	Result[1] = m[1] * v[1];
+	Result[2] = m[2] * v[2];
+	Result[3] = m[3];
+	return Result;
+}
+
+inline Matrix4 Matrix4::Ortho(float left, float right, float bottom, float top, float zNear, float zFar)
+{
+	Matrix4 Result = Matrix4::Identity;
+	Result[0][0] = 2.0f / (right - left);
+	Result[1][1] = 2.0f / (top - bottom);
+	Result[2][2] = 2.0f / (zFar - zNear);
+	Result[3][0] = -(right + left) / (right - left);
+	Result[3][1] = -(top + bottom) / (top - bottom);
+	Result[3][2] = -(zFar + zNear) / (zFar - zNear);
+	return Result;
+}
+
+inline Matrix4 Matrix4::Frustum(float left, float right, float bottom, float top, float zNear, float zFar)
+{
+	Matrix4 Result = Matrix4::Zero;
+	Result[0][0] = (2.0f * zNear) / (right - left);
+	Result[1][1] = (2.0f * zNear) / (top - bottom);
+	Result[2][0] = -(right + left) / (right - left);
+	Result[2][1] = -(top + bottom) / (top - bottom);
+	Result[2][2] = (zFar + zNear) / (zFar - zNear);
+	Result[2][3] = 1.0f;
+	Result[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear);
+	return Result;
+}
+
+inline Matrix4 Matrix4::Perspective(float fovy, float aspect, float zNear, float zFar)
+{
+	assert(abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
+
+	const float tanHalfFovy = tan(fovy / 2.0f);
+
+	Matrix4 Result = Matrix4::Zero;
+	Result[0][0] = 1.0f / (aspect * tanHalfFovy);
+	Result[1][1] = 1.0f / (tanHalfFovy);
+	Result[2][2] = (zFar + zNear) / (zFar - zNear);
+	Result[2][3] = 1.0f;
+	Result[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear);
+	return Result;
+}
+
+inline Matrix4 Matrix4::PerspectiveFov(float fov, float width, float height, float zNear, float zFar)
+{
+	assert(width > 0.0f);
+	assert(height > 0.0f);
+	assert(fov > 0.0f);
+
+	const float rad = fov;
+	const float h = cos(0.5f * rad) / sin(0.5f * rad);
+	const float w = h * height / width;
+
+	Matrix4 Result = Matrix4::Zero;
+	Result[0][0] = w;
+	Result[1][1] = h;
+	Result[2][2] = (zFar + zNear) / (zFar - zNear);
+	Result[2][3] = 1.0f;
+	Result[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear);
+	return Result;
+}
+
+inline Matrix4 Matrix4::InfinitePerspective(float fovy, float aspect, float zNear)
+{
+	const float range = tan(fovy / 2.0f) * zNear;
+	const float left = -range * aspect;
+	const float right = range * aspect;
+	const float bottom = -range;
+	const float top = range;
+
+	Matrix4 Result = Matrix4::Zero;
+	Result[0][0] = (2.0f * zNear) / (right - left);
+	Result[1][1] = (2.0f * zNear) / (top - bottom);
+	Result[2][2] = 1.0f;
+	Result[2][3] = 1.0f;
+	Result[3][2] = -2.0f * zNear;
+	return Result;
+}
+
+inline Matrix4 Matrix4::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up)
+{
+	const Vector3 f((center - eye).GetNormalize());
+	const Vector3 s(CrossProduct(up, f).GetNormalize());
+	const Vector3 u(CrossProduct(f, s));
+
+	Matrix4 Result = Matrix4::Identity;
+	Result[0][0] = s.x;
+	Result[1][0] = s.y;
+	Result[2][0] = s.z;
+	Result[0][1] = u.x;
+	Result[1][1] = u.y;
+	Result[2][1] = u.z;
+	Result[0][2] = f.x;
+	Result[1][2] = f.y;
+	Result[2][2] = f.z;
+	Result[3][0] = -DotProduct(s, eye);
+	Result[3][1] = -DotProduct(u, eye);
+	Result[3][2] = -DotProduct(f, eye);
+	return Result;
+}
+
+inline Vector3 Matrix4::Project(const Vector3& obj, const Matrix4& model, const Matrix4& proj, const Vector4& viewport)
+{
+	Vector4 tmp = Vector4(obj, 1.0f);
+	tmp = model * tmp;
+	tmp = proj * tmp;
+
+	tmp /= tmp.w;
+	tmp = tmp * 0.5f + 0.5f;
+	tmp[0] = tmp[0] * (viewport[2]) + (viewport[0]);
+	tmp[1] = tmp[1] * (viewport[3]) + (viewport[1]);
+
+	return Vector3(tmp);
+}
+
+inline Vector3 Matrix4::UnProject(const Vector3& win, const Matrix4& model, const Matrix4& proj, const Vector4& viewport)
+{
+	Matrix4 inverse = (proj * model).Inverse();
+
+	Vector4 tmp = Vector4(win, 1.0f);
+	tmp.x = (tmp.x - (viewport[0])) / (viewport[2]);
+	tmp.y = (tmp.y - (viewport[1])) / (viewport[3]);
+	tmp = tmp * 2.0f - 1.0f;
+
+	Vector4 obj = inverse * tmp;
+	obj /= obj.w;
+
+	return Vector3(obj);
+}
+
+inline Matrix4 Matrix4::PickMatrix(const Vector2& center, const Vector2& delta, const Vector4& viewport)
+{
+	assert(delta.x > 0.0f && delta.y > 0.0f);
+	Matrix4 Result = Matrix4::Identity;
+
+	if( !(delta.x > 0.0f && delta.y > 0.0f) )
+		return Result; // Error
+
+	Vector3 Temp(
+		((viewport[2]) - 2.0f * (center.x - (viewport[0]))) / delta.x,
+		((viewport[3]) - 2.0f * (center.y - (viewport[1]))) / delta.y,
+		0.0f);
+
+	// Translate and scale the picked region to the entire window
+	Result = Matrix4::Translate(Result, Temp);
+	return Matrix4::Scale(Result, Vector3((viewport[2]) / delta.x, (viewport[3]) / delta.y, 1.0f));
 }
 
 inline Matrix4 CastToMatrix4(const Quaternion& q)

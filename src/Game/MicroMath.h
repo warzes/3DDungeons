@@ -60,8 +60,6 @@ inline constexpr float Clamp(float value, float min, float max) noexcept;
 inline constexpr float Lerp(float x, float y, float f) noexcept; // Linear interpolation between two float values.
 inline constexpr float Mix(float x, float y, float a) noexcept;
 
-inline float InverseSqrt(float x); // TODO: удалить
-
 //=============================================================================
 // Color
 //=============================================================================
@@ -171,6 +169,10 @@ inline float Distance(const Vector2& v1, const Vector2& v2);
 inline float DotProduct(const Vector2& v1, const Vector2& v2);
 inline Vector2 Reflect(const Vector2& v, const Vector2& normal);
 inline Vector2 Refract(const Vector2& i, const Vector2& normal, float eta);
+inline Vector2 Min(const Vector2& v1, const Vector2& v2);
+inline Vector2 Max(const Vector2& v1, const Vector2& v2);
+inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x);
+inline Vector2 Mix(const Vector2& x, const Vector2& y, float a);
 
 inline bool operator==(const Vector2& Left, const Vector2& Right) noexcept;
 inline bool operator!=(const Vector2& Left, const Vector2& Right) noexcept;
@@ -200,10 +202,6 @@ inline Vector2& operator/=(Vector2& Left, const Vector2& Right) noexcept;
 
 //=============================================================================
 // OLD
-inline Vector2 Min(const Vector2& v1, const Vector2& v2);
-inline Vector2 Max(const Vector2& v1, const Vector2& v2);
-inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x);
-inline Vector2 Mix(const Vector2& u, const Vector2& v, float a);
 inline Vector2 Project(const Vector2& v1, const Vector2& v2);
 inline Vector2 Slide(const Vector2& v, const Vector2& normal);
 inline Vector2 Tangent(const Vector2& v);
@@ -259,6 +257,10 @@ inline float DotProduct(const Vector3& v1, const Vector3& v2);
 inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2);
 inline Vector3 Reflect(const Vector3& v, const Vector3& normal);
 inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta);
+inline Vector3 Min(const Vector3& v1, const Vector3& v2);
+inline Vector3 Max(const Vector3& v1, const Vector3& v2);
+inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
+inline Vector3 Mix(const Vector3& x, const Vector3& y, float t);
 
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept;
 inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept;
@@ -294,10 +296,6 @@ inline Vector3& operator/=(Vector3& Left, const Vector3& Right) noexcept;
 
 //=============================================================================
 // OLD
-inline Vector3 Min(const Vector3& v1, const Vector3& v2);
-inline Vector3 Max(const Vector3& v1, const Vector3& v2);
-inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
-inline Vector3 Mix(const Vector3& u, const Vector3& v, float t);
 inline Vector3 Project(const Vector3& v1, const Vector3& v2);
 inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v); // TODO: удалить?
 // Return the angle between this vector and another vector in degrees.
@@ -346,6 +344,10 @@ public:
 inline bool Equals(const Vector4& v1, const Vector4& v2, float epsilon = EPSILON) noexcept;
 
 inline float DotProduct(const Vector4& v1, const Vector4& v2);
+inline Vector4 Min(const Vector4& v1, const Vector4& v2);
+inline Vector4 Max(const Vector4& v1, const Vector4& v2);
+inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x);
+inline Vector4 Mix(const Vector4& x, const Vector4& y, float a);
 
 inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept;
 inline bool operator!=(const Vector4& Left, const Vector4& Right) noexcept;
@@ -381,10 +383,6 @@ inline Vector4& operator/=(Vector4& Left, const Vector4& Right) noexcept;
 
 //=============================================================================
 // OLD
-inline Vector4 Min(const Vector4& v1, const Vector4& v2);
-inline Vector4 Max(const Vector4& v1, const Vector4& v2);
-inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x);
-inline Vector4 Mix(const Vector4& u, const Vector4& v, float a);
 inline void Abs(Vector4& v);
 inline void Floor(Vector4& v);
 inline void Ceil(Vector4& v);
@@ -469,10 +467,6 @@ inline Quaternion AngleAxis(float angle, const Vector3& axis);
 // Build a look at quaternion based on the default handedness. Left-handed look at quaternion.
 inline Quaternion QuatLookAt(const Vector3& direction, const Vector3& up);
 
-
-
-
-
 // Spherical linear interpolation of two quaternions.
 // a - Interpolation factor. The interpolation is defined beyond the range [0, 1].
 // For short path spherical linear interpolation, use the SLerp function.
@@ -513,6 +507,8 @@ inline Quaternion& operator/=(Quaternion& Left, float Right) noexcept;
 class Matrix3
 {
 public:
+	static const Matrix3 Identity;
+
 	constexpr Matrix3() = default;
 	constexpr Matrix3(Matrix3&&) = default;
 	constexpr Matrix3(const Matrix3&) = default;
@@ -577,6 +573,9 @@ inline Matrix3& operator/=(Matrix3& Left, const Matrix3& Right) noexcept;
 class Matrix4
 {
 public:
+	static const Matrix4 Zero;
+	static const Matrix4 Identity;
+
 	constexpr Matrix4() = default;
 	constexpr Matrix4(Matrix4&&) = default;
 	constexpr Matrix4(const Matrix4&) = default;
@@ -600,6 +599,40 @@ public:
 	float GetDeterminant() const;
 	Matrix4 Inverse() const;
 	Matrix4 Transpose() const;
+
+	static Matrix4 Translate(const Matrix4& m, const Vector3& v);
+	static Matrix4 Rotate(const Matrix4& m, float angle, const Vector3& axis);
+	static Matrix4 Scale(const Matrix4& m, const Vector3& v);
+
+	static Matrix4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
+	static Matrix4 Frustum(float left, float right, float bottom, float top, float zNear, float zFar);
+	static Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar);
+	static Matrix4 PerspectiveFov(float fov, float width, float height, float zNear, float zFar);
+	static Matrix4 InfinitePerspective(float fovy, float aspect, float zNear);
+	static Matrix4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
+
+	// Map the specified object coordinates into window coordinates using default near and far clip planes definition.
+	// obj - Specify the object coordinates.
+	// model - Specifies the current modelview matrix
+	// proj - Specifies the current projection matrix
+	// viewport - Specifies the current viewport
+	// Return the computed window coordinates.
+	// https://stackoverflow.com/questions/35261192/how-to-use-glmproject-to-get-the-coordinates-of-a-point-in-world-space
+	static Vector3 Project(const Vector3& obj, const Matrix4& model, const Matrix4& proj, const Vector4& viewport);
+
+	// Map the specified window coordinates into object coordinates using default near and far clip planes definition.
+	// win - Specify the window coordinates to be mapped.
+	// model Specifies the modelview matrix
+	// proj - - Specifies the projection matrix
+	// viewport - Specifies the viewport
+	// Returns the computed object coordinates.
+	static Vector3 UnProject(const Vector3& win, const Matrix4& model, const Matrix4& proj, const Vector4& viewport);
+
+	// Define a picking region
+	// center - Specify the center of a picking region in window coordinates.
+	// delta - Specify the width and height, respectively, of the picking region in window coordinates.
+	// viewport - Rendering viewport
+	static Matrix4 PickMatrix(const Vector2& center, const Vector2& delta, const Vector4& viewport);
 
 	Vector4 value[4] = {
 		{1.0f, 0.0f, 0.0f, 0.0f},
