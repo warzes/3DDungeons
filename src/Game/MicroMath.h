@@ -86,12 +86,12 @@ public:
 inline bool operator==(const Color& Left, const Color& Right) noexcept;
 
 // Пока не реализованно, при этом функции должны клампится
-inline Color operator-(const Color& Left, const Color& Right) noexcept;
-inline Color operator+(const Color& Left, const Color& Right) noexcept;
-inline Color operator*(const Color& Left, const Color& Right) noexcept;
-inline Color& operator-=(Color& Left, const Color& Right) noexcept;
-inline Color& operator+=(Color& Left, const Color& Right) noexcept;
-inline Color& operator*=(Color& Left, const Color& Right) noexcept;
+//inline Color operator-(const Color& Left, const Color& Right) noexcept;
+//inline Color operator+(const Color& Left, const Color& Right) noexcept;
+//inline Color operator*(const Color& Left, const Color& Right) noexcept;
+//inline Color& operator-=(Color& Left, const Color& Right) noexcept;
+//inline Color& operator+=(Color& Left, const Color& Right) noexcept;
+//inline Color& operator*=(Color& Left, const Color& Right) noexcept;
 
 //=============================================================================
 // Point2
@@ -174,6 +174,15 @@ inline Vector2 Max(const Vector2& v1, const Vector2& v2);
 inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x);
 inline Vector2 Mix(const Vector2& x, const Vector2& y, float a);
 
+// Rotate a two dimensional vector.
+inline Vector2 Rotate(const Vector2& v, float angle);
+
+// Returns the absolute angle between two vectors.
+inline float Angle(const Vector2& x, const Vector2& y);
+
+// Returns the oriented angle between two 2d vectors.
+inline float OrientedAngle(const Vector2& x, const Vector2& y);
+
 inline bool operator==(const Vector2& Left, const Vector2& Right) noexcept;
 inline bool operator!=(const Vector2& Left, const Vector2& Right) noexcept;
 
@@ -205,7 +214,7 @@ inline Vector2& operator/=(Vector2& Left, const Vector2& Right) noexcept;
 inline Vector2 Project(const Vector2& v1, const Vector2& v2);
 inline Vector2 Slide(const Vector2& v, const Vector2& normal);
 inline Vector2 Tangent(const Vector2& v);
-inline Vector2 Rotate(const Vector2& v, float angle);
+
 inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, float f);
 inline Vector2 Bezier4(const Vector2& v0, const Vector2& v1, const Vector2& v2, const Vector2& v3, float f);
 inline void Abs(Vector2& v);
@@ -260,7 +269,22 @@ inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta);
 inline Vector3 Min(const Vector3& v1, const Vector3& v2);
 inline Vector3 Max(const Vector3& v1, const Vector3& v2);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
+// Spherical interpolation between two vectors
+inline Vector3 SLerp(const Vector3& x, const Vector3& y, float a);
 inline Vector3 Mix(const Vector3& x, const Vector3& y, float t);
+
+inline Vector3 Rotate(const Vector3& v, float angle, const Vector3& normal);
+inline Vector3 RotateX(const Vector3& v, float angle);
+inline Vector3 RotateY(const Vector3& v, float angle);
+inline Vector3 RotateZ(const Vector3& v, float angle);
+// Rotates a 3 components vector by a quaternion.
+inline Vector3 Rotate(const Quaternion& q, const Vector3& v);
+
+// Returns the absolute angle between two vectors.
+inline float Angle(const Vector3& x, const Vector3& y);
+
+// Returns the oriented angle between two 3d vectors based from a reference axis.
+inline float OrientedAngle(const Vector3& x, const Vector3& y, const Vector3& ref);
 
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept;
 inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept;
@@ -297,12 +321,11 @@ inline Vector3& operator/=(Vector3& Left, const Vector3& Right) noexcept;
 //=============================================================================
 // OLD
 inline Vector3 Project(const Vector3& v1, const Vector3& v2);
-inline Vector3 Rotate(const Vector3& u, float angle, const Vector3& v); // TODO: удалить?
 // Return the angle between this vector and another vector in degrees.
 inline float Angle(const Vector3& v1, const Vector3& v2);
 // Returns this vector slide along a plane defined by the given normal.
 inline Vector3 Slide(const Vector3& v, const Vector3& normal);
-inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle);
+inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle); // TODO: удалить
 inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f);
 inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3, float f);
 inline void Abs(Vector3& v);
@@ -329,8 +352,6 @@ public:
 	constexpr float& operator[](size_t i) noexcept { return (&x)[i]; }
 	constexpr const float operator[](size_t i) const noexcept { return (&x)[i]; }
 
-	float* operator&() { return (float*)this; }
-
 	float GetLength() const;
 	float GetLengthSquared() const;
 	Vector4 GetNormalize() const;
@@ -348,6 +369,16 @@ inline Vector4 Min(const Vector4& v1, const Vector4& v2);
 inline Vector4 Max(const Vector4& v1, const Vector4& v2);
 inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x);
 inline Vector4 Mix(const Vector4& x, const Vector4& y, float a);
+
+inline Vector4 Rotate(const Vector4& v, float angle, const Vector3& normal);
+inline Vector4 RotateX(const Vector4& v, float angle);
+inline Vector4 RotateY(const Vector4& v, float angle);
+inline Vector4 RotateZ(const Vector4& v, float angle);
+// Rotates a 4 components vector by a quaternion.
+inline Vector4 Rotate(const Quaternion& q, const Vector4& v);
+
+// Returns the absolute angle between two vectors.
+inline float Angle(const Vector4& x, const Vector4& y);
 
 inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept;
 inline bool operator!=(const Vector4& Left, const Vector4& Right) noexcept;
@@ -441,11 +472,7 @@ public:
 	float y = 0.0f;
 	float z = 0.0f;
 
-
 	// OLD
-	Matrix3 ToMatrix3() const;
-	Matrix4 ToMatrix4() const;
-
 	// Define from an angle and axis.
 	void FromAngleAxis(float angle, const Vector3& axis); // TODO: проверить
 	void FromMatrix(const Matrix4_old& m0);
@@ -458,6 +485,8 @@ inline Quaternion CastToQuaternion(const Matrix4& m);
 
 inline float DotProduct(const Quaternion& q1, const Quaternion& q2);
 inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2);
+inline Quaternion CrossProduct(const Quaternion& q, const Vector3& v);
+inline Quaternion CrossProduct(const Vector3& v, const Quaternion& q);
 
 // Rotates a quaternion from a vector of 3 components axis and an angle.
 inline Quaternion Rotate(const Quaternion& q, float angle, const Vector3& axis);
@@ -600,9 +629,21 @@ public:
 	Matrix4 Inverse() const;
 	Matrix4 Transpose() const;
 
+	// http://www.opensource.apple.com/source/WebCore/WebCore-514/platform/graphics/transforms/TransformationMatrix.cpp
+	// Decomposes the mode matrix to translations,rotation scale components
+	bool Decompose(Vector3& scale, Quaternion& orientation, Vector3& translation, Vector3& skew, Vector4& perspective);
+
 	static Matrix4 Translate(const Matrix4& m, const Vector3& v);
 	static Matrix4 Rotate(const Matrix4& m, float angle, const Vector3& axis);
 	static Matrix4 Scale(const Matrix4& m, const Vector3& v);
+	static Matrix4 EulerAngleX(float angleX);
+	static Matrix4 EulerAngleY(float angleY);
+	static Matrix4 EulerAngleZ(float angleZ);
+	// Creates a 3D 4 * 4 homogeneous rotation matrix from euler angles (Y * X * Z).
+	static Matrix4 YawPitchRoll(float yaw, float pitch, float roll);
+
+	// Build a rotation matrix from a normal and a up vector.
+	static Matrix4 Orientation(const Vector3& normal, const Vector3& up);
 
 	static Matrix4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
 	static Matrix4 Frustum(float left, float right, float bottom, float top, float zNear, float zFar);

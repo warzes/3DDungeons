@@ -126,6 +126,30 @@ inline Vector2 Max(const Vector2& v1, const Vector2& v2) { return { Max(v1.x, v2
 inline Vector2 Lerp(const Vector2& a, const Vector2& b, float x) { return a + (b - a) * x; }
 inline Vector2 Mix(const Vector2& x, const Vector2& y, float a) { return x * (1.0f - a) + y * a; }
 
+inline Vector2 Rotate(const Vector2& v, float angle)
+{
+	const float cs = cosf(angle);
+	const float sn = sinf(angle);
+	return {
+		v.x * cs - v.y * sn,
+		v.x * sn + v.y * cs
+	};
+}
+
+inline float Angle(const Vector2& x, const Vector2& y)
+{
+	return acos(Clamp(DotProduct(x, y), -1.0f, 1.0f));
+}
+
+inline float OrientedAngle(const Vector2& x, const Vector2& y)
+{
+	const float Angle(acos(Clamp(DotProduct(x, y), -1.0f, 1.0f)));
+	const float partialCross = x.x * y.y - y.x * x.y;
+
+	if( partialCross > 0.0f ) return Angle;
+	else return -Angle;
+}
+
 //=============================================================================
 // OLD
 inline Vector2 Project(const Vector2& v1, const Vector2& v2)
@@ -139,22 +163,9 @@ inline Vector2 Slide(const Vector2& v, const Vector2& normal)
 	const float d = DotProduct(v, normal);
 	return v - normal * d; // проверить что так { v.x - normal.x * d, v.y - normal.y * d };
 }
-
-
-
 inline Vector2 Tangent(const Vector2& v)
 {
 	return { v.y, -v.x };
-}
-
-inline Vector2 Rotate(const Vector2& v, float angle)
-{
-	const float cs = cosf(angle);
-	const float sn = sinf(angle);
-	return {
-		v.x * cs - v.y * sn,
-		v.x * sn + v.y * cs
-	};
 }
 
 inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, float f)
@@ -283,7 +294,78 @@ inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta)
 inline Vector3 Min(const Vector3& v1, const Vector3& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z) }; }
 inline Vector3 Max(const Vector3& v1, const Vector3& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z) }; }
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x) { return a + (b - a) * x; }
+
+inline Vector3 SLerp(const Vector3 & x, const Vector3 & y, float a)
+{
+	// get cosine of angle between vectors (-1 -> 1)
+	const float CosAlpha = DotProduct(x, y);
+	// get angle (0 -> pi)
+	const float Alpha = acos(CosAlpha);
+	// get sine of angle between vectors (0 -> 1)
+	const float SinAlpha = sin(Alpha);
+	// this breaks down when SinAlpha = 0, i.e. Alpha = 0 or pi
+	const float t1 = sin((1.0f - a) * Alpha) / SinAlpha;
+	const float t2 = sin(a * Alpha) / SinAlpha;
+
+	// interpolate src vectors
+	return x * t1 + y * t2;
+}
+
 inline Vector3 Mix(const Vector3& x, const Vector3& y, float t) { return x * (1.0f - t) + y * t; }
+
+inline Vector3 Rotate(const Vector3& v, float angle, const Vector3& normal)
+{
+	return Matrix3(Matrix4::Rotate(Matrix4::Identity, angle, normal)) * v;
+}
+
+inline Vector3 RotateX(const Vector3& v, float angle)
+{
+	const float Cos(cos(angle));
+	const float Sin(sin(angle));
+
+	Vector3 Result(v);
+	Result.y = v.y * Cos - v.z * Sin;
+	Result.z = v.y * Sin + v.z * Cos;
+	return Result;
+}
+
+inline Vector3 RotateY(const Vector3& v, float angle)
+{
+	const float Cos(cos(angle));
+	const float Sin(sin(angle));
+
+	Vector3 Result(v);
+	Result.x = v.x * Cos + v.z * Sin;
+	Result.z = -v.x * Sin + v.z * Cos;
+	return Result;
+}
+
+inline Vector3 RotateZ(const Vector3& v, float angle)
+{
+	const float Cos(cos(angle));
+	const float Sin(sin(angle));
+
+	Vector3 Result(v);
+	Result.x = v.x * Cos - v.y * Sin;
+	Result.y = v.x * Sin + v.y * Cos;
+	return Result;
+}
+
+inline Vector3 Rotate(const Quaternion& q, const Vector3& v)
+{
+	return q * v;
+}
+
+inline float Angle(const Vector3& x, const Vector3& y)
+{
+	return acos(Clamp(DotProduct(x, y), -1.0f, 1.0f));
+}
+
+inline float OrientedAngle(const Vector3& x, const Vector3& y, const Vector3& ref)
+{
+	const float Angle(acos(Clamp(DotProduct(x, y), -1.0f, 1.0f)));
+	return Mix(Angle, -Angle, DotProduct(ref, CrossProduct(x, y)) < 0.0f);
+}
 
 //=============================================================================
 // OLD
@@ -292,12 +374,6 @@ inline Vector3 Project(const Vector3& v0, const Vector3& v1)
 	const float d = DotProduct(v1, v1);
 	const float s = DotProduct(v0, v1) / d;
 	return { v1.x * s, v1.y * s, v1.z * s };
-}
-
-inline float Angle(const Vector3& v1, const Vector3& v2)
-{
-	float x = DotProduct(v1, v2) / (v1.GetLength() * v2.GetLength());
-	return RAD2DEG * acosf(Clamp(x, -1.0f, 1.0f)); // TODO: не конвертировать в градусы
 }
 
 inline Vector3 Slide(const Vector3& v, const Vector3& normal)
@@ -459,6 +535,54 @@ inline Vector4 Min(const Vector4& v1, const Vector4& v2) { return { Min(v1.x, v2
 inline Vector4 Max(const Vector4& v1, const Vector4& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z), Max(v1.w, v2.w) }; }
 inline Vector4 Lerp(const Vector4& a, const Vector4& b, float x) { return a + (b - a) * x; }
 inline Vector4 Mix(const Vector4& x, const Vector4& y, float a) { return x * (1.0f - a) + y * a; }
+
+inline Vector4 Rotate(const Vector4& v, float angle, const Vector3& normal)
+{
+	return Rotate(Matrix4::Identity, angle, normal) * v;
+}
+
+inline Vector4 RotateX(const Vector4& v, float angle)
+{
+	const float Cos(cos(angle));
+	const float Sin(sin(angle));
+
+	Vector4 Result = v;
+	Result.y = v.y * Cos - v.z * Sin;
+	Result.z = v.y * Sin + v.z * Cos;
+	return Result;
+}
+
+inline Vector4 RotateY(const Vector4& v, float angle)
+{
+	const float Cos(cos(angle));
+	const float Sin(sin(angle));
+
+	Vector4 Result = v;
+	Result.x = v.x * Cos + v.z * Sin;
+	Result.z = -v.x * Sin + v.z * Cos;
+	return Result;
+}
+
+inline Vector4 RotateZ(const Vector4& v, float angle)
+{
+	const float Cos(cos(angle));
+	const float Sin(sin(angle));
+
+	Vector4 Result = v;
+	Result.x = v.x * Cos - v.y * Sin;
+	Result.y = v.x * Sin + v.y * Cos;
+	return Result;
+}
+
+inline Vector4 Rotate(const Quaternion& q, const Vector4& v)
+{
+	return q * v;
+}
+
+inline float Angle(const Vector4& x, const Vector4& y)
+{
+	return acos(Clamp(DotProduct(x, y), -1.0f, 1.0f));
+}
 
 //=============================================================================
 // OLD
@@ -756,6 +880,16 @@ inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2)
 		q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
 		q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z,
 		q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x};
+}
+
+inline Quaternion CrossProduct(const Quaternion& q, const Vector3& v)
+{
+	return q * v;
+}
+
+inline Quaternion CrossProduct(const Vector3& v, const Quaternion& q)
+{
+	return q.Inverse() * v;
 }
 
 inline Quaternion Rotate(const Quaternion& q, float angle, const Vector3& axis)
@@ -1326,6 +1460,156 @@ inline Matrix4 Matrix4::Transpose() const
 	return Result;
 }
 
+inline bool Matrix4::Decompose(Vector3& scale, Quaternion& orientation, Vector3& translation, Vector3& skew, Vector4& perspective)
+{
+	Matrix4 LocalMatrix(*this);
+
+	// Normalize the matrix.
+	if ( fabsf(LocalMatrix[3][3]) < std::numeric_limits<float>::epsilon() )
+		return false;
+
+	for( size_t i = 0; i < 4; ++i )
+		for( size_t j = 0; j < 4; ++j )
+			LocalMatrix[i][j] /= LocalMatrix[3][3];
+
+	// perspectiveMatrix is used to solve for perspective, but it also provides an easy way to test for singularity of the upper 3x3 component.
+	Matrix4 PerspectiveMatrix(LocalMatrix);
+
+	for( size_t i = 0; i < 3; i++ )
+		PerspectiveMatrix[i][3] = 0.0f;
+	PerspectiveMatrix[3][3] = 1.0f;
+
+	if( fabsf(PerspectiveMatrix.GetDeterminant()) < std::numeric_limits<float>::epsilon() )
+		return false;
+
+	// First, isolate perspective.  This is the messiest.
+	if(
+		!fabsf(LocalMatrix[0][3]) >= std::numeric_limits<float>::epsilon() ||
+		!fabsf(LocalMatrix[1][3]) >= std::numeric_limits<float>::epsilon() ||
+		!fabsf(LocalMatrix[2][3]) >= std::numeric_limits<float>::epsilon() )
+	{
+		// rightHandSide is the right hand side of the equation.
+		Vector4 RightHandSide;
+		RightHandSide[0] = LocalMatrix[0][3];
+		RightHandSide[1] = LocalMatrix[1][3];
+		RightHandSide[2] = LocalMatrix[2][3];
+		RightHandSide[3] = LocalMatrix[3][3];
+
+		// Solve the equation by inverting PerspectiveMatrix and multiplying rightHandSide by the inverse.  (This is the easiest way, not necessarily the best.)
+		Matrix4 InversePerspectiveMatrix = PerspectiveMatrix.Inverse();//   inverse(PerspectiveMatrix, inversePerspectiveMatrix);
+		Matrix4 TransposedInversePerspectiveMatrix = InversePerspectiveMatrix.Transpose();//   transposeMatrix4(inversePerspectiveMatrix, transposedInversePerspectiveMatrix);
+
+		perspective = TransposedInversePerspectiveMatrix * RightHandSide;
+
+		// Clear the perspective partition
+		LocalMatrix[0][3] = LocalMatrix[1][3] = LocalMatrix[2][3] = 0.0f;
+		LocalMatrix[3][3] = 1.0f;
+	}
+	else
+	{
+		// No perspective.
+		perspective = { 0, 0, 0, 1 };
+	}
+
+	// Next take care of translation (easy).
+	translation = Vector3(LocalMatrix[3]);
+	LocalMatrix[3] = Vector4(0, 0, 0, LocalMatrix[3].w);
+
+	Vector3 Row[3], Pdum3;
+
+	// Now get scale and shear.
+	for( size_t i = 0; i < 3; ++i )
+		for( size_t j = 0; j < 3; ++j )
+			Row[i][j] = LocalMatrix[i][j];
+
+	// Compute X scale factor and normalize first row.
+	scale.x = Row[0].GetLength();// v3Length(Row[0]);
+
+	Row[0] = Row[0] * 1.0f / Row[0].GetLength();
+
+	// Compute XY shear factor and make 2nd row orthogonal to 1st.
+	skew.z = DotProduct(Row[0], Row[1]);
+	Row[1] = (Row[1] * 1.0f) + (Row[0] * -skew.z);
+
+	// Now, compute Y scale and normalize 2nd row.
+	scale.y = Row[1].GetLength();
+	Row[1] = Row[1] * 1.0f / Row[1].GetLength();
+	skew.z /= scale.y;
+
+	// Compute XZ and YZ shears, orthogonalize 3rd row.
+	skew.y = DotProduct(Row[0], Row[2]);
+	Row[2] = (Row[2] * 1.0f) + (Row[0] * -skew.y);
+	skew.x = DotProduct(Row[1], Row[2]);
+	Row[2] = (Row[2] * 1.0f) + (Row[1] * -skew.x);
+
+	// Next, get Z scale and normalize 3rd row.
+	scale.z = Row[2].GetLength();
+	Row[2] = Row[2] * 1.0f / Row[2].GetLength();
+	skew.y /= scale.z;
+	skew.x /= scale.z;
+
+	// At this point, the matrix (in rows[]) is orthonormal.
+	// Check for a coordinate system flip.  If the determinant
+	// is -1, then negate the matrix and the scaling factors.
+	Pdum3 = CrossProduct(Row[1], Row[2]); // v3Cross(row[1], row[2], Pdum3);
+	if( DotProduct(Row[0], Pdum3) < 0 )
+	{
+		for( size_t i = 0; i < 3; i++ )
+		{
+			scale[i] *= -1.0f;
+			Row[i] *= -1.0f;
+		}
+	}
+
+	// Now, get the rotations out, as described in the gem.
+
+	// FIXME - Add the ability to return either quaternions (which are
+	// easier to recompose with) or Euler angles (rx, ry, rz), which
+	// are easier for authors to deal with. The latter will only be useful
+	// when we fix https://bugs.webkit.org/show_bug.cgi?id=23799, so I
+	// will leave the Euler angle code here for now.
+
+	// ret.rotateY = asin(-Row[0][2]);
+	// if (cos(ret.rotateY) != 0) {
+	//     ret.rotateX = atan2(Row[1][2], Row[2][2]);
+	//     ret.rotateZ = atan2(Row[0][1], Row[0][0]);
+	// } else {
+	//     ret.rotateX = atan2(-Row[2][0], Row[1][1]);
+	//     ret.rotateZ = 0;
+	// }
+
+	int i, j, k = 0;
+	float root, trace = Row[0].x + Row[1].y + Row[2].z;
+	if( trace > 0.0f )
+	{
+		root = sqrt(trace + 1.0f);
+		orientation.w = 0.5f * root;
+		root = 0.5f / root;
+		orientation.x = root * (Row[1].z - Row[2].y);
+		orientation.y = root * (Row[2].x - Row[0].z);
+		orientation.z = root * (Row[0].y - Row[1].x);
+	} // End if > 0
+	else
+	{
+		static int Next[3] = { 1, 2, 0 };
+		i = 0;
+		if( Row[1].y > Row[0].x ) i = 1;
+		if( Row[2].z > Row[i][i] ) i = 2;
+		j = Next[i];
+		k = Next[j];
+
+		root = sqrt(Row[i][i] - Row[j][j] - Row[k][k] + 1.0f);
+		const int off = 1;
+		orientation[i + off] = 0.5f * root;
+		root = 0.5f / root;
+		orientation[j + off] = root * (Row[i][j] + Row[j][i]);
+		orientation[k + off] = root * (Row[i][k] + Row[k][i]);
+		orientation.w = root * (Row[j][k] - Row[k][j]);
+	} // End if <= 0
+
+	return true;
+}
+
 inline Matrix4 Matrix4::Translate(const Matrix4 & m, const Vector3 & v)
 {
 	Matrix4 Result(m);
@@ -1370,6 +1654,82 @@ inline Matrix4 Matrix4::Scale(const Matrix4& m, const Vector3& v)
 	Result[2] = m[2] * v[2];
 	Result[3] = m[3];
 	return Result;
+}
+
+inline Matrix4 Matrix4::EulerAngleX(float angleX)
+{
+	const float cosX = cos(angleX);
+	const float sinX = sin(angleX);
+
+	return {
+		1.0f,  0.0f, 0.0f, 0.0f,
+		0.0f,  cosX, sinX, 0.0f,
+		0.0f, -sinX, cosX, 0.0f,
+		0.0f,  0.0f, 0.0f, 1.0f };
+}
+
+inline Matrix4 Matrix4::EulerAngleY(float angleY)
+{
+	const float cosY = cos(angleY);
+	const float sinY = sin(angleY);
+
+	return {
+		cosY, 0.0f, -sinY, 0.0f,
+		0.0f, 1.0f,  0.0f, 0.0f,
+		sinY, 0.0f,  cosY, 0.0f,
+		0.0f, 0.0f,  0.0f, 1.0f };
+}
+
+inline Matrix4 Matrix4::EulerAngleZ(float angleZ)
+{
+	const float cosZ = cos(angleZ);
+	const float sinZ = sin(angleZ);
+
+	return {
+		cosZ,  sinZ, 0.0f, 0.0f,
+		-sinZ, cosZ, 0.0f, 0.0f,
+		0.0f,  0.0f, 1.0f, 0.0f,
+		0.0f,  0.0f, 0.0f, 1.0f };
+}
+
+inline Matrix4 Matrix4::YawPitchRoll(float yaw, float pitch, float roll)
+{
+	const float tmp_ch = cos(yaw);
+	const float tmp_sh = sin(yaw);
+	const float tmp_cp = cos(pitch);
+	const float tmp_sp = sin(pitch);
+	const float tmp_cb = cos(roll);
+	const float tmp_sb = sin(roll);
+
+	Matrix4 Result;
+	Result[0][0] = tmp_ch * tmp_cb + tmp_sh * tmp_sp * tmp_sb;
+	Result[0][1] = tmp_sb * tmp_cp;
+	Result[0][2] = -tmp_sh * tmp_cb + tmp_ch * tmp_sp * tmp_sb;
+	Result[0][3] = 0.0f;
+	Result[1][0] = -tmp_ch * tmp_sb + tmp_sh * tmp_sp * tmp_cb;
+	Result[1][1] = tmp_cb * tmp_cp;
+	Result[1][2] = tmp_sb * tmp_sh + tmp_ch * tmp_sp * tmp_cb;
+	Result[1][3] = 0.0f;
+	Result[2][0] = tmp_sh * tmp_cp;
+	Result[2][1] = -tmp_sp;
+	Result[2][2] = tmp_ch * tmp_cp;
+	Result[2][3] = 0.0f;
+	Result[3][0] = 0.0f;
+	Result[3][1] = 0.0f;
+	Result[3][2] = 0.0f;
+	Result[3][3] = 1.0f;
+	return Result;
+}
+
+inline Matrix4 Matrix4::Orientation(const Vector3& normal, const Vector3& up)
+{
+	if( (Equals(normal, up, std::numeric_limits<float>::epsilon())) )
+		return Matrix4::Identity;
+
+	Vector3 RotationAxis = CrossProduct(up, normal);
+	const float Angle = acos(DotProduct(normal, up));
+
+	return Rotate(Matrix4::Identity, Angle, RotationAxis);
 }
 
 inline Matrix4 Matrix4::Ortho(float left, float right, float bottom, float top, float zNear, float zFar)
