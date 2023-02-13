@@ -76,6 +76,15 @@ namespace std
 // Model
 //=============================================================================
 //-----------------------------------------------------------------------------
+std::vector<Vector3> Mesh::GetTriangles() const
+{
+	std::vector<Vector3> v;
+	// востановление треугольников по индексному буферу
+	for( size_t i = 0; i < indices.size(); i++ ) 
+		v.push_back(vertices[indices[i]].position);
+	return v;
+}
+//-----------------------------------------------------------------------------
 bool Model::Create(const char* fileName, const char* pathMaterialFiles)
 {
 	Destroy();
@@ -129,6 +138,18 @@ void Model::Draw()
 			m_subMeshes[i].vao.Draw(PrimitiveDraw::Triangles);
 		}
 	}
+}
+//-----------------------------------------------------------------------------
+std::vector<Vector3> Model::GetTriangles() const
+{
+	std::vector<Vector3> v;
+	for( size_t i = 0; i < m_subMeshes.size(); i++ )
+	{
+		auto subV = m_subMeshes[i].GetTriangles();
+		// https://www.techiedelight.com/ru/concatenate-two-vectors-cpp/
+		std::move(subV.begin(), subV.end(), std::back_inserter(v));
+	}
+	return v;
 }
 //-----------------------------------------------------------------------------
 bool Model::loadObjFile(const char* fileName, const char* pathMaterialFiles)

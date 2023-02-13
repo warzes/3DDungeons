@@ -7,79 +7,44 @@
 
 #include <iterator>
 
+/*
+написать визуальный тест CheckPointInTriangle - просто отрисовка всех векторов по клавише
+*/
+
 #define ENABLE_FPS 1
-
-
-class Poly
-{
-public:
-	std::vector<Vector3> verts;
-	int cnt = 0; // todo: delete, in verts.size
-};
-
-Poly MeshGetPoly(const Mesh& mesh)
-{
-	Poly poly;
-
-#if 1
-	for( size_t i = 0; i < mesh.indices.size(); i++ ) // TODO: медленно, надо переделать
-	{
-		poly.verts.push_back(mesh.vertices[mesh.indices[i]].position);
-	}
-#else
-	for( size_t i = 0; i < vertices.size(); i++ ) // TODO: медленно, надо переделать
-	{
-		poly.verts.push_back(vertices[i].position);
-	}
-#endif
-	poly.cnt = poly.verts.size();
-
-	return poly;
-}
-
 
 class MeshColliderData
 {
 public:
 	void Init(const Model& model)
 	{
-		for( int i = 0; i < model.GetSubMesh().size(); i++ )
-		{
-			Poly subPoly = MeshGetPoly(model.GetSubMesh()[i]);
-
-			// https://www.techiedelight.com/ru/concatenate-two-vectors-cpp/
-			std::move(subPoly.verts.begin(), subPoly.verts.end(), std::back_inserter(poly.verts));
-			poly.cnt += subPoly.cnt;
-		}
+		triangles = model.GetTriangles();
 	}
 
-	Poly poly;
+	std::vector<Vector3> triangles;
 };
-
 
 namespace Collisions
 {
 	inline bool CheckPointInTriangle(const Vector3& tri0, const Vector3& tri1, const Vector3& tri2, const Vector3& point)
 	{
-		Vector3 u = tri1 - tri0;
-		Vector3 v = tri2 - tri0;
-		Vector3 w = point - tri0;
+		const Vector3 u = tri1 - tri0;
+		const Vector3 v = tri2 - tri0;
+		const Vector3 w = point - tri0;
 
-		Vector3 vw = CrossProduct(v, w);
-		Vector3 vu = CrossProduct(v, u);
-
+		const Vector3 vw = CrossProduct(v, w);
+		const Vector3 vu = CrossProduct(v, u);
 		if (DotProduct(vw, vu) < 0.0f)
 			return false;
 
-		Vector3 uw = CrossProduct(u, w);
-		Vector3 uv = CrossProduct(u, v);
-
+		const Vector3 uw = CrossProduct(u, w);
+		const Vector3 uv = CrossProduct(u, v);
 		if (DotProduct(uw, uv) < 0.0f)
 			return false;
 
-		float d = uv.GetLength();
-		float r = vw.GetLength() / d;
-		float t = uw.GetLength() / d;
+		const float d = uv.GetLength();
+		const float r = vw.GetLength() / d;
+		const float t = uw.GetLength() / d;
 		return ((r + t) <= 1.0f);
 	}
 
@@ -454,7 +419,6 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 		}
 	}
 }
-
 
 class CharacterEntity
 {
@@ -833,11 +797,11 @@ void CharacterEntity::CheckCollision()
 
 	for( size_t i = 0; i < colliders.size(); i++ )
 	{
-		for( size_t j = 0; j < colliders[i].poly.verts.size(); j += 3 )
+		for( size_t j = 0; j < colliders[i].triangles.size(); j += 3 )
 		{
-			const Vector3 a = colliders[i].poly.verts[j + 0] / collisionPackage.eRadius;
-			const Vector3 b = colliders[i].poly.verts[j + 1] / collisionPackage.eRadius;
-			const Vector3 c = colliders[i].poly.verts[j + 2] / collisionPackage.eRadius;
+			const Vector3 a = colliders[i].triangles[j + 0] / collisionPackage.eRadius;
+			const Vector3 b = colliders[i].triangles[j + 1] / collisionPackage.eRadius;
+			const Vector3 c = colliders[i].triangles[j + 2] / collisionPackage.eRadius;
 
 			CheckCollisionsTriangle(&collisionPackage, a, b, c);
 		}

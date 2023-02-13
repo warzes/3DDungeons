@@ -41,6 +41,8 @@ struct VertexMesh
 class Mesh
 {
 public:
+	std::vector<Vector3> GetTriangles() const;
+
 	std::vector<VertexMesh> vertices;
 	std::vector<uint32_t> indices;
 	Material material;
@@ -73,6 +75,9 @@ public:
 
 	std::vector<Mesh>& GetSubMesh() { return m_subMeshes; }
 	const std::vector<Mesh>& GetSubMesh() const { return m_subMeshes; }
+
+	// возвращает треугольники от всех сабмешей
+	std::vector<Vector3> GetTriangles() const;
 
 private:
 	bool loadObjFile(const char* fileName, const char* pathMaterialFiles = "./");
