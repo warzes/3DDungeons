@@ -181,6 +181,10 @@ inline float Angle(const Vector2& x, const Vector2& y);
 // Returns the oriented angle between two 2d vectors.
 inline float OrientedAngle(const Vector2& x, const Vector2& y);
 
+inline Vector2 Slide(const Vector2& v, const Vector2& normal);
+inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, float f);
+inline Vector2 Bezier4(const Vector2& v0, const Vector2& v1, const Vector2& v2, const Vector2& v3, float f);
+
 inline bool operator==(const Vector2& Left, const Vector2& Right) noexcept;
 inline bool operator!=(const Vector2& Left, const Vector2& Right) noexcept;
 
@@ -206,19 +210,6 @@ inline Vector2& operator*=(Vector2& Left, float Right) noexcept;
 inline Vector2& operator*=(Vector2& Left, const Vector2& Right) noexcept;
 inline Vector2& operator/=(Vector2& Left, float Right) noexcept;
 inline Vector2& operator/=(Vector2& Left, const Vector2& Right) noexcept;
-
-//=============================================================================
-// OLD
-inline Vector2 Project(const Vector2& v1, const Vector2& v2);
-inline Vector2 Slide(const Vector2& v, const Vector2& normal);
-inline Vector2 Tangent(const Vector2& v);
-
-inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, float f);
-inline Vector2 Bezier4(const Vector2& v0, const Vector2& v1, const Vector2& v2, const Vector2& v3, float f);
-inline void Abs(Vector2& v);
-inline void Floor(Vector2& v);
-inline void Ceil(Vector2& v);
-inline void Round(Vector2& v);
 
 //=============================================================================
 // Vector3
@@ -284,6 +275,13 @@ inline float Angle(const Vector3& x, const Vector3& y);
 // Returns the oriented angle between two 3d vectors based from a reference axis.
 inline float OrientedAngle(const Vector3& x, const Vector3& y, const Vector3& ref);
 
+// Returns this vector slide along a plane defined by the given normal.
+inline Vector3 Slide(const Vector3& v, const Vector3& normal);
+
+inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f);
+inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3, float f);
+
+
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept;
 inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept;
 
@@ -315,21 +313,6 @@ inline Vector3& operator*=(Vector3& Left, float Right) noexcept;
 inline Vector3& operator*=(Vector3& Left, const Vector3& Right) noexcept;
 inline Vector3& operator/=(Vector3& Left, float Right) noexcept;
 inline Vector3& operator/=(Vector3& Left, const Vector3& Right) noexcept;
-
-//=============================================================================
-// OLD
-inline Vector3 Project(const Vector3& v1, const Vector3& v2);
-// Return the angle between this vector and another vector in degrees.
-inline float Angle(const Vector3& v1, const Vector3& v2);
-// Returns this vector slide along a plane defined by the given normal.
-inline Vector3 Slide(const Vector3& v, const Vector3& normal);
-inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle); // TODO: удалить
-inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f);
-inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3, float f);
-inline void Abs(Vector3& v);
-inline void Floor(Vector3& v);
-inline void Ceil(Vector3& v);
-inline void Round(Vector3& v);
 
 //=============================================================================
 // Vector4
@@ -409,13 +392,6 @@ inline Vector4& operator*=(Vector4& Left, float Right) noexcept;
 inline Vector4& operator*=(Vector4& Left, const Vector4& Right) noexcept;
 inline Vector4& operator/=(Vector4& Left, float Right) noexcept;
 inline Vector4& operator/=(Vector4& Left, const Vector4& Right) noexcept;
-
-//=============================================================================
-// OLD
-inline void Abs(Vector4& v);
-inline void Floor(Vector4& v);
-inline void Ceil(Vector4& v);
-inline void Round(Vector4& v);
 
 //=============================================================================
 // Quaternion

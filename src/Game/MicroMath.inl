@@ -150,22 +150,10 @@ inline float OrientedAngle(const Vector2& x, const Vector2& y)
 	else return -Angle;
 }
 
-//=============================================================================
-// OLD
-inline Vector2 Project(const Vector2& v1, const Vector2& v2)
-{
-	const float d = DotProduct(v2, v2);
-	const float s = DotProduct(v1, v2) / d;
-	return { v2.x * s, v2.y * s };
-}
 inline Vector2 Slide(const Vector2& v, const Vector2& normal)
 {
 	const float d = DotProduct(v, normal);
 	return v - normal * d; // проверить что так { v.x - normal.x * d, v.y - normal.y * d };
-}
-inline Vector2 Tangent(const Vector2& v)
-{
-	return { v.y, -v.x };
 }
 
 inline Vector2 Bezier3(const Vector2& v0, const Vector2& v1, const Vector2& v2, float f)
@@ -183,30 +171,6 @@ inline Vector2 Bezier4(const Vector2& v0, const Vector2& v1, const Vector2& v2, 
 	Vector2 tmp3 = Lerp(tmp0, tmp1, f);
 	Vector2 tmp4 = Lerp(tmp1, tmp2, f);
 	return Lerp(tmp3, tmp4, f);
-}
-
-inline void Abs(Vector2& v)
-{
-	v.x = fabsf(v.x);
-	v.y = fabsf(v.y);
-}
-
-inline void Floor(Vector2& v)
-{
-	v.x = floorf(v.x);
-	v.y = floorf(v.y);
-}
-
-inline void Ceil(Vector2& v)
-{
-	v.x = ceilf(v.x);
-	v.y = ceilf(v.y);
-}
-
-inline void Round(Vector2& v)
-{
-	v.x = roundf(v.x);
-	v.y = roundf(v.y);
 }
 
 inline bool operator==(const Vector2& Left, const Vector2& Right) noexcept   { return Left.x == Right.x && Left.y == Right.y; }
@@ -367,31 +331,10 @@ inline float OrientedAngle(const Vector3& x, const Vector3& y, const Vector3& re
 	return Mix(Angle, -Angle, DotProduct(ref, CrossProduct(x, y)) < 0.0f);
 }
 
-//=============================================================================
-// OLD
-inline Vector3 Project(const Vector3& v0, const Vector3& v1)
-{
-	const float d = DotProduct(v1, v1);
-	const float s = DotProduct(v0, v1) / d;
-	return { v1.x * s, v1.y * s, v1.z * s };
-}
-
 inline Vector3 Slide(const Vector3& v, const Vector3& normal)
 {
 	const float d = DotProduct(v, normal);
 	return v - normal * d; //проверить что так { v.x - normal.x * d, v.y - normal.y * d, v.z - normal.z * d };
-}
-
-inline Vector3 Rotate(const Vector3& v0, Vector3 ra, float angle)
-{
-	const float cs = cosf(angle);
-	const float sn = sinf(angle);
-	ra = ra.GetNormalize();
-	return {
-		v0.x * (cs + ra.x * ra.x * (1.0f - cs)) + v0.y * (ra.x * ra.y * (1.0f - cs) - ra.z * sn) + v0.z * (ra.x * ra.z * (1.0f - cs) + ra.y * sn),
-		v0.x * (ra.y * ra.x * (1.0f - cs) + ra.z * sn) + v0.y * (cs + ra.y * ra.y * (1.0f - cs)) + v0.z * (ra.y * ra.z * (1.0f - cs) - ra.x * sn),
-		v0.x * (ra.z * ra.x * (1.0f - cs) - ra.y * sn) + v0.y * (ra.z * ra.y * (1.0f - cs) + ra.x * sn) + v0.z * (cs + ra.z * ra.z * (1.0f - cs))
-	};
 }
 
 inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f)
@@ -409,34 +352,6 @@ inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
 	Vector3 tmp3 = Lerp(tmp0, tmp1, f);
 	Vector3 tmp4 = Lerp(tmp1, tmp2, f);
 	return Lerp(tmp3, tmp4, f);
-}
-
-inline void Abs(Vector3& v)
-{
-	v.x = fabsf(v.x);
-	v.y = fabsf(v.y);
-	v.z = fabsf(v.z);
-}
-
-inline void Floor(Vector3& v)
-{
-	v.x = floorf(v.x);
-	v.y = floorf(v.y);
-	v.z = floorf(v.z);
-}
-
-inline void Ceil(Vector3& v)
-{
-	v.x = ceilf(v.x);
-	v.y = ceilf(v.y);
-	v.z = ceilf(v.z);
-}
-
-inline void Round(Vector3& v)
-{
-	v.x = roundf(v.x);
-	v.y = roundf(v.y);
-	v.z = roundf(v.z);
 }
 
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept   { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z; }
@@ -582,40 +497,6 @@ inline Vector4 Rotate(const Quaternion& q, const Vector4& v)
 inline float Angle(const Vector4& x, const Vector4& y)
 {
 	return acos(Clamp(DotProduct(x, y), -1.0f, 1.0f));
-}
-
-//=============================================================================
-// OLD
-inline void Abs(Vector4& v)
-{
-	v.x = fabsf(v.x);
-	v.y = fabsf(v.y);
-	v.z = fabsf(v.z);
-	v.w = fabsf(v.w);
-}
-
-inline void Floor(Vector4& v)
-{
-	v.x = floorf(v.x);
-	v.y = floorf(v.y);
-	v.z = floorf(v.z);
-	v.w = floorf(v.w);
-}
-
-inline void Ceil(Vector4& v)
-{
-	v.x = ceilf(v.x);
-	v.y = ceilf(v.y);
-	v.z = ceilf(v.z);
-	v.w = ceilf(v.w);
-}
-
-inline void Round(Vector4& v)
-{
-	v.x = roundf(v.x);
-	v.y = roundf(v.y);
-	v.z = roundf(v.z);
-	v.w = roundf(v.w);
 }
 
 inline bool operator==(const Vector4& Left, const Vector4& Right) noexcept   { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z && Left.w == Right.w; }
