@@ -26,39 +26,15 @@ public:
 
 namespace Collisions
 {
-	inline bool CheckPointInTriangle(const Vector3& tri0, const Vector3& tri1, const Vector3& tri2, const Vector3& point)
-	{
-		const Vector3 u = tri1 - tri0;
-		const Vector3 v = tri2 - tri0;
-		const Vector3 w = point - tri0;
-
-		const Vector3 vw = CrossProduct(v, w);
-		const Vector3 vu = CrossProduct(v, u);
-		if (DotProduct(vw, vu) < 0.0f)
-			return false;
-
-		const Vector3 uw = CrossProduct(u, w);
-		const Vector3 uv = CrossProduct(u, v);
-		if (DotProduct(uw, uv) < 0.0f)
-			return false;
-
-		const float d = uv.GetLength();
-		const float r = vw.GetLength() / d;
-		const float t = uw.GetLength() / d;
-		return ((r + t) <= 1.0f);
-	}
-
 	bool GetLowestRoot(float a, float b, float c, float maxR, float* root)
 	{
 		// Check if a solution exists
-		float determinant = b * b - 4.0f * a * c;
-
+		const float determinant = b * b - 4.0f * a * c;
 		// If determinant is negative it means no solutions.
 		if (determinant < 0.0f) return false;
 
-		// calculate the two roots: (if determinant == 0 then
-		// x1==x2 but let’s disregard that slight optimization)
-		float sqrtD = sqrt(determinant);
+		// calculate the two roots: (if determinant == 0 then x1==x2 but let’s disregard that slight optimization)
+		const float sqrtD = sqrt(determinant);
 		float r1 = (-b - sqrtD) / (2.0f * a);
 		float r2 = (-b + sqrtD) / (2.0f * a);
 
@@ -85,55 +61,6 @@ namespace Collisions
 		// No (valid) solutions
 		return false;
 	}
-}
-
-class Plane
-{
-public:
-	Plane() = default;
-	Plane(const Vector3& origin, const Vector3& normal);
-	Plane(const Vector3& p1, const Vector3& p2, const Vector3& p3);
-
-	bool IsFrontFacingTo(const Vector3& direction) const;
-	float SignedDistanceTo(const Vector3& point) const;
-
-	Vector4 equation;
-	Vector3 origin;
-	Vector3 normal;
-};
-
-inline Plane::Plane(const Vector3& Origin, const Vector3& Normal)
-{
-	origin = Origin;
-	normal = Normal;
-	equation.x = Normal.x;
-	equation.y = Normal.y;
-	equation.z = Normal.z;
-	equation.w = -DotProduct(Origin, Normal);
-}
-
-// Construct from triangle:
-inline Plane::Plane(const Vector3& p1, const Vector3& p2, const Vector3& p3)
-{
-	normal = CrossProduct(p2 - p1, p3 - p1).GetNormalize();
-
-	origin = p1;
-
-	equation.x = normal.x;
-	equation.y = normal.y;
-	equation.z = normal.z;
-	equation.w = -DotProduct(normal, origin);
-}
-
-inline float Plane::SignedDistanceTo(const Vector3& point) const
-{
-	return (DotProduct(point, normal)) + equation.w;
-}
-
-inline bool Plane::IsFrontFacingTo(const Vector3& direction) const
-{
-	const float d = DotProduct(normal, direction);
-	return (d <= 0.0f);
 }
 
 #define unitsPerMeter 100.0f
@@ -175,7 +102,7 @@ public:
 inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& p1, const Vector3& p2, const Vector3& p3)
 {
 	// Make the Plane containing this triangle.
-	Plane trianglePlane(p1, p2, p3);
+	const Plane trianglePlane(p1, p2, p3);
 	// Is triangle front-facing to the velocity vector?
 	// only check front-facing triangles
 	if (!trianglePlane.IsFrontFacingTo(colPackage->normalizedVelocity))
@@ -186,14 +113,14 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 	bool embeddedInPlane = false;
 
 	// Calculate the signed distance from sphere position to triangle Plane
-	float signedDistToTrianglePlane = trianglePlane.SignedDistanceTo(colPackage->basePoint);
+	const float signedDistToTrianglePlane = trianglePlane.SignedDistanceTo(colPackage->basePoint);
 
 	// cache this as we’re going to use it a few times below:
-	float normalDotVelocity = DotProduct(trianglePlane.normal, colPackage->velocity);
+	const float normalDotVelocity = DotProduct(trianglePlane.normal, colPackage->velocity);
 	// if sphere is travelling parrallel to the Plane:
 	if (normalDotVelocity == 0.0f)
 	{
-		if (fabs(signedDistToTrianglePlane) >= 1.0f)
+		if (fabsf(signedDistToTrianglePlane) >= 1.0f)
 		{
 			// Sphere is not embedded in Plane.
 			// No collision possible:
@@ -212,7 +139,7 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 	{
 		// N dot D is not 0. Calculate intersection interval:
 		t0 = (-1.0f - signedDistToTrianglePlane) / normalDotVelocity;
-		t1 = (1.0f - signedDistToTrianglePlane) / normalDotVelocity;
+		t1 = (+1.0f - signedDistToTrianglePlane) / normalDotVelocity;
 
 		// Swap so t0 < t1
 		if (t0 > t1)
@@ -236,50 +163,36 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 		if (t1 > 1.0f) t1 = 1.0f;
 	}
 
-	// OK, at this point we have two time values t0 and t1
-	// between which the swept sphere intersects with the
-	// triangle Plane. If any collision is to occur it must
-	// happen within this interval.
+	// OK, at this point we have two time values t0 and t1 between which the swept sphere intersects with the triangle Plane. If any collision is to occur it must happen within this interval.
 	Vector3 collisionPoint;
 	bool foundCollison = false;
 	float t = 1.0f;
 
-	// First we check for the easy case - collision inside
-	// the triangle. If this happens it must be at time t0
-	// as this is when the sphere rests on the front side
-	// of the triangle Plane. Note, this can only happen if
-	// the sphere is not embedded in the triangle Plane.
+	// First we check for the easy case - collision inside the triangle. If this happens it must be at time t0 as this is when the sphere rests on the front side of the triangle Plane. Note, this can only happen if the sphere is not embedded in the triangle Plane.
 	if (!embeddedInPlane)
 	{
-		Vector3 PlaneIntersectionPoint = (colPackage->basePoint - trianglePlane.normal) + t0 * colPackage->velocity;
+		const Vector3 PlaneIntersectionPoint = (colPackage->basePoint - trianglePlane.normal) + t0 * colPackage->velocity;
 
-		if (Collisions::CheckPointInTriangle(p1, p2, p3, PlaneIntersectionPoint))
+		if (CheckPointInTriangle(p1, p2, p3, PlaneIntersectionPoint))
 		{
 			foundCollison = true;
 			t = t0;
 			collisionPoint = PlaneIntersectionPoint;
 		}
 	}
-	// if we haven’t found a collision already we’ll have to
-	// sweep sphere against points and edges of the triangle.
-	// Note: A collision inside the triangle (the check above)
-	// will always happen before a vertex or edge collision!
-	// This is why we can skip the swept test if the above
-	// gives a collision!
-
+	// if we haven’t found a collision already we’ll have to sweep sphere against points and edges of the triangle.
+	// Note: A collision inside the triangle (the check above) will always happen before a vertex or edge collision!
+	// This is why we can skip the swept test if the above gives a collision!
 	if (foundCollison == false)
 	{
 		// some commonly used terms:
-		Vector3 velocity = colPackage->velocity;
-		Vector3 base = colPackage->basePoint;
-		float velocitySquaredLength = DotProduct(velocity, velocity);
+		const Vector3 velocity = colPackage->velocity;
+		const Vector3 base = colPackage->basePoint;
+		const float velocitySquaredLength = DotProduct(velocity, velocity);
 		float a, b, c; // Params for equation
 		float newT;
 
-		// For each vertex or edge a quadratic equation have to
-		// be solved. We parameterize this equation as
-		// a*t^2 + b*t + c = 0 and below we calculate the
-		// parameters a,b and c for each test.
+		// For each vertex or edge a quadratic equation have to be solved. We parameterize this equation as a*t^2 + b*t + c = 0 and below we calculate the parameters a,b and c for each test.
 
 		// Check against points:
 		a = velocitySquaredLength;
@@ -402,7 +315,7 @@ inline void CheckCollisionsTriangle(CollisionPacket* colPackage, const Vector3& 
 	if (foundCollison == true)
 	{
 		// distance to collision: ’t’ is time of collision
-		float distToCollision = t * colPackage->velocity.GetLength();
+		const float distToCollision = t * colPackage->velocity.GetLength();
 		// Does this triangle qualify for the closest hit?
 		// it does if it’s the first hit or the closest
 		if (colPackage->foundCollision == false || distToCollision < colPackage->nearestDistance)
@@ -590,13 +503,13 @@ inline void CharacterEntity::CollideAndSlide2()
 inline void CharacterEntity::CollideWithWorld2(Vector3& e_position, Vector3& e_velocity)
 {
 	Vector3 dest = e_position + e_velocity;
-	Vector3 src = e_position;
+	const Vector3 src = e_position;
 
 	Plane first_plane;
 
 	// check for collision
 	Vector3 temp;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		// setup coll packet
 		collisionPackage.velocity = e_velocity;
@@ -678,10 +591,9 @@ void CharacterEntity::CheckGrounded()
 
 inline void CharacterEntity::Update2(float dt)
 {
-	Vector3 xz = Vector3(velocity.x, 0.0f, velocity.z);
+	const Vector3 xz = Vector3(velocity.x, 0.0f, velocity.z);
 	// prevent sliding while standing still on a slope
 	// change < 0.0f to > 0.0f if inverting y axis
-
 	if (grounded && fabs(sqrtf(DotProduct(xz, xz))) < 0.1f && velocity.y < 0.0f)
 		velocity.y = 0.0f;
 	else
@@ -953,9 +865,9 @@ void ExampleFrame()
 		if( IsKeyDown('A') ) PlayerMovement -= PlayerRight;
 		if( IsKeyDown('D') ) PlayerMovement += PlayerRight;
 
-		PlayerMovement *= 1000.0f * GetDeltaTime();
+		PlayerMovement *= 30.0f;
 		entity->velocity.x = PlayerMovement.x;
-		//entity->velocity.y = -500.0f * GetDeltaTime();
+		//entity->velocity.y = -30.0f;
 		entity->velocity.z = PlayerMovement.z;
 
 		static float impulseSpace = 0.0f;
@@ -965,11 +877,11 @@ void ExampleFrame()
 		}
 		if( impulseSpace <= 0.0f )
 		{
-			entity->velocity.y = -900.0f * GetDeltaTime();
+			entity->velocity.y = -40.0f;
 		}
 		else
 		{
-			entity->velocity.y = 900.0f * GetDeltaTime();
+			entity->velocity.y = 40.0f;
 			impulseSpace -= entity->velocity.y;
 		}
 #else
@@ -1009,7 +921,9 @@ void ExampleFrame()
 #endif
 
 	Matrix4 view = cam.GetViewMatrix();
-	Matrix4 perpective = Matrix4::Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 100000.f);
+	//Matrix4 perpective = Matrix4::Perspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f, 100000.f);
+	Matrix4 perpective = Matrix4::InfinitePerspective(45.0f * DEG2RAD, GetWindowAspectRatio(), 0.01f);
+
 	Matrix4 world1;
 
 	shader.Bind();

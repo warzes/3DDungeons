@@ -61,5 +61,23 @@ public:
 	Vector2 max = { -INFINITY };
 };
 
+//=============================================================================
+// Plane
+//=============================================================================
+class Plane
+{
+public:
+	Plane() = default;
+	Plane(const Vector3& origin, const Vector3& normal);
+	// Construct from triangle
+	Plane(const Vector3& p1, const Vector3& p2, const Vector3& p3);
+
+	bool IsFrontFacingTo(const Vector3& direction) const;
+	float SignedDistanceTo(const Vector3& point) const;
+
+	Vector4 equation;
+	Vector3 origin;
+	Vector3 normal;
+};
 
 #include "MicroGeometry.inl"

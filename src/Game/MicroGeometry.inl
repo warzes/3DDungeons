@@ -93,3 +93,32 @@ inline Intersection Rect::IsInside(const Vector2 & point) const
 	else
 		return INSIDE;
 }
+
+//=============================================================================
+// Plane
+//=============================================================================
+
+inline Plane::Plane(const Vector3& Origin, const Vector3& Normal)
+{
+	origin = Origin;
+	normal = Normal;
+	equation = { normal, -DotProduct(origin, normal) };
+}
+
+inline Plane::Plane(const Vector3& p1, const Vector3& p2, const Vector3& p3)
+{
+	normal = CrossProduct(p2 - p1, p3 - p1).GetNormalize();
+	origin = p1;
+	equation = { normal, -DotProduct(origin, normal) };
+}
+
+inline float Plane::SignedDistanceTo(const Vector3& point) const
+{
+	return (DotProduct(point, normal)) + equation.w;
+}
+
+inline bool Plane::IsFrontFacingTo(const Vector3& direction) const
+{
+	const float dot = DotProduct(normal, direction);
+	return (dot <= 0.0f);
+}

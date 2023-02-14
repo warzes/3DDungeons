@@ -16,6 +16,7 @@
 	https://github.com/felselva/uastar
 
 Физика и коллизии
+	Halloween3D на основе Coldet
 	https://github.com/gszauer/GamePhysicsCookbook
 	софт-пиксель-эндж - организация менеджера коллайдеров
 	https://github.com/frabbani/polysoup - https://www.youtube.com/watch?v=6R4RItlo--U

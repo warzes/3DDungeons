@@ -23,6 +23,7 @@
 #include "MicroRender.h"
 #include "MicroMath.h"
 #include "MicroGeometry.h"
+#include "MicroCollisions.h"
 #include "MicroGraphics.h"
 #include "MicroAdvance.h"
 
