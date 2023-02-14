@@ -20,15 +20,15 @@
 #	pragma warning(pop)
 #endif // _MSC_VER
 
-#include "MicroRender.h"
 #include "MicroMath.h"
 #include "MicroGeometry.h"
 #include "MicroCollisions.h"
+#include "MicroRender.h"
 #include "MicroGraphics.h"
 #include "MicroAdvance.h"
 
 //=============================================================================
-// Core Func
+// Base Inline Func
 //=============================================================================
 template<class T>
 inline void Swap(T& left, T& right) noexcept
@@ -86,6 +86,8 @@ struct WindowSystemCreateInfo
 	int Height = 768;
 	const wchar_t* Title = L"Game";
 	bool Vsync = true;
+	bool Resizable = true;
+	bool Fullscreen = false;
 };
 [[nodiscard]] bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo);
 void WindowSystemDestroy();
@@ -95,13 +97,6 @@ void WindowSystemUpdate();
 [[nodiscard]] int GetWindowWidth();
 [[nodiscard]] int GetWindowHeight();
 [[nodiscard]] float GetWindowAspectRatio();
-
-//=============================================================================
-// Render System
-//=============================================================================
-
-void RenderSystemInit();
-void RenderSystemBeginFrame();
 
 //=============================================================================
 // App System

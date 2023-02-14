@@ -430,3 +430,10 @@ private:
 	int m_width = 0;
 	int m_height = 0;
 };
+
+//=============================================================================
+// Render System
+//=============================================================================
+
+void RenderSystemInit();
+void RenderSystemBeginFrame(int WindowClientWidth, int WindowClientHeight);

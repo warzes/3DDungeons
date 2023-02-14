@@ -56,6 +56,8 @@ typedef int GLintptr;
 #define GL_ACTIVE_ATTRIBUTES 0x8B89
 #define GL_ACTIVE_ATTRIBUTE_MAX_LENGTH 0x8B8A
 #define GL_ARRAY_BUFFER 0x8892
+#define GL_BACK 0x0405
+#define GL_BLEND 0x0BE2
 #define GL_CLAMP_TO_BORDER 0x812D
 #define GL_CLAMP_TO_EDGE 0x812F
 #define GL_COLOR_ATTACHMENT0 0x8CE0
@@ -73,6 +75,7 @@ typedef int GLintptr;
 #define GL_DYNAMIC_DRAW 0x88E8
 #define GL_ELEMENT_ARRAY_BUFFER 0x8893
 #define GL_FALSE 0
+#define GL_FILL 0x1B02
 #define GL_FLOAT 0x1406
 #define GL_FLOAT_VEC2 0x8B50
 #define GL_FLOAT_VEC3 0x8B51
@@ -86,10 +89,14 @@ typedef int GLintptr;
 #define GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT 0x8CD7
 #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE 0x8D56
 #define GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER 0x8CDC
+#define GL_FRAMEBUFFER_SRGB 0x8DB9
 #define GL_FRAMEBUFFER_UNDEFINED 0x8219
 #define GL_FRAMEBUFFER_UNSUPPORTED 0x8CDD
+#define GL_FRONT_AND_BACK 0x0408
 #define GL_GREEN 0x1904
 #define GL_INFO_LOG_LENGTH 0x8B84
+#define GL_LEQUAL 0x0203
+#define GL_LINE 0x1B01
 #define GL_LINEAR 0x2601
 #define GL_LINEAR_MIPMAP_LINEAR 0x2703
 #define GL_LINEAR_MIPMAP_NEAREST 0x2701
@@ -99,6 +106,8 @@ typedef int GLintptr;
 #define GL_NEAREST 0x2600
 #define GL_NEAREST_MIPMAP_LINEAR 0x2702
 #define GL_NEAREST_MIPMAP_NEAREST 0x2700
+#define GL_NONE 0
+#define GL_ONE_MINUS_SRC_ALPHA 0x0303
 #define GL_PACK_ALIGNMENT 0x0D05
 #define GL_POINTS 0x0000
 #define GL_R8 0x8229
@@ -111,6 +120,7 @@ typedef int GLintptr;
 #define GL_RGB8 0x8051
 #define GL_RGBA 0x1908
 #define GL_RGBA8 0x8058
+#define GL_SRC_ALPHA 0x0302
 #define GL_STATIC_DRAW 0x88E4
 #define GL_STENCIL_BUFFER_BIT 0x00000400
 #define GL_STREAM_DRAW 0x88E0
@@ -158,24 +168,28 @@ extern "C" {
 }
 #endif
 
+// не сортировать тут, сортировать в объявлении типа и затем тут ставить в нужном месте
 typedef void (GLAPIENTRY* PFNGLACTIVETEXTUREPROC)(GLenum texture);
 typedef void (GLAPIENTRY* PFNGLATTACHSHADERPROC)(GLuint program, GLuint shader);
 typedef void (GLAPIENTRY* PFNGLBINDBUFFERPROC)(GLenum target, GLuint buffer);
 typedef void (GLAPIENTRY* PFNGLBINDFRAMEBUFFERPROC)(GLenum target, GLuint framebuffer);
 typedef void (GLAPIENTRY* PFNGLBINDRENDERBUFFERPROC)(GLenum target, GLuint renderbuffer);
 typedef void (GLAPIENTRY* PFNGLBINDVERTEXARRAYPROC)(GLuint array);
+typedef void (GLAPIENTRY* PFNGLBLENDFUNCPROC)(GLenum sfactor, GLenum dfactor);
 typedef void (GLAPIENTRY* PFNGLBUFFERDATAPROC)(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
 typedef void (GLAPIENTRY* PFNGLBUFFERSUBDATAPROC)(GLenum target, GLintptr offset, GLsizeiptr size, const void* data);
 typedef GLenum(GLAPIENTRY* PFNGLCHECKFRAMEBUFFERSTATUSPROC)(GLenum target);
 typedef void (GLAPIENTRY* PFNGLCOMPILESHADERPROC)(GLuint shader);
 typedef GLuint(GLAPIENTRY* PFNGLCREATEPROGRAMPROC)();
 typedef GLuint(GLAPIENTRY* PFNGLCREATESHADERPROC)(GLenum type);
+typedef void (GLAPIENTRY* PFNGLCULLFACEPROC)(GLenum mode);
 typedef void (GLAPIENTRY* PFNGLDELETEBUFFERSPROC)(GLsizei n, const GLuint* buffers);
 typedef void (GLAPIENTRY* PFNGLDELETEFRAMEBUFFERSPROC)(GLsizei n, const GLuint* framebuffers);
 typedef void (GLAPIENTRY* PFNGLDELETEPROGRAMPROC)(GLuint program);
 typedef void (GLAPIENTRY* PFNGLDELETERENDERBUFFERSPROC)(GLsizei n, const GLuint* renderbuffers);
 typedef void (GLAPIENTRY* PFNGLDELETESHADERPROC)(GLuint shader);
 typedef void (GLAPIENTRY* PFNGLDELETEVERTEXARRAYSPROC)(GLsizei n, const GLuint* arrays);
+typedef void (GLAPIENTRY* PFNGLDEPTHFUNCPROC)(GLenum func);
 typedef void (GLAPIENTRY *PFNGLDETACHSHADERPROC)(GLuint program, GLuint shader);
 typedef void (GLAPIENTRY* PFNGLENABLEVERTEXATTRIBARRAYPROC)(GLuint index);
 typedef void (GLAPIENTRY* PFNGLFRAMEBUFFERRENDERBUFFERPROC)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
@@ -193,6 +207,7 @@ typedef void (GLAPIENTRY* PFNGLGETSHADERINFOLOGPROC)(GLuint shader, GLsizei bufS
 typedef void (GLAPIENTRY* PFNGLGETSHADERIVPROC)(GLuint shader, GLenum pname, GLint* params);
 typedef GLint(GLAPIENTRY* PFNGLGETUNIFORMLOCATIONPROC)(GLuint program, const char* name);
 typedef void (GLAPIENTRY* PFNGLLINKPROGRAMPROC)(GLuint program);
+typedef void (GLAPIENTRY* PFNGLPOLYGONMODEPROC)(GLenum face, GLenum mode);
 typedef void (GLAPIENTRY* PFNGLRENDERBUFFERSTORAGEPROC)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
 typedef void (GLAPIENTRY* PFNGLSHADERSOURCEPROC)(GLuint shader, GLsizei count, const char* const* string, const GLint* length);
 typedef void (GLAPIENTRY* PFNGLUNIFORM1FPROC)(GLint location, GLfloat v0);
@@ -209,18 +224,21 @@ extern PFNGLBINDBUFFERPROC glBindBuffer;
 extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 extern PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
 extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+extern PFNGLBLENDFUNCPROC glBlendFunc;
 extern PFNGLBUFFERDATAPROC glBufferData;
 extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
 extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 extern PFNGLCOMPILESHADERPROC glCompileShader;
 extern PFNGLCREATEPROGRAMPROC glCreateProgram;
 extern PFNGLCREATESHADERPROC glCreateShader;
+extern PFNGLCULLFACEPROC glCullFace;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
 extern PFNGLDELETERENDERBUFFERSPROC glDeleteRenderbuffers;
 extern PFNGLDELETESHADERPROC glDeleteShader;
 extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+extern PFNGLDEPTHFUNCPROC glDepthFunc;
 extern PFNGLDETACHSHADERPROC glDetachShader;
 extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 extern PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
@@ -238,6 +256,7 @@ extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 extern PFNGLGETSHADERIVPROC glGetShaderiv;
 extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 extern PFNGLLINKPROGRAMPROC glLinkProgram;
+extern PFNGLPOLYGONMODEPROC glPolygonMode;
 extern PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
 extern PFNGLSHADERSOURCEPROC glShaderSource;
 extern PFNGLUNIFORM1FPROC glUniform1f;

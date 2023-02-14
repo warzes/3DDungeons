@@ -18,13 +18,16 @@
     <ClCompile Include="MicroOpenGLLoader.cpp">
       <Filter>MicroEngine\utils</Filter>
     </ClCompile>
+    <ClCompile Include="Octree.cpp">
+      <Filter>MicroEngine\TempCollisions1\math</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionTemp.cpp">
+      <Filter>MicroEngine\TempCollisions1\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
     <ClInclude Include="MicroEngine.h">
-      <Filter>MicroEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="MicroGeometry.h">
       <Filter>MicroEngine</Filter>
     </ClInclude>
     <ClInclude Include="MicroRender.h">
@@ -54,20 +57,44 @@
     <ClInclude Include="X_Debug.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
-    <ClInclude Include="MicroMath.h">
-      <Filter>MicroEngine</Filter>
-    </ClInclude>
     <ClInclude Include="UnitTestMath.h">
       <Filter>MicroEngine\UnitTest</Filter>
     </ClInclude>
     <ClInclude Include="X_TestFPS.h">
       <Filter>ExampleDemo</Filter>
     </ClInclude>
-    <ClInclude Include="MicroCollisions.h">
-      <Filter>MicroEngine</Filter>
-    </ClInclude>
     <ClInclude Include="DCGameApp.h">
       <Filter>SimpleGame\DungeonCrawler</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroCollisions.h">
+      <Filter>MicroEngine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroGeometry.h">
+      <Filter>MicroEngine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="MicroMath.h">
+      <Filter>MicroEngine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="TempCollisions2.h">
+      <Filter>MicroEngine\math\TempCollisions2</Filter>
+    </ClInclude>
+    <ClInclude Include="TempPhysics.h">
+      <Filter>MicroEngine\math\TempPhysics</Filter>
+    </ClInclude>
+    <ClInclude Include="Octree.h">
+      <Filter>MicroEngine\TempCollisions1\math</Filter>
+    </ClInclude>
+    <ClInclude Include="TempMath1.h">
+      <Filter>MicroEngine\TempCollisions1\math</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionTemp.h">
+      <Filter>MicroEngine\TempCollisions1\math</Filter>
+    </ClInclude>
+    <ClInclude Include="TempCubeVertices.h">
+      <Filter>MicroEngine\TempCollisions1\util</Filter>
+    </ClInclude>
+    <ClInclude Include="TempList.h">
+      <Filter>MicroEngine\TempCollisions1\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -95,16 +122,34 @@
     <Filter Include="SimpleGame\DungeonCrawler">
       <UniqueIdentifier>{cff1a619-6ff6-480a-8ed2-a190d463427e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MicroEngine\math">
+      <UniqueIdentifier>{577f23e5-8709-4d3d-998a-019b63056c76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\math\TempCollisions2">
+      <UniqueIdentifier>{12008b5d-ff81-4203-844a-83872dad4131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\math\TempPhysics">
+      <UniqueIdentifier>{d248455f-b6dc-480c-9e3f-54682627e36f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\TempCollisions1">
+      <UniqueIdentifier>{288dde05-6bb6-4445-8ad0-6fb3aa2a5899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\TempCollisions1\math">
+      <UniqueIdentifier>{e6ff5401-e41d-4278-b3b0-330e0748049d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\TempCollisions1\util">
+      <UniqueIdentifier>{1f17e968-2d4d-47fd-930c-9d57f78bf8a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="MicroCollisions.inl">
+      <Filter>MicroEngine\math</Filter>
+    </None>
     <None Include="MicroGeometry.inl">
-      <Filter>MicroEngine</Filter>
+      <Filter>MicroEngine\math</Filter>
     </None>
     <None Include="MicroMath.inl">
-      <Filter>MicroEngine</Filter>
-    </None>
-    <None Include="MicroCollisions.inl">
-      <Filter>MicroEngine</Filter>
+      <Filter>MicroEngine\math</Filter>
     </None>
   </ItemGroup>
 </Project>

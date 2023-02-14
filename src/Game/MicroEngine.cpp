@@ -48,7 +48,7 @@ namespace core
 	LARGE_INTEGER Frequency = {};
 	LARGE_INTEGER CurrentTime = {};
 	LARGE_INTEGER PrevTime = {};
-#endif
+#endif // _WIN32
 	float DeltaTime = 0.0f;
 }
 //-----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ namespace input
 			};
 			ClipCursor(&mouseRect);
 		}
-#endif
+#endif // _WIN32
 	}
 
 	// Update mouse visibility and clipping region to the OS.
@@ -123,7 +123,7 @@ namespace input
 		{
 #if defined(_WIN32)
 			ShowCursor(newMouseVisible ? TRUE : FALSE);
-#endif
+#endif // _WIN32
 			input::MouseVisibleInternal = newMouseVisible;
 		}
 
@@ -139,21 +139,8 @@ namespace input
 		ScreenToClient(window::Win32WindowHandle, &screenPosition);
 		CursorPosition.x = screenPosition.x;
 		CursorPosition.y = screenPosition.y;
-#endif
+#endif // _WIN32
 	}
-}
-//-----------------------------------------------------------------------------
-namespace render
-{
-	int FramebufferWidth = 0;
-	int FramebufferHeight = 0;
-
-	Color ClearColor;
-	float PerspectiveFOV = 45.0f;
-	float PerspectiveNear = 0.01f;
-	float PerspectiveFar = 1000.0f;
-	Matrix4 ProjectionMatrix;
-	Matrix4 OrthoMatrix;
 }
 //-----------------------------------------------------------------------------
 namespace app
@@ -418,64 +405,13 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 }
 #endif // _WIN32
 //-----------------------------------------------------------------------------
-bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
-{
 #if defined(_WIN32)
-
-	window::Win32HInstance = GetModuleHandle(nullptr);
-
-	const wchar_t* windowClassName = L"WindowWin32App";
-
-	WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
-	wcex.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	wcex.lpfnWndProc = WindowProc;
-	wcex.hInstance = window::Win32HInstance;
-	wcex.lpszClassName = windowClassName;
-	if (!RegisterClassEx(&wcex))
-	{
-		Fatal("Failed To Register The Window Class.");
-		return false;
-	}
-
-	// Create Window
-
-	const int windowPosX = (GetSystemMetrics(SM_CXSCREEN) - createInfo.Width) / 2;
-	const int windowPosY = (GetSystemMetrics(SM_CYSCREEN) - createInfo.Height) / 2;
-
-	const DWORD style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-
-	RECT windowRect = { windowPosX, windowPosY, windowPosX + createInfo.Width, windowPosY + createInfo.Height };
-	AdjustWindowRect(&windowRect, style, 0);
-
-	window::Win32WindowHandle = CreateWindowEx(0, windowClassName, createInfo.Title, style, windowRect.left, windowRect.top, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, window::Win32HInstance, nullptr);
-	if (!window::Win32WindowHandle)
-	{
-		Fatal("CreateWindow() failed:  Cannot create a window.");
-		return false;
-	}
-	ShowWindow(window::Win32WindowHandle, SW_SHOW);
-	UpdateWindow(window::Win32WindowHandle);
-
-	RECT clientRect;
-	GetClientRect(window::Win32WindowHandle, &clientRect);
-	window::WindowClientWidth = clientRect.right - clientRect.left;
-	window::WindowClientHeight = clientRect.bottom - clientRect.top;
-
-	// Create OpenGL Context
-
-#define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
-#define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
-#define WGL_CONTEXT_FLAGS_ARB 0x2094
-#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x00000002
-#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
-#define WGL_CONTEXT_DEBUG_BIT_ARB 0x00000001
-#define WGL_CONTEXT_PROFILE_MASK_ARB 0x9126
-
-	typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int* attribList);
-	typedef BOOL(WINAPI* PFNWGLSWAPINTERVALEXTPROC)(int interval);
-
+// TODO: контексты для других платформ (в том числе андроид и эмскриптен) посмотреть тут - https://github.com/alaingalvan/CrossWindow-Graphics
+// Create OpenGL Context
+bool CreateWindowContext(bool vsync)
+{
 	window::Win32DCHandle = GetDC(window::Win32WindowHandle);
-	if (!window::Win32DCHandle)
+	if( !window::Win32DCHandle )
 	{
 		Fatal("Failed to get DC for window.");
 		return false;
@@ -490,13 +426,13 @@ bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
 	pfd.cStencilBits = 8;
 
 	int pixelFormat = ChoosePixelFormat(window::Win32DCHandle, &pfd);
-	if (!pixelFormat)
+	if( !pixelFormat )
 	{
 		Fatal("ChoosePixelFormat() failed: Cannot find a suitable pixel format.");
 		return false;
 	}
 	DescribePixelFormat(window::Win32DCHandle, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
-	if (!SetPixelFormat(window::Win32DCHandle, pixelFormat, &pfd))
+	if( !SetPixelFormat(window::Win32DCHandle, pixelFormat, &pfd) )
 	{
 		Fatal("SetPixelFormat() failed: Cannot set format specified.");
 		return false;
@@ -504,47 +440,102 @@ bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
 
 	// временное окно не создается так как нет установки пиксельформата (а обычно стоит его делать - https://www.khronos.org/opengl/wiki/Creating_an_OpenGL_Context_(WGL) - Create a False Context
 	HGLRC tempContext = wglCreateContext(window::Win32DCHandle);
-	if (!tempContext || !wglMakeCurrent(window::Win32DCHandle, tempContext))
+	if( !tempContext || !wglMakeCurrent(window::Win32DCHandle, tempContext) )
 	{
 		Fatal("Сreating temp render context fail");
 		return false;
 	}
 
 	// Get OpenGL Func
+	typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int* attribList);
 	auto wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)OpenGLGetProcAddress("wglCreateContextAttribsARB");
+	typedef BOOL(WINAPI* PFNWGLSWAPINTERVALEXTPROC)(int interval);
 	auto wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)OpenGLGetProcAddress("wglSwapIntervalEXT");
 
 	wglMakeCurrent(nullptr, nullptr);
 	wglDeleteContext(tempContext);
 
-	if (!wglCreateContextAttribsARB)
+	if( !wglCreateContextAttribsARB )
 	{
 		Fatal("wglCreateContextAttribsARB fail");
 		return false;
 	}
 
+#define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
+#define WGL_CONTEXT_FLAGS_ARB 0x2094
+#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x00000002
+#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
+#define WGL_CONTEXT_DEBUG_BIT_ARB 0x00000001
+#define WGL_CONTEXT_PROFILE_MASK_ARB 0x9126
 	const int contextAttribs[] =
 	{
 		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
 		WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-		WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
 		WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+		WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
 		0
 	};
 	window::Win32ContextHandle = wglCreateContextAttribsARB(window::Win32DCHandle, 0, contextAttribs);
-	if (!window::Win32ContextHandle || !wglMakeCurrent(window::Win32DCHandle, window::Win32ContextHandle))
+	if( !window::Win32ContextHandle || !wglMakeCurrent(window::Win32DCHandle, window::Win32ContextHandle) )
 	{
 		Fatal("Creating render context fail");
 		return false;
 	}
 
 	// Vsync
-	if (wglSwapIntervalEXT) wglSwapIntervalEXT(createInfo.Vsync ? 1 : 0);
+	if( wglSwapIntervalEXT ) wglSwapIntervalEXT(vsync ? 1 : 0);
 
 	OpenGLInit(OpenGLGetProcAddress);
+}
+#endif // _WIN32
+//-----------------------------------------------------------------------------
+bool WindowSystemCreate(const WindowSystemCreateInfo& createInfo)
+{
+#if defined(_WIN32)
 
-	input::updateMouseVisible();
-	input::updateMousePosition();
+	window::Win32HInstance = GetModuleHandle(nullptr);
+
+	const wchar_t* windowClassName = L"WindowWin32App";
+
+	WNDCLASSEX wndClass    = { sizeof(WNDCLASSEX) };
+	wndClass.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	wndClass.lpfnWndProc   = WindowProc;
+	wndClass.hInstance     = window::Win32HInstance;
+	wndClass.lpszClassName = windowClassName;
+	if (!RegisterClassEx(&wndClass))
+	{
+		Fatal("Failed To Register The Window Class.");
+		return false;
+	}
+
+	// Create Window
+
+	const int windowPosX = (GetSystemMetrics(SM_CXSCREEN) - createInfo.Width) / 2;
+	const int windowPosY = (GetSystemMetrics(SM_CYSCREEN) - createInfo.Height) / 2;
+
+	const DWORD dwStyle = WS_OVERLAPPEDWINDOW;
+	const DWORD dwExStyle = 0/*WS_EX_APPWINDOW | WS_EX_WINDOWEDGE*/; // TODO: почему-то клиенская высота больше на 20 чем должно быть (920 вместо 20)
+
+	RECT windowRect = { windowPosX, windowPosY, windowPosX + createInfo.Width, windowPosY + createInfo.Height };
+	AdjustWindowRect(&windowRect, dwStyle, dwExStyle);
+
+	window::Win32WindowHandle = CreateWindowEx(0, windowClassName, createInfo.Title, dwStyle, windowRect.left, windowRect.top, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, window::Win32HInstance, nullptr);
+	if (!window::Win32WindowHandle)
+	{
+		Fatal("CreateWindow() failed:  Cannot create a window.");
+		return false;
+	}
+	ShowWindow(window::Win32WindowHandle, SW_SHOW);
+	UpdateWindow(window::Win32WindowHandle);
+
+	RECT clientRect;
+	GetClientRect(window::Win32WindowHandle, &clientRect);
+	window::WindowClientWidth = clientRect.right - clientRect.left;
+	window::WindowClientHeight = clientRect.bottom - clientRect.top;
+
+	if( !CreateWindowContext(createInfo.Vsync) )
+		return false;
 
 	window::IsWindowRunning = true;
 	return true;
@@ -613,92 +604,6 @@ float GetWindowAspectRatio()
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
-// Render System
-//=============================================================================
-//-----------------------------------------------------------------------------
-#if defined(_DEBUG)
-void openglDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei /*length*/, const GLchar* message, const void* /*userParam*/) noexcept
-{
-	// Ignore non-significant error/warning codes (NVidia drivers)
-	// NOTE: Here there are the details with a sample output:
-	// - #131169 - Framebuffer detailed info: The driver allocated storage for renderbuffer 2. (severity: low)
-	// - #131185 - Buffer detailed info: Buffer object 1 (bound to GL_ELEMENT_ARRAY_BUFFER_ARB, usage hint is GL_ENUM_88e4)
-	//             will use VIDEO memory as the source for buffer object operations. (severity: low)
-	// - #131218 - Program/shader state performance warning: Vertex shader in program 7 is being recompiled based on GL state. (severity: medium)
-	// - #131204 - Texture state usage warning: The texture object (0) bound to texture image unit 0 does not have
-	//             a defined base level and cannot be used for texture mapping. (severity: low)
-	if( (id == 131169) || (id == 131185) || (id == 131218) || (id == 131204) ) return;
-
-	std::string msgSource;
-	switch( source )
-	{
-	case 0x8246/*GL_DEBUG_SOURCE_API*/:             msgSource = "API"; break;
-	case 0x8247/*GL_DEBUG_SOURCE_WINDOW_SYSTEM*/:   msgSource = "WINDOW_SYSTEM"; break;
-	case 0x8248/*GL_DEBUG_SOURCE_SHADER_COMPILER*/: msgSource = "SHADER_COMPILER"; break;
-	case 0x8249/*GL_DEBUG_SOURCE_THIRD_PARTY*/:     msgSource = "THIRD_PARTY"; break;
-	case 0x824A/*GL_DEBUG_SOURCE_APPLICATION*/:     msgSource = "APPLICATION"; break;
-	case 0x824B/*GL_DEBUG_SOURCE_OTHER*/:           msgSource = "OTHER"; break;
-	default: break;
-	}
-
-	std::string msgType;
-	switch( type )
-	{
-	case 0x824C/*GL_DEBUG_TYPE_ERROR*/:               msgType = "ERROR"; break;
-	case 0x824D/*GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR*/: msgType = "DEPRECATED_BEHAVIOR"; break;
-	case 0x824E/*GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR*/:  msgType = "UNDEFINED_BEHAVIOR"; break;
-	case 0x824F/*GL_DEBUG_TYPE_PORTABILITY*/:         msgType = "PORTABILITY"; break;
-	case 0x8250/*GL_DEBUG_TYPE_PERFORMANCE*/:         msgType = "PERFORMANCE"; break;
-	case 0x8268/*GL_DEBUG_TYPE_MARKER*/:              msgType = "MARKER"; break;
-	case 0x8269/*GL_DEBUG_TYPE_PUSH_GROUP*/:          msgType = "PUSH_GROUP"; break;
-	case 0x826A/*GL_DEBUG_TYPE_POP_GROUP*/:           msgType = "POP_GROUP"; break;
-	case 0x8251/*GL_DEBUG_TYPE_OTHER*/:               msgType = "OTHER"; break;
-	default: break;
-	}
-
-	std::string msgSeverity = "DEFAULT";
-	switch( severity )
-	{
-	case 0x9148/*GL_DEBUG_SEVERITY_LOW*/:          msgSeverity = "LOW"; break;
-	case 0x9147/*GL_DEBUG_SEVERITY_MEDIUM*/:       msgSeverity = "MEDIUM"; break;
-	case 0x9146/*GL_DEBUG_SEVERITY_HIGH*/:         msgSeverity = "HIGH"; break;
-	case 0x826B/*GL_DEBUG_SEVERITY_NOTIFICATION*/: msgSeverity = "NOTIFICATION"; break;
-	default: break;
-	}
-
-	LogError("GL: OpenGL debug message: " + std::string(message));
-	LogError("    > Type: " + msgType);
-	LogError("    > Source: " + msgSource);
-	LogError("    > Severity: " + msgSeverity);
-}
-#endif // _DEBUG
-//-----------------------------------------------------------------------------
-void RenderSystemInit()
-{
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glEnable(GL_DEPTH_TEST);
-	glClearDepth(1.0f);
-	glDepthRange(0.0f, 1.0f);
-	glClearColor(0.2f, 0.4f, 0.9f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-}
-//-----------------------------------------------------------------------------
-void RenderSystemBeginFrame()
-{
-	if (render::FramebufferWidth != window::WindowClientWidth || render::FramebufferHeight != window::WindowClientHeight)
-	{
-		render::FramebufferWidth = window::WindowClientWidth;
-		render::FramebufferHeight = window::WindowClientHeight;
-
-		glViewport(0, 0, render::FramebufferWidth, render::FramebufferHeight);
-		glScissor(0, 0, render::FramebufferWidth, render::FramebufferHeight);
-	}
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-}
-//-----------------------------------------------------------------------------
-//=============================================================================
 // App System
 //=============================================================================
 //-----------------------------------------------------------------------------
@@ -714,6 +619,9 @@ bool AppSystemCreate(const AppSystemCreateInfo& createInfo)
 
 	if (!WindowSystemCreate(createInfo.window))
 		return false;
+
+	input::updateMouseVisible();
+	input::updateMousePosition();
 
 	RenderSystemInit();
 
@@ -738,7 +646,7 @@ bool IsAppExitRequested()
 //-----------------------------------------------------------------------------
 void AppSystemBeginFrame()
 {
-	RenderSystemBeginFrame();
+	RenderSystemBeginFrame(window::WindowClientWidth, window::WindowClientHeight);
 }
 //-----------------------------------------------------------------------------
 void AppSystemEndFrame()

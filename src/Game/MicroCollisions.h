@@ -27,10 +27,6 @@ inline Vector3 ClosestPointOnLineSegment(
 
 inline bool CheckPointInTriangle(const Vector3& tri0, const Vector3& tri1, const Vector3& tri2, const Vector3& point);
 
-
-
-
-
 //=============================================================================
 // Impl
 //=============================================================================

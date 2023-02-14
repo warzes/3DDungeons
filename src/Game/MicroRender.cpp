@@ -46,7 +46,19 @@ namespace state
 
 	FrameBuffer* CurrentFrameBuffer = nullptr;
 }
+//-----------------------------------------------------------------------------
+namespace render
+{
+	int FramebufferWidth = 0;
+	int FramebufferHeight = 0;
 
+	Color ClearColor;
+	float PerspectiveFOV = 45.0f;
+	float PerspectiveNear = 0.01f;
+	float PerspectiveFar = 1000.0f;
+	Matrix4 ProjectionMatrix;
+	Matrix4 OrthoMatrix;
+}
 //=============================================================================
 // Core
 //=============================================================================
@@ -916,5 +928,92 @@ bool FrameBuffer::checkFramebuffer()
 	LogError("OpenGL Error = " + strStatus);
 
 	return false;
+}
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//=============================================================================
+// Render System
+//=============================================================================
+//-----------------------------------------------------------------------------
+#if defined(_DEBUG)
+void openglDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei /*length*/, const GLchar* message, const void* /*userParam*/) noexcept
+{
+	// Ignore non-significant error/warning codes (NVidia drivers)
+	// NOTE: Here there are the details with a sample output:
+	// - #131169 - Framebuffer detailed info: The driver allocated storage for renderbuffer 2. (severity: low)
+	// - #131185 - Buffer detailed info: Buffer object 1 (bound to GL_ELEMENT_ARRAY_BUFFER_ARB, usage hint is GL_ENUM_88e4)
+	//             will use VIDEO memory as the source for buffer object operations. (severity: low)
+	// - #131218 - Program/shader state performance warning: Vertex shader in program 7 is being recompiled based on GL state. (severity: medium)
+	// - #131204 - Texture state usage warning: The texture object (0) bound to texture image unit 0 does not have
+	//             a defined base level and cannot be used for texture mapping. (severity: low)
+	if( (id == 131169) || (id == 131185) || (id == 131218) || (id == 131204) ) return;
+
+	std::string msgSource;
+	switch( source )
+	{
+	case 0x8246/*GL_DEBUG_SOURCE_API*/:             msgSource = "API"; break;
+	case 0x8247/*GL_DEBUG_SOURCE_WINDOW_SYSTEM*/:   msgSource = "WINDOW_SYSTEM"; break;
+	case 0x8248/*GL_DEBUG_SOURCE_SHADER_COMPILER*/: msgSource = "SHADER_COMPILER"; break;
+	case 0x8249/*GL_DEBUG_SOURCE_THIRD_PARTY*/:     msgSource = "THIRD_PARTY"; break;
+	case 0x824A/*GL_DEBUG_SOURCE_APPLICATION*/:     msgSource = "APPLICATION"; break;
+	case 0x824B/*GL_DEBUG_SOURCE_OTHER*/:           msgSource = "OTHER"; break;
+	default: break;
+	}
+
+	std::string msgType;
+	switch( type )
+	{
+	case 0x824C/*GL_DEBUG_TYPE_ERROR*/:               msgType = "ERROR"; break;
+	case 0x824D/*GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR*/: msgType = "DEPRECATED_BEHAVIOR"; break;
+	case 0x824E/*GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR*/:  msgType = "UNDEFINED_BEHAVIOR"; break;
+	case 0x824F/*GL_DEBUG_TYPE_PORTABILITY*/:         msgType = "PORTABILITY"; break;
+	case 0x8250/*GL_DEBUG_TYPE_PERFORMANCE*/:         msgType = "PERFORMANCE"; break;
+	case 0x8268/*GL_DEBUG_TYPE_MARKER*/:              msgType = "MARKER"; break;
+	case 0x8269/*GL_DEBUG_TYPE_PUSH_GROUP*/:          msgType = "PUSH_GROUP"; break;
+	case 0x826A/*GL_DEBUG_TYPE_POP_GROUP*/:           msgType = "POP_GROUP"; break;
+	case 0x8251/*GL_DEBUG_TYPE_OTHER*/:               msgType = "OTHER"; break;
+	default: break;
+	}
+
+	std::string msgSeverity = "DEFAULT";
+	switch( severity )
+	{
+	case 0x9148/*GL_DEBUG_SEVERITY_LOW*/:          msgSeverity = "LOW"; break;
+	case 0x9147/*GL_DEBUG_SEVERITY_MEDIUM*/:       msgSeverity = "MEDIUM"; break;
+	case 0x9146/*GL_DEBUG_SEVERITY_HIGH*/:         msgSeverity = "HIGH"; break;
+	case 0x826B/*GL_DEBUG_SEVERITY_NOTIFICATION*/: msgSeverity = "NOTIFICATION"; break;
+	default: break;
+	}
+
+	LogError("GL: OpenGL debug message: " + std::string(message));
+	LogError("    > Type: " + msgType);
+	LogError("    > Source: " + msgSource);
+	LogError("    > Severity: " + msgSeverity);
+}
+#endif // _DEBUG
+//-----------------------------------------------------------------------------
+void RenderSystemInit()
+{
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glEnable(GL_DEPTH_TEST);
+	glClearDepth(1.0f);
+	glDepthRange(0.0f, 1.0f);
+	glClearColor(0.2f, 0.4f, 0.9f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+//-----------------------------------------------------------------------------
+void RenderSystemBeginFrame(int WindowClientWidth, int WindowClientHeight)
+{
+	if( render::FramebufferWidth != WindowClientWidth || render::FramebufferHeight != WindowClientHeight )
+	{
+		render::FramebufferWidth = WindowClientWidth;
+		render::FramebufferHeight = WindowClientHeight;
+
+		glViewport(0, 0, render::FramebufferWidth, render::FramebufferHeight);
+		glScissor(0, 0, render::FramebufferWidth, render::FramebufferHeight);
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 //-----------------------------------------------------------------------------
