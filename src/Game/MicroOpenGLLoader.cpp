@@ -60,6 +60,7 @@ PFNGLUNIFORM3FVPROC glUniform3fv = nullptr;
 PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv = nullptr;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv = nullptr;
 PFNGLUSEPROGRAMPROC glUseProgram = nullptr;
+PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor = nullptr;
 PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer = nullptr;
 
 //-----------------------------------------------------------------------------
@@ -108,6 +109,7 @@ void OpenGLInit(OpenGLGetProcAddressFunc func)
 	glUniformMatrix3fv = (PFNGLUNIFORMMATRIX3FVPROC)func("glUniformMatrix3fv");
 	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)func("glUniformMatrix4fv");
 	glUseProgram = (PFNGLUSEPROGRAMPROC)func("glUseProgram");
+	glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)func("glVertexAttribDivisor");
 	glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)func("glVertexAttribPointer");
 }
 //-----------------------------------------------------------------------------

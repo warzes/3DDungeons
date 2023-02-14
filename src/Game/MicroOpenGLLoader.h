@@ -93,6 +93,7 @@ typedef int GLintptr;
 #define GL_FRAMEBUFFER_UNDEFINED 0x8219
 #define GL_FRAMEBUFFER_UNSUPPORTED 0x8CDD
 #define GL_FRONT_AND_BACK 0x0408
+#define GL_GEOMETRY_SHADER 0x8DD9
 #define GL_GREEN 0x1904
 #define GL_INFO_LOG_LENGTH 0x8B84
 #define GL_LEQUAL 0x0203
@@ -141,6 +142,7 @@ typedef int GLintptr;
 #define GL_UNSIGNED_INT 0x1405
 #define GL_UNSIGNED_SHORT 0x1403
 #define GL_VERTEX_SHADER 0x8B31
+#define GL_VIEWPORT 0x0BA2
 
 // OpenGL32.lib
 #ifdef __cplusplus
@@ -216,6 +218,7 @@ typedef void (GLAPIENTRY* PFNGLUNIFORM3FVPROC)(GLint location, GLsizei count, co
 typedef void (GLAPIENTRY* PFNGLUNIFORMMATRIX3FVPROC)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
 typedef void (GLAPIENTRY* PFNGLUNIFORMMATRIX4FVPROC)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
 typedef void (GLAPIENTRY* PFNGLUSEPROGRAMPROC)(GLuint program);
+typedef void (GLAPIENTRY* PFNGLVERTEXATTRIBDIVISORPROC)(GLuint index, GLuint divisor);
 typedef void (GLAPIENTRY* PFNGLVERTEXATTRIBPOINTERPROC)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer);
 
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
@@ -261,6 +264,7 @@ extern PFNGLUNIFORM3FVPROC glUniform3fv;
 extern PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
 extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 extern PFNGLUSEPROGRAMPROC glUseProgram;
+extern PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 
 //=============================================================================
