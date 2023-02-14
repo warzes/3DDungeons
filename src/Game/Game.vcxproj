@@ -212,6 +212,7 @@
     <ClInclude Include="X_CurrentTest.h" />
     <ClInclude Include="X_Debug.h" />
     <ClInclude Include="X_TestFPS.h" />
+    <ClInclude Include="X_WIP.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MicroCollisions.inl" />

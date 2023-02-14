@@ -96,6 +96,9 @@
     <ClInclude Include="TempList.h">
       <Filter>MicroEngine\TempCollisions1\util</Filter>
     </ClInclude>
+    <ClInclude Include="X_WIP.h">
+      <Filter>ExampleDemo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

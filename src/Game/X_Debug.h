@@ -5,16 +5,6 @@ FlyingCamera cam;
 void ExampleInit()
 {
 	cam.Look({ 0.0f, 3.0f, -6.0f }, { 0.0f, 0.0f, 0.0f });
-
-	// set viewport etc
-	//glViewport(0, 0, width, height);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glCullFace(GL_BACK);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
 void ExampleClose()

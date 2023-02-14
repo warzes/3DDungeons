@@ -10,8 +10,9 @@
 #define EXAMPLE_03_OBJMODEL 0
 
 #define EXAMPLE_X_TEMP 0
-#define EXAMPLE_X_DEBUG 1
+#define EXAMPLE_X_DEBUG 0
 #define EXAMPLE_X_TESTFPS 0
+#define EXAMPLE_X_WIP 1
 
 #if EXAMPLE_01_TRIANGLE
 #	include "01_Triangle.h"
@@ -35,6 +36,10 @@
 
 #if EXAMPLE_X_TESTFPS
 #	include "X_TestFPS.h"
+#endif
+
+#if EXAMPLE_X_WIP
+#	include "X_WIP.h"
 #endif
 
 //=============================================================================
