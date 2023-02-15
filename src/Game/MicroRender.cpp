@@ -533,6 +533,17 @@ void VertexArrayBuffer::Draw(PrimitiveDraw primitive)
 	}
 }
 //-----------------------------------------------------------------------------
+void VertexArrayBuffer::DrawNoCache(PrimitiveDraw primitive)
+{
+	state::CurrentVAO = 0;
+	state::CurrentVBO = 0;
+	state::CurrentIBO = 0;
+	Draw(primitive);
+	state::CurrentVAO = 0;
+	state::CurrentVBO = 0;
+	state::CurrentIBO = 0;
+}
+//-----------------------------------------------------------------------------
 //=============================================================================
 // Texture 2D
 //=============================================================================
@@ -714,6 +725,13 @@ void Texture2D::Bind(unsigned slot) const
 {
 	if (state::CurrentTexture2D[slot] == m_id) return;
 	state::CurrentTexture2D[slot] = m_id;
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(GL_TEXTURE_2D, m_id);
+}
+//-----------------------------------------------------------------------------
+void Texture2D::BindUnCache(unsigned slot) const
+{
+	state::CurrentTexture2D[slot] = 0;
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_id);
 }

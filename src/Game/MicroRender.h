@@ -254,6 +254,7 @@ public:
 	static void UnBind();
 
 	void Draw(PrimitiveDraw primitive = PrimitiveDraw::Triangles);
+	void DrawNoCache(PrimitiveDraw primitive = PrimitiveDraw::Triangles);
 
 	[[nodiscard]] bool IsValid() const { return m_id > 0; }
 
@@ -339,6 +340,7 @@ public:
 	void Destroy();
 
 	void Bind(unsigned slot = 0) const;
+	void BindUnCache(unsigned slot = 0) const;
 
 	static void UnBind(unsigned slot = 0);
 	static void UnBindAll();
