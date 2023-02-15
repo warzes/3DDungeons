@@ -177,14 +177,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CollisionTemp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MicroAdvance.cpp" />
     <ClCompile Include="MicroEngine.cpp" />
     <ClCompile Include="MicroGraphics.cpp" />
     <ClCompile Include="MicroOpenGLLoader.cpp" />
     <ClCompile Include="MicroRender.cpp" />
-    <ClCompile Include="Octree.cpp" />
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -192,7 +190,6 @@
     <ClInclude Include="02_QuadTexture.h" />
     <ClInclude Include="03_ObjModel.h" />
     <ClInclude Include="AppConfig.h" />
-    <ClInclude Include="CollisionTemp.h" />
     <ClInclude Include="DCGameApp.h" />
     <ClInclude Include="MicroAdvance.h" />
     <ClInclude Include="MicroCollisions.h" />
@@ -202,17 +199,11 @@
     <ClInclude Include="MicroMath.h" />
     <ClInclude Include="MicroOpenGLLoader.h" />
     <ClInclude Include="MicroRender.h" />
-    <ClInclude Include="Octree.h" />
-    <ClInclude Include="TempCollisions2.h" />
-    <ClInclude Include="TempCubeVertices.h" />
-    <ClInclude Include="TempMath1.h" />
-    <ClInclude Include="TempList.h" />
     <ClInclude Include="TempPhysics.h" />
     <ClInclude Include="UnitTestMath.h" />
     <ClInclude Include="X_CurrentTest.h" />
     <ClInclude Include="X_Debug.h" />
     <ClInclude Include="X_TestFPS.h" />
-    <ClInclude Include="X_WIP.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MicroCollisions.inl" />
