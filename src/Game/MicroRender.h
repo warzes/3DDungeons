@@ -156,6 +156,7 @@ public:
 	void Destroy();
 
 	void Bind() const;
+
 	static void UnBind();
 
 	[[nodiscard]] int GetUniformLocation(const char* name) const;
@@ -291,8 +292,9 @@ enum class TextureWrapping
 {
 	Repeat,
 	MirroredRepeat,
+	Clamp,
 	ClampToEdge,
-	ClampToBorder,
+	ClampToBorder
 };
 
 enum class TexelsFormat
@@ -302,6 +304,7 @@ enum class TexelsFormat
 	RG_U8,
 	RGB_U8,
 	RGBA_U8,
+	RGBA_UINT8888Rev, // GL_UNSIGNED_INT_8_8_8_8_REV
 	Depth_U16,
 	DepthStencil_U16,
 	Depth_U24,
@@ -341,9 +344,11 @@ public:
 
 	void Bind(unsigned slot = 0) const;
 	void BindUnCache(unsigned slot = 0) const;
-
+	
 	static void UnBind(unsigned slot = 0);
 	static void UnBindAll();
+
+	void SetData(uint8_t* pixelData);
 
 	unsigned GetWidth() const { return m_width; }
 	unsigned GetHeight() const { return m_height; }
@@ -358,6 +363,7 @@ private:
 	unsigned m_id = 0;
 	unsigned m_width = 0;
 	unsigned m_height = 0;
+	TexelsFormat m_format = TexelsFormat::RGBA_U8;
 };
 
 //=============================================================================

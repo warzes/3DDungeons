@@ -91,6 +91,7 @@ inline GLint translateToGL(TextureWrapping wrap)
 	{
 	case TextureWrapping::Repeat:         return GL_REPEAT;
 	case TextureWrapping::MirroredRepeat: return GL_MIRRORED_REPEAT;
+	case TextureWrapping::Clamp:          return GL_CLAMP;
 	case TextureWrapping::ClampToEdge:    return GL_CLAMP_TO_EDGE;
 	case TextureWrapping::ClampToBorder:  return GL_CLAMP_TO_BORDER;
 	}
@@ -576,6 +577,12 @@ inline bool getTextureFormatType(TexelsFormat inFormat, GLenum textureType, GLen
 		internalFormat = GL_RGBA8;
 		oglType = GL_UNSIGNED_BYTE;
 	}
+	else if (inFormat == TexelsFormat::RGBA_UINT8888Rev )
+	{
+		format = GL_RGBA;
+		internalFormat = GL_RGBA;
+		oglType = GL_UNSIGNED_INT_8_8_8_8_REV;
+	}
 	else if (inFormat == TexelsFormat::Depth_U16)
 	{
 		format = GL_DEPTH_COMPONENT;
@@ -691,12 +698,14 @@ bool Texture2D::Create(const Texture2DCreateInfo& createInfo, const Texture2DInf
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, translateToGL(textureInfo.magFilter));
 
 	// set texture format
+	m_format = createInfo.format;
 	GLenum format = GL_RGB;
 	GLint internalFormat = GL_RGB;
 	GLenum oglType = GL_UNSIGNED_BYTE;
 	getTextureFormatType(createInfo.format, GL_TEXTURE_2D, format, internalFormat, oglType);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, (GLsizei)m_width, (GLsizei)m_height, 0, format, oglType, createInfo.pixelData);
+
 	if (textureInfo.mipmap)
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -747,6 +756,21 @@ void Texture2D::UnBindAll()
 {
 	for (unsigned i = 0; i < MaxBindingTextures; i++)
 		UnBind(i);
+}
+//-----------------------------------------------------------------------------
+void Texture2D::SetData(uint8_t* pixelData)
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_id);
+
+	GLenum format = GL_RGB;
+	GLint internalFormat = GL_RGB;
+	GLenum oglType = GL_UNSIGNED_BYTE;
+	getTextureFormatType(m_format, GL_TEXTURE_2D, format, internalFormat, oglType);
+
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, format, oglType, pixelData);
+
+	glBindTexture(GL_TEXTURE_2D, state::CurrentTexture2D[0]);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
