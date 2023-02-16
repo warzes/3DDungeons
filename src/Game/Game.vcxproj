@@ -177,6 +177,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DCGameApp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MicroAdvance.cpp" />
     <ClCompile Include="MicroEngine.cpp" />

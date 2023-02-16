@@ -2,17 +2,19 @@
 
 #define START_UNIT_TEST 1
 
-//=============================================================================
-#define START_EXAMPLE 1
+#define START_EXAMPLE 0
+#define START_GAME 1
 
-#define EXAMPLE_01_TRIANGLE 0
+//=============================================================================
+#if START_EXAMPLE
+
+#define EXAMPLE_01_TRIANGLE 1
 #define EXAMPLE_02_QUADTTEXTURE 0
 #define EXAMPLE_03_OBJMODEL 0
 
 #define EXAMPLE_X_TEMP 0
 #define EXAMPLE_X_DEBUG 0
 #define EXAMPLE_X_TESTFPS 0
-#define EXAMPLE_X_WIP 1
 
 #if EXAMPLE_01_TRIANGLE
 #	include "01_Triangle.h"
@@ -38,15 +40,14 @@
 #	include "X_TestFPS.h"
 #endif
 
-#if EXAMPLE_X_WIP
-#	include "X_WIP.h"
-#endif
+#endif // START_EXAMPLE
 
 //=============================================================================
-#define START_GAME 0
+#if START_GAME
 
-#define GAME_01_DUNGEONCRAWLER 0
+#define GAME_01_DUNGEONCRAWLER 1
 
 #if GAME_01_DUNGEONCRAWLER
 #	include "DCGameApp.h"
 #endif
+#endif // START_GAME

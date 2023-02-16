@@ -18,6 +18,9 @@
     <ClCompile Include="MicroOpenGLLoader.cpp">
       <Filter>MicroEngine\utils</Filter>
     </ClCompile>
+    <ClCompile Include="DCGameApp.cpp">
+      <Filter>SimpleGame\DungeonCrawler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
