@@ -628,11 +628,15 @@ bool AppSystemCreate(const AppSystemCreateInfo& createInfo)
 	if (!DebugDraw::Init())
 		return false;
 
+	if( !DebugText::Init() )
+		return false;
+
 	return !IsAppExitRequested();
 }
 //-----------------------------------------------------------------------------
 void AppSystemDestroy()
 {
+	DebugText::Close();
 	DebugDraw::Close();
 	ResourceCacheSystem::Clear();
 	WindowSystemDestroy();

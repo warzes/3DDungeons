@@ -1,7 +1,7 @@
 #include "DCGameApp.h"
 
-https://www.youtube.com/watch?v=Vr-Fsd6M5Tk
-https://www.youtube.com/watch?v=VjuyfBaryu8&t=3s
+//https://www.youtube.com/watch?v=Vr-Fsd6M5Tk
+//https://www.youtube.com/watch?v=VjuyfBaryu8&t=3s
 
 //вынести в отдельный проект
 //
@@ -19,7 +19,7 @@ https://www.youtube.com/watch?v=VjuyfBaryu8&t=3s
 //столкновения такие - при движении проверяем высоту клетки, если шаг допустим - подымаемся (с модом высоты) или стопоримся
 //позже продумать скаты и спуски. Честная коллизия не нужна
 //
-//текстуры для старта взять отсюда - https ://forum.zdoom.org/viewtopic.php?t=63994
+//текстуры для старта взять отсюда - https://forum.zdoom.org/viewtopic.php?t=63994
 
 constexpr const char* vertexShaderText = R"(
 #version 330 core
@@ -146,4 +146,10 @@ void GameAppFrame()
 	DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, { -10.0f, 2.0f, 5.0f }, RED);
 
 	DebugDraw::Flush(perpective * view);
+
+	DebugText::Begin();
+	DebugText::SetForeground({ 255, 255, 0, 255 });
+	DebugText::SetBackground({ 100, 120, 255, 255 });
+	DebugText::Print(1, 1, "Hello");
+	DebugText::Flush();
 }

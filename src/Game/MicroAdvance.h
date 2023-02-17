@@ -97,3 +97,19 @@ namespace DebugDraw
 	bool Init();
 	void Close();
 } // DebugDraw
+
+//=============================================================================
+// Debug Text (only ASCII)
+//=============================================================================
+namespace DebugText
+{
+	void SetForeground(const Color& color);
+	void SetBackground(const Color& color);
+	void Print(int x, int y, const char* str);
+
+	void Begin();
+	void Flush();
+
+	bool Init();
+	void Close();
+}
