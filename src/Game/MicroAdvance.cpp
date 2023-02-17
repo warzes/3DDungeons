@@ -1188,7 +1188,6 @@ void main()
 	if( !debugTextTexture.Create(createInfo, texInfo) )
 		return false;
 
-	// set up vao, vbo etc
 	float w = DEBUG_WIDTH;
 	float h = DEBUG_HEIGHT;
 	float u0 = 0.0f, v0 = 0.0f;
@@ -1208,12 +1207,10 @@ void main()
 	if( !debugTextVao.Create(&debugTextVbo, nullptr, &debugTextShader) )
 		return false;
 
-	// calculate vga data len
 	debugTextlen = DEBUG_FONT_WIDTH * DEBUG_FONT_HEIGHT;
 	debugTextlen *= DEBUG_WIDTH * DEBUG_HEIGHT;
 
-	// malloc a large buffer for the pixel data
-	debugTextData = (uint32_t*)malloc(sizeof(uint32_t) * debugTextlen);
+	debugTextData = new uint32_t[debugTextlen];
 	memset(debugTextData, 0, sizeof(uint32_t) * debugTextlen);
 
 	return true;
@@ -1223,7 +1220,7 @@ void DebugText::Close()
 {
 	if( debugTextData )
 	{
-		delete debugTextData;
+		delete[] debugTextData;
 		debugTextData = nullptr;
 
 		debugTextVbo.Destroy();
