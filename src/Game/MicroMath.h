@@ -281,7 +281,6 @@ inline Vector3 Slide(const Vector3& v, const Vector3& normal);
 inline Vector3 Bezier3(const Vector3& v0, const Vector3& v1, const Vector3& v2, float f);
 inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3, float f);
 
-
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept;
 inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept;
 
@@ -441,6 +440,12 @@ public:
 	// Returns roll value of euler angles expressed in radians.
 	float RollAngle() const;
 
+	// Build a quaternion from an angle and a normalized axis.
+	static Quaternion AngleAxis(float angle, const Vector3& axis);
+	static Quaternion FromEuler(const Vector3& euler);
+	static Quaternion ToQuaternion(const Matrix3& m);
+	static Quaternion ToQuaternion(const Matrix4& m);
+
 	float w = 1.0f;
 	float x = 0.0f;
 	float y = 0.0f;
@@ -449,9 +454,6 @@ public:
 
 inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon = EPSILON) noexcept;
 
-inline Quaternion CastToQuaternion(const Matrix3& m);
-inline Quaternion CastToQuaternion(const Matrix4& m);
-
 inline float DotProduct(const Quaternion& q1, const Quaternion& q2);
 inline Quaternion CrossProduct(const Quaternion& q1, const Quaternion& q2);
 inline Quaternion CrossProduct(const Quaternion& q, const Vector3& v);
@@ -459,8 +461,6 @@ inline Quaternion CrossProduct(const Vector3& v, const Quaternion& q);
 
 // Rotates a quaternion from a vector of 3 components axis and an angle.
 inline Quaternion Rotate(const Quaternion& q, float angle, const Vector3& axis);
-// Build a quaternion from an angle and a normalized axis.
-inline Quaternion AngleAxis(float angle, const Vector3& axis);
 
 // Build a look at quaternion based on the default handedness. Left-handed look at quaternion.
 inline Quaternion QuatLookAt(const Vector3& direction, const Vector3& up);
@@ -598,6 +598,8 @@ public:
 	Matrix4 Inverse() const;
 	Matrix4 Transpose() const;
 
+	Vector3 TransformPoint(const Vector3& pos) const;
+
 	// http://www.opensource.apple.com/source/WebCore/WebCore-514/platform/graphics/transforms/TransformationMatrix.cpp
 	// Decomposes the mode matrix to translations,rotation scale components
 	bool Decompose(Vector3& scale, Quaternion& orientation, Vector3& translation, Vector3& skew, Vector4& perspective);
@@ -679,6 +681,26 @@ inline Matrix4& operator*=(Matrix4& Left, float Right) noexcept;
 inline Matrix4& operator*=(Matrix4& Left, const Matrix4& Right) noexcept;
 inline Matrix4& operator/=(Matrix4& Left, float Right) noexcept;
 inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept;
+
+//=============================================================================
+// Transform
+//=============================================================================
+class Transform
+{
+public:
+	Transform() = default;
+	Transform(const Vector3& pos, const Quaternion& rot, float _scale) : position(pos), rotate(rot), scale(_scale) {}
+
+	Transform Inverted() const;
+
+	Vector3 ToTransform(const Vector3& value) const;
+
+	Vector3 position;
+	Quaternion rotate;
+	float scale = 1.0f;
+};
+
+inline Transform operator*(const Transform& Left, const Transform& Right) noexcept;
 
 //=============================================================================
 // Impl

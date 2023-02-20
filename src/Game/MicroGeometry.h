@@ -62,6 +62,51 @@ public:
 };
 
 //=============================================================================
+// Sphere
+//=============================================================================
+class Sphere
+{
+public:
+	Sphere() = default;
+	Sphere(const Vector3& point, float _radius) : position(point), radius(_radius) {}
+
+	Vector3 position;
+	float radius = 0.0f;
+};
+
+//=============================================================================
+// AABB
+//=============================================================================
+class AABB
+{
+public:
+	AABB() = default;
+	AABB(const Vector3& _min, const Vector3& _max) : min(_min), max(_max) {}
+
+	void Merge(const AABB& rhs);
+	void AddPoint(const Vector3& point);
+	bool Overlaps(const AABB& aabb) const;
+	bool Contains(const Vector3& point) const;
+	void ToTransform(const Matrix4& matrix);
+	void Translate(const Vector3& v);
+	void GetCorners(const Transform& tr, Vector3* points) const;
+	void GetCorners(const Matrix4& matrix, Vector3* points) const;
+	static Vector3 MinCoords(const Vector3& a, const Vector3& b);
+	static Vector3 MaxCoords(const Vector3& a, const Vector3& b);
+	void Shrink(float x);
+	AABB Intersection(const AABB& rhs) const;
+	AABB operator*(float scale) { return { min * scale, max * scale }; }
+
+	Vector3 min;
+	Vector3 max;
+};
+
+//=============================================================================
+// Frustum
+//=============================================================================
+
+
+//=============================================================================
 // Plane
 //=============================================================================
 class Plane

@@ -95,6 +95,8 @@ void GameAppInit()
 	texture.Create("../data/textures/tile.png");
 
 	// create custom model
+
+	рисовать стены и пол отдельными мешами
 	{
 		std::vector<Mesh> meshData(1);
 #if 0

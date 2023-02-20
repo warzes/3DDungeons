@@ -609,12 +609,12 @@ inline Quaternion::Quaternion(const Vector3& eulerAngle)
 
 inline Quaternion::Quaternion(const Matrix3& m)
 {
-	*this = CastToQuaternion(m);
+	*this = Quaternion::ToQuaternion(m);
 }
 
 inline Quaternion::Quaternion(const Matrix4& m)
 {
-	*this = CastToQuaternion(m);
+	*this = Quaternion::ToQuaternion(m);
 }
 
 inline Quaternion::operator Matrix3() const
@@ -678,24 +678,95 @@ inline float Quaternion::YawAngle() const
 inline float Quaternion::PitchAngle() const
 {
 	//return (atan(2 * (y * z + w * x), w * w - x * x - y * y + z * z));
-	const float y = 2.0f * (y * z + w * x);
-	const float x = w * w - x * x - y * y + z * z;
+	const float _y = 2.0f * (y * z + w * x);
+	const float _x = w * w - x * x - y * y + z * z;
 
-	if (Equals(Vector2(x, y), Vector2(0.0f), std::numeric_limits<float>::epsilon())) //avoid atan2(0,0) - handle singularity - Matiis
+	if (Equals(Vector2(_x, _y), Vector2(0.0f), std::numeric_limits<float>::epsilon())) //avoid atan2(0,0) - handle singularity - Matiis
 		return 2.0f * atan2(x, w);
 
-	return atan2(y, x);
+	return atan2(_y, _x);
 }
 
 inline float Quaternion::RollAngle() const
 {
-	const float y = 2.0f * (x * y + w * z);
-	const float x = w * w + x * x - y * y - z * z;
+	const float _y = 2.0f * (x * y + w * z);
+	const float _x = w * w + x * x - y * y - z * z;
 
-	if (Equals(Vector2(x, y), Vector2(0.0f), std::numeric_limits<float>::epsilon())) //avoid atan2(0,0) - handle singularity - Matiis
+	if (Equals(Vector2(_x, _y), Vector2(0.0f), std::numeric_limits<float>::epsilon())) //avoid atan2(0,0) - handle singularity - Matiis
 		return 0.0f;
 
-	return atan2(y, x);
+	return atan2(_y, _x);
+}
+
+inline Quaternion Quaternion::AngleAxis(float angle, const Vector3& axis)
+{
+	const float halfAngle = angle * 0.5f;
+	const float Sin = sinf(halfAngle);
+	return Quaternion(cosf(halfAngle), axis.x * Sin, axis.y * Sin, axis.z * Sin);
+}
+
+inline Quaternion Quaternion::FromEuler(const Vector3 & euler)
+{
+	const float ex = euler.x * 0.5f;
+	const float ey = euler.y * 0.5f;
+	const float ez = euler.z * 0.5f;
+	const float sinX = sinf(ex);
+	const float cosX = cosf(ex);
+	const float sinY = sinf(ey);
+	const float cosY = cosf(ey);
+	const float sinZ = sinf(ez);
+	const float cosZ = cosf(ez);
+	Quaternion q;
+	q.w = cosY * cosX * cosZ + sinY * sinX * sinZ;
+	q.x = cosY * sinX * cosZ + sinY * cosX * sinZ;
+	q.y = sinY * cosX * cosZ - cosY * sinX * sinZ;
+	q.z = cosY * cosX * sinZ - sinY * sinX * cosZ;
+	return q;
+}
+
+inline Quaternion Quaternion::ToQuaternion(const Matrix3& m)
+{
+	const float fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
+	const float fourYSquaredMinus1 = m[1][1] - m[0][0] - m[2][2];
+	const float fourZSquaredMinus1 = m[2][2] - m[0][0] - m[1][1];
+	const float fourWSquaredMinus1 = m[0][0] + m[1][1] + m[2][2];
+
+	int biggestIndex = 0;
+	float fourBiggestSquaredMinus1 = fourWSquaredMinus1;
+	if( fourXSquaredMinus1 > fourBiggestSquaredMinus1 )
+	{
+		fourBiggestSquaredMinus1 = fourXSquaredMinus1;
+		biggestIndex = 1;
+	}
+	if( fourYSquaredMinus1 > fourBiggestSquaredMinus1 )
+	{
+		fourBiggestSquaredMinus1 = fourYSquaredMinus1;
+		biggestIndex = 2;
+	}
+	if( fourZSquaredMinus1 > fourBiggestSquaredMinus1 )
+	{
+		fourBiggestSquaredMinus1 = fourZSquaredMinus1;
+		biggestIndex = 3;
+	}
+
+	const float biggestVal = sqrtf(fourBiggestSquaredMinus1 + 1.0f) * 0.5f;
+	const float mult = 0.25f / biggestVal;
+
+	switch( biggestIndex )
+	{
+	case 0: return { biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult };
+	case 1: return { (m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult };
+	case 2: return { (m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult };
+	case 3: return { (m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal };
+	default:
+		assert(false);
+		return Quaternion::Identity;
+	}
+}
+
+inline Quaternion Quaternion::ToQuaternion(const Matrix4& m)
+{
+	return ToQuaternion(Matrix3(m));
 }
 
 inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) noexcept
@@ -705,51 +776,6 @@ inline bool Equals(const Quaternion& v1, const Quaternion& v2, float epsilon) no
 		&& ::Equals(v1.x, v2.x, epsilon)
 		&& ::Equals(v1.y, v2.y, epsilon)
 		&& ::Equals(v1.z, v2.z, epsilon);
-}
-
-inline Quaternion CastToQuaternion(const Matrix3& m)
-{
-	const float fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
-	const float fourYSquaredMinus1 = m[1][1] - m[0][0] - m[2][2];
-	const float fourZSquaredMinus1 = m[2][2] - m[0][0] - m[1][1];
-	const float fourWSquaredMinus1 = m[0][0] + m[1][1] + m[2][2];
-
-	int biggestIndex = 0;
-	float fourBiggestSquaredMinus1 = fourWSquaredMinus1;
-	if (fourXSquaredMinus1 > fourBiggestSquaredMinus1)
-	{
-		fourBiggestSquaredMinus1 = fourXSquaredMinus1;
-		biggestIndex = 1;
-	}
-	if (fourYSquaredMinus1 > fourBiggestSquaredMinus1)
-	{
-		fourBiggestSquaredMinus1 = fourYSquaredMinus1;
-		biggestIndex = 2;
-	}
-	if (fourZSquaredMinus1 > fourBiggestSquaredMinus1)
-	{
-		fourBiggestSquaredMinus1 = fourZSquaredMinus1;
-		biggestIndex = 3;
-	}
-
-	const float biggestVal = sqrtf(fourBiggestSquaredMinus1 + 1.0f) * 0.5f;
-	const float mult = 0.25f / biggestVal;
-
-	switch (biggestIndex)
-	{
-	case 0: return {biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
-	case 1: return {(m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult};
-	case 2: return {(m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult};
-	case 3: return {(m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal};
-	default:
-		assert(false);
-		return Quaternion::Identity;
-	}
-}
-
-inline Quaternion CastToQuaternion(const Matrix4& m)
-{
-	return CastToQuaternion(Matrix3(m));
 }
 
 inline float DotProduct(const Quaternion& q1, const Quaternion& q2) { return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z; }
@@ -788,15 +814,8 @@ inline Quaternion Rotate(const Quaternion& q, float angle, const Vector3& axis)
 	}
 
 	const float halfAndgle = angle * 0.5f;
-	const float Sin = sin(halfAndgle);
+	const float Sin = sinf(halfAndgle);
 	return q * Quaternion(cos(halfAndgle), tmp.x * Sin, tmp.y * Sin, tmp.z * Sin);
-}
-
-inline Quaternion AngleAxis(float angle, const Vector3& axis)
-{
-	const float halfAndgle = angle * 0.5f;
-	const float Sin = sin(halfAndgle);
-	return Quaternion(cos(halfAndgle), axis * Sin);
 }
 
 inline Quaternion QuatLookAt(const Vector3& direction, const Vector3& up)
@@ -807,7 +826,7 @@ inline Quaternion QuatLookAt(const Vector3& direction, const Vector3& up)
 	Result[0] = Right * 1.0f / sqrt(Max(0.00001f, DotProduct(Right, Right)));
 	Result[1] = CrossProduct(Result[2], Result[0]);
 
-	return CastToQuaternion(Result);
+	return Quaternion::ToQuaternion(Result);
 }
 
 inline Quaternion Mix(const Quaternion& x, const Quaternion& y, float a)
@@ -1271,6 +1290,14 @@ inline Matrix4 Matrix4::Transpose() const
 	return Result;
 }
 
+inline Vector3 Matrix4::TransformPoint(const Vector3& pos) const
+{
+	return Vector3(
+		value[0].x * pos.x + value[1].x * pos.y + value[2].x * pos.z + value[3].x,
+		value[0].y * pos.x + value[1].y * pos.y + value[2].y * pos.z + value[3].y,
+		value[0].z * pos.x + value[1].z * pos.y + value[2].z * pos.z + value[3].z);
+}
+
 inline bool Matrix4::Decompose(Vector3& scale, Quaternion& orientation, Vector3& translation, Vector3& skew, Vector4& perspective)
 {
 	Matrix4 LocalMatrix(*this);
@@ -1572,7 +1599,7 @@ inline Matrix4 Matrix4::Perspective(float fovy, float aspect, float zNear, float
 {
 	assert(abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
 
-	const float tanHalfFovy = tan(fovy / 2.0f);
+	const float tanHalfFovy = tan(fovy * 0.5f);
 
 	Matrix4 Result = Matrix4::Zero;
 	Result[0][0] = 1.0f / (aspect * tanHalfFovy);
@@ -1690,7 +1717,7 @@ inline Matrix4 Matrix4::PickMatrix(const Vector2& center, const Vector2& delta, 
 
 inline Matrix4 CastToMatrix4(const Quaternion& q)
 {
-	return Matrix4(Matrix3(q));
+	return Matrix4(CastToMatrix3(q));
 }
 
 inline bool operator==(const Matrix4& Left, const Matrix4& Right) noexcept
@@ -1792,3 +1819,29 @@ inline Matrix4& operator*=(Matrix4& Left, float Right) noexcept { return Left = 
 inline Matrix4& operator*=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right; }
 inline Matrix4& operator/=(Matrix4& Left, float Right) noexcept { return Left = Left / Right; }
 inline Matrix4& operator/=(Matrix4& Left, const Matrix4& Right) noexcept { return Left = Left * Right.Inverse(); }
+
+//=============================================================================
+// Transform
+//=============================================================================
+
+inline Transform Transform::Inverted() const
+{
+	Transform result;
+	result.rotate = rotate.Conjugate();
+	result.position = result.rotate * (-position / scale); // rotate
+	result.scale = 1.0f / scale;
+	return result;
+}
+
+inline Vector3 Transform::ToTransform(const Vector3 & value) const
+{
+	return position + (rotate*value) * scale;
+}
+
+inline Transform operator*(const Transform& Left, const Transform& Right) noexcept
+{
+	return { 
+		Left.rotate * (Right.position * Left.scale) + Left.position,
+		Left.rotate * Right.rotate,
+		Left.scale * Right.scale };
+}
