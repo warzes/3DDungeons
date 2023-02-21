@@ -2,7 +2,6 @@
 
 #include "MicroEngine.h"
 
-
-void GameAppInit();
+bool GameAppInit();
 void GameAppClose();
 void GameAppFrame();

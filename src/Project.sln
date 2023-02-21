@@ -7,8 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game\Game.vcxproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{088018CB-1A93-45FE-9858-D1E2977390ED}"
 	ProjectSection(SolutionItems) = preProject
-		docMath.md = docMath.md
 		..\README.md = ..\README.md
+		doc.md = doc.md
 		ref.md = ref.md
 		TODO.md = TODO.md
 	EndProjectSection

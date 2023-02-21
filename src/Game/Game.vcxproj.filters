@@ -21,6 +21,9 @@
     <ClCompile Include="DCGameApp.cpp">
       <Filter>SimpleGame\DungeonCrawler</Filter>
     </ClCompile>
+    <ClCompile Include="3DTile.cpp">
+      <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
@@ -75,6 +78,9 @@
     <ClInclude Include="TempPhysics.h">
       <Filter>MicroEngine\math\TempPhysics</Filter>
     </ClInclude>
+    <ClInclude Include="3DTile.h">
+      <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">
@@ -106,6 +112,12 @@
     </Filter>
     <Filter Include="MicroEngine\math\TempPhysics">
       <UniqueIdentifier>{d248455f-b6dc-480c-9e3f-54682627e36f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SimpleGame\DungeonCrawler\Framework">
+      <UniqueIdentifier>{78b84503-2c6d-4a1c-9676-f51e16fa60a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SimpleGame\DungeonCrawler\Gameplay">
+      <UniqueIdentifier>{2171e183-da56-454c-a489-865a8beb2bdb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

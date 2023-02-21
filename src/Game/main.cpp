@@ -49,9 +49,8 @@ int main(
 	createInfo.window.Vsync = true;
 	createInfo.window.Width = 1600;
 	createInfo.window.Height = 900;
-	if (AppSystemCreate(createInfo))
+	if (AppSystemCreate(createInfo) && GameAppInit() )
 	{
-		GameAppInit();
 		while (!IsAppExitRequested())
 		{
 			AppSystemBeginFrame();
