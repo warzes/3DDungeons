@@ -24,6 +24,9 @@
     <ClCompile Include="3DTile.cpp">
       <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerCamera.cpp">
+      <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
@@ -79,6 +82,9 @@
       <Filter>MicroEngine\math\TempPhysics</Filter>
     </ClInclude>
     <ClInclude Include="3DTile.h">
+      <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerCamera.h">
       <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,6 @@
 #include "DCGameApp.h"
 #include "3DTile.h"
+#include "PlayerCamera.h"
 
 //https://www.youtube.com/watch?v=Vr-Fsd6M5Tk
 //https://www.youtube.com/watch?v=VjuyfBaryu8&t=3s
@@ -22,14 +23,12 @@
 //
 //текстуры для старта взять отсюда - https://forum.zdoom.org/viewtopic.php?t=63994
 
-FlyingCamera cam;
-
 bool GameAppInit()
 {
 	if( !Tile3DManager::Create() )
 		return false;
 
-	cam.Look({ 0.0f, 3.0f, -6.0f }, { 0.0f, 0.0f, 0.0f });
+	PlayerCamera::SetPosition({ 0.0f, 0.0f, -6.0f }, { 0.0f, 0.0f, 0.0f });
 	//SetMouseVisible(false);
 
 	return true;
@@ -42,50 +41,30 @@ void GameAppClose()
 
 void GameAppFrame()
 {
-	auto deltaCursor = GetCursorDelta();
-	if( deltaCursor.x != 0 || deltaCursor.y != 0 )
-	{
-		if( IsMouseButtonDown(MouseButton::Right) )
-			cam.OnMouseMove(deltaCursor.x, deltaCursor.y);
-	}
+	PlayerCamera::Update(true, false);
 
-	short Keys = 0x0000;
-	if( IsKeyDown('W') ) Keys |= CAMERA_KEY_W;
-	if( IsKeyDown('S') ) Keys |= CAMERA_KEY_S;
-	if( IsKeyDown('A') ) Keys |= CAMERA_KEY_A;
-	if( IsKeyDown('D') ) Keys |= CAMERA_KEY_D;
-	if( IsKeyDown('R') ) Keys |= CAMERA_KEY_R;
-	if( IsKeyDown('F') ) Keys |= CAMERA_KEY_F;
-	if( IsKeyDown('Q') ) Keys |= CAMERA_KEY_Q;
-	if( IsKeyDown('E') ) Keys |= CAMERA_KEY_E;
-	if( IsKeyDown('C') ) Keys |= CAMERA_KEY_E;
-
-	if( IsKeyDown(0x20/*VK_SPACE*/) ) Keys |= CAMERA_KEY_SPACE;
-	if( IsKeyDown(0x10/*VK_SHIFT*/) ) Keys |= CAMERA_KEY_SHIFT;
-	if( IsKeyDown(0x11/*VK_CONTROL*/) ) Keys |= CAMERA_KEY_CONTROL;
-
-	Vector3 Movement;
-	bool MoveCamera = cam.OnKeys(Keys, 0.01f, Movement);
-	if( MoveCamera ) cam.Move(Movement);
-
-	Matrix4 view = cam.GetViewMatrix();
+	Matrix4 view = PlayerCamera::GetView();
 	Matrix4 perpective = Matrix4::Perspective(45.0f, GetWindowAspectRatio(), 0.01f, 1000.f);
 	Tile3DManager::BeginDraw(perpective, view);
 
-	for( size_t x = 0; x < 100; x++ )
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CW); // TODO: пофиксить
+	for( size_t x = 0; x < 50; x++ )
 	{
-		for( size_t y = 0; y < 100; y++ )
+		for( size_t y = 0; y < 50; y++ )
 		{
-			for( size_t z = 0; z < 10; z++ )
+			for( size_t z = 0; z < 5; z++ )
 			{
 				Vector3 pos;
-				pos.x = x;
-				pos.y = z;
-				pos.z = y;
+				pos.x = x*2;
+				pos.y = z*2;
+				pos.z = y*2;
 				Tile3DManager::DrawWall(pos);
 			}
 		}
 	}
+	glFrontFace(GL_CCW);
+	glDisable(GL_CULL_FACE);
 
 	//DebugDraw::DrawLine({ 0.0f, 0.0f, 0.0f }, { -10.0f, 2.0f, 0.0f }, RED);
 	//DebugDraw::Flush(perpective * view);

@@ -58,6 +58,7 @@ typedef int GLintptr;
 #define GL_ARRAY_BUFFER 0x8892
 #define GL_BACK 0x0405
 #define GL_BLEND 0x0BE2
+#define GL_CCW 0x0901
 #define GL_CLAMP 0x2900
 #define GL_CLAMP_TO_BORDER 0x812D
 #define GL_CLAMP_TO_EDGE 0x812F
@@ -65,6 +66,7 @@ typedef int GLintptr;
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #define GL_COMPILE_STATUS 0x8B81
 #define GL_CULL_FACE 0x0B44
+#define GL_CW 0x0900
 #define GL_DEPTH24_STENCIL8 0x88F0
 #define GL_DEPTH_ATTACHMENT 0x8D00
 #define GL_DEPTH_BUFFER_BIT 0x00000100
@@ -178,6 +180,7 @@ extern "C" {
 	GLAPI void GLAPIENTRY glDrawBuffer(GLenum mode);
 	GLAPI void GLAPIENTRY glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid* indices);
 	GLAPI void GLAPIENTRY glEnable(GLenum cap);
+	GLAPI void GLAPIENTRY glFrontFace(GLenum mode);
 	GLAPI void GLAPIENTRY glGenTextures(GLsizei n, GLuint* textures);
 	GLAPI void GLAPIENTRY glGetIntegerv(GLenum pname, GLint* params);
 	GLAPI void GLAPIENTRY glPixelStorei(GLenum pname, GLint param);

@@ -185,6 +185,7 @@
     <ClCompile Include="MicroGraphics.cpp" />
     <ClCompile Include="MicroOpenGLLoader.cpp" />
     <ClCompile Include="MicroRender.cpp" />
+    <ClCompile Include="PlayerCamera.cpp" />
     <ClCompile Include="UnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +203,7 @@
     <ClInclude Include="MicroMath.h" />
     <ClInclude Include="MicroOpenGLLoader.h" />
     <ClInclude Include="MicroRender.h" />
+    <ClInclude Include="PlayerCamera.h" />
     <ClInclude Include="TempPhysics.h" />
     <ClInclude Include="UnitTestMath.h" />
     <ClInclude Include="X_CurrentTest.h" />
