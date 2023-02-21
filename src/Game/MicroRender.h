@@ -142,6 +142,28 @@ void SetBlendState(const BlendState& state, float alphaRef);
 // Shader Program
 //=============================================================================
 
+class Uniform
+{
+public:
+	Uniform() = default;
+	Uniform(int location, unsigned programId) : m_location(location), m_programId(programId) {}
+
+	int GetLocation() const { return m_location; }
+	bool IsValid() const { return m_location >= 0; }
+	bool IsReady() const;
+
+	void operator=(int value) const;
+	void operator=(float value) const;
+	void operator=(const Vector2& v) const;
+	void operator=(const Vector3& v) const;
+	void operator=(const Matrix3& m) const;
+	void operator=(const Matrix4& m) const;
+
+private:
+	int m_location = -1;
+	unsigned m_programId = 0;
+};
+
 struct ShaderAttribInfo
 {
 	unsigned typeId;
@@ -156,10 +178,14 @@ public:
 	void Destroy();
 
 	void Bind() const;
-
 	static void UnBind();
 
-	[[nodiscard]] int GetUniformLocation(const char* name) const;
+	[[nodiscard]] Uniform operator[](const char* uniformName) const;
+
+	// TODO: удалить
+	[[nodiscard]] int GetUniformLocation(const char* uniformName) const;
+	void SetSampler(int uniformId, int value) const;
+	void SetUniform(int uniformId, int value) const;
 	void SetUniform(int uniformId, float value) const;
 	void SetUniform(int uniformId, const Vector2& v) const;
 	void SetUniform(int uniformId, const Vector3& v) const;
@@ -238,11 +264,14 @@ enum class PrimitiveDraw
 
 struct VertexAttribute
 {
-	int location = -1;   // если -1, то берется индекс массива атрибутов
-	unsigned size;
+	void Bind(unsigned loc) const;
+
+	int location = -1;  // если -1, то берется индекс массива атрибутов
+	int size;
+	//unsigned type;
 	bool normalized;
-	unsigned stride;     // sizeof Vertex
-	const void* pointer; // (void*)offsetof(Vertex, TexCoord)}
+	int stride;         // sizeof Vertex
+	const void* offset; // (void*)offsetof(Vertex, TexCoord)}
 };
 
 class VertexArrayBuffer

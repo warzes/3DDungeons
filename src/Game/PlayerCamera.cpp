@@ -11,7 +11,7 @@ Vector3 playerEyeTarget;
 bool m_isMoving = false;
 bool m_isTurning = false;
 bool m_continuedWalk = true;
-float m_walkSpeed = 2.0f;
+float m_walkSpeed = 6.0f;
 float m_stepSize = 1.0f;
 Vector3 m_targetPosition = { 0.0f, 0.0f, 0.0f };
 Vector3 m_direction = { 0 };
@@ -40,11 +40,34 @@ float m_currentRotateY = 0.0f;
 float m_endRotateY = 0.0f;
 float m_speedRotate = 200.0f;
 
+void setOneFloat(float& f)
+{
+	if (f > 0.0f)
+	{
+		if (f > 0.9f) f = 1.0f;
+		else f = 0.0f;
+	}
+	else
+	{
+		if (f < -0.9f) f = -1.0f;
+		else f = 0.0f;
+	}
+}
+
+void setOneVector(Vector3& v)
+{
+	setOneFloat(v.x);
+	setOneFloat(v.y);
+	setOneFloat(v.z);
+}
+
 void move(moveDir dir)
 {
-	Vector3 Up = camera.y;
 	Vector3 Right = camera.x;
 	Vector3 Forward = camera.z;
+
+	setOneVector(Right);
+	setOneVector(Forward);
 
 	if( dir == moveDir::Forward ) m_direction = Forward;
 	if( dir == moveDir::Back ) m_direction = -Forward;
@@ -79,9 +102,6 @@ void turn(rotateDirY dir)
 			angleRotateCamera = 1.0f;
 			TargetRotateAngle2 = 90.0f * DEG2RAD;
 		}
-
-
-
 
 		if( dir == rotateDirY::Left && m_currentRotateY <= 0.0f ) m_currentRotateY = 360.0f;
 		else if( dir == rotateDirY::Right && m_currentRotateY >= 360.0f ) m_currentRotateY = 0.0f;
@@ -160,8 +180,8 @@ void PlayerCamera::Update(bool FreeCameraRotate, bool FreeCameraMove)
 				if( IsKeyDown('E') ) move(moveDir::Right);
 			}
 
-			if( IsKeyPressed('A') ) turn(rotateDirY::Left);
-			if( IsKeyPressed('D') ) turn(rotateDirY::Right);
+			if(IsKeyDown('A') ) turn(rotateDirY::Left);
+			if(IsKeyDown('D') ) turn(rotateDirY::Right);
 		}
 
 		Vector3 capPos = camera.position;
@@ -183,7 +203,6 @@ void PlayerCamera::Update(bool FreeCameraRotate, bool FreeCameraMove)
 		{
 			float angle = angleRotateCamera*3.0f * GetDeltaTime();
 
-
 			if( m_rotateDir == rotateDirY::Left )
 			{
 				if( TargetRotateAngle2 >= 0.0f )
@@ -191,10 +210,6 @@ void PlayerCamera::Update(bool FreeCameraRotate, bool FreeCameraMove)
 					m_isTurning = false;
 					m_rotateDir = rotateDirY::No;
 					TargetRotateAngle2 = 0.0f;
-
-					camera.x = camera.x.GetNormalize();
-					camera.y = camera.y.GetNormalize();
-					camera.z = camera.z.GetNormalize();
 				}
 				else
 					TargetRotateAngle2 -= angle;
@@ -213,10 +228,16 @@ void PlayerCamera::Update(bool FreeCameraRotate, bool FreeCameraMove)
 			}
 
 			camera.x = Rotate(camera.x, angle, Vector3::Up);
-			camera.y = Rotate(camera.y, angle, Vector3::Up);
+			//camera.y = Rotate(camera.y, angle, Vector3::Up);
 			camera.z = Rotate(camera.z, angle, Vector3::Up);
 
-			
+			// законченно вращение, нормализовать координаты
+			if (m_isTurning == false)
+			{
+				setOneVector(camera.x);
+				//setOneVector(camera.y);
+				setOneVector(camera.z);
+			}
 		}
 		camera.SetPosition(capPos);
 	}

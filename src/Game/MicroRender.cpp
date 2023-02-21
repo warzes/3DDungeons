@@ -170,6 +170,47 @@ unsigned createShader(GLenum openGLshaderType, const std::string& source)
 	return shaderId;
 }
 //-----------------------------------------------------------------------------
+bool Uniform::IsReady() const
+{
+	return IsValid() && m_programId == state::CurrentShaderProgram;
+}
+//-----------------------------------------------------------------------------
+void Uniform::operator=(int value) const
+{
+	assert(IsReady());
+	glUniform1i(m_location, value);
+}
+//-----------------------------------------------------------------------------
+void Uniform::operator=(float value) const
+{
+	assert(IsReady());
+	glUniform1f(m_location, value);
+}
+//-----------------------------------------------------------------------------
+void Uniform::operator=(const Vector2& v) const
+{
+	assert(IsReady());
+	glUniform2fv(m_location, 1, &(v.x));
+}
+//-----------------------------------------------------------------------------
+void Uniform::operator=(const Vector3& v) const
+{
+	assert(IsReady());
+	glUniform3fv(m_location, 1, &(v.x));
+}
+//-----------------------------------------------------------------------------
+void Uniform::operator=(const Matrix3& m) const
+{
+	assert(IsReady());
+	glUniformMatrix3fv(m_location, 1, GL_FALSE, m.DataPtr());
+}
+//-----------------------------------------------------------------------------
+void Uniform::operator=(const Matrix4& m) const
+{
+	assert(IsReady());
+	glUniformMatrix4fv(m_location, 1, GL_FALSE, m.DataPtr());
+}
+//-----------------------------------------------------------------------------
 bool ShaderProgram::CreateFromMemories(const std::string& vertexShaderMemory, const std::string& fragmentShaderMemory)
 {
 	Destroy();
@@ -229,9 +270,26 @@ void ShaderProgram::UnBind()
 	glUseProgram(0);
 }
 //-----------------------------------------------------------------------------
-int ShaderProgram::GetUniformLocation(const char* name) const
+Uniform ShaderProgram::operator[](const char* uniformName) const
 {
-	return glGetUniformLocation(m_id, name);
+	return Uniform(glGetUniformLocation(m_id, uniformName), m_id);
+}
+//-----------------------------------------------------------------------------
+int ShaderProgram::GetUniformLocation(const char* uniformName) const
+{
+	return glGetUniformLocation(m_id, uniformName);
+}
+//-----------------------------------------------------------------------------
+void ShaderProgram::SetSampler(int uniformId, int value) const
+{
+	assert(state::CurrentShaderProgram == m_id);
+	glUniform1i(uniformId, value);
+}
+//-----------------------------------------------------------------------------
+void ShaderProgram::SetUniform(int uniformId, int value) const
+{
+	assert(state::CurrentShaderProgram == m_id);
+	glUniform1i(uniformId, value);
 }
 //-----------------------------------------------------------------------------
 void ShaderProgram::SetUniform(int uniformId, float value) const
@@ -411,6 +469,13 @@ void IndexBuffer::Bind() const
 // Vertex Array Buffer
 //=============================================================================
 //-----------------------------------------------------------------------------
+void VertexAttribute::Bind(unsigned loc) const
+{
+	const GLuint oglLocation = static_cast<GLuint>(location > -1 ? location : loc);
+	glEnableVertexAttribArray(oglLocation);
+	glVertexAttribPointer(oglLocation, size, GL_FLOAT, (GLboolean)(normalized ? GL_TRUE : GL_FALSE), stride, offset);
+}
+//-----------------------------------------------------------------------------
 bool VertexArrayBuffer::Create(VertexBuffer* vbo, IndexBuffer* ibo, const std::vector<VertexAttribute>& attribs)
 {
 	if (!vbo || attribs.empty()) return false;
@@ -425,12 +490,8 @@ bool VertexArrayBuffer::Create(VertexBuffer* vbo, IndexBuffer* ibo, const std::v
 
 	vbo->Bind();
 	for (size_t i = 0; i < attribs.size(); i++)
-	{
-		const auto& att = attribs[i];
-		const GLuint location = (GLuint)(att.location > -1 ? att.location : i);
-		glEnableVertexAttribArray(location);
-		glVertexAttribPointer(location, (GLint)att.size, GL_FLOAT, (GLboolean)(att.normalized ? GL_TRUE : GL_FALSE), (GLsizei)att.stride, att.pointer);
-	}
+		attribs[i].Bind(i);
+
 	m_attribsCount = (unsigned)attribs.size();
 
 	if (m_ibo) m_ibo->Bind();
@@ -479,7 +540,7 @@ bool VertexArrayBuffer::Create(VertexBuffer* vbo, IndexBuffer* ibo, ShaderProgra
 			return false;
 		}
 
-		attribs[i].pointer = (void*)+offset;
+		attribs[i].offset = (void*)+offset;
 		offset += sizeType;
 	}
 	for (size_t i = 0; i < attribs.size(); i++)

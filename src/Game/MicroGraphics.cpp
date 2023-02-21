@@ -298,10 +298,10 @@ bool Model::createBuffer()
 	// формат вершин
 	const std::vector<VertexAttribute> formatVertex =
 	{
-		{.size = 3, .normalized = false, .stride = sizeof(VertexMesh), .pointer = (void*)offsetof(VertexMesh, position)},
-		{.size = 3, .normalized = false, .stride = sizeof(VertexMesh), .pointer = (void*)offsetof(VertexMesh, normal)},
-		{.size = 3, .normalized = false, .stride = sizeof(VertexMesh), .pointer = (void*)offsetof(VertexMesh, color)},
-		{.size = 2, .normalized = false, .stride = sizeof(VertexMesh), .pointer = (void*)offsetof(VertexMesh, texCoord)}
+		{.size = 3, .normalized = false, .stride = sizeof(VertexMesh), .offset = (void*)offsetof(VertexMesh, position)},
+		{.size = 3, .normalized = false, .stride = sizeof(VertexMesh), .offset = (void*)offsetof(VertexMesh, normal)},
+		{.size = 3, .normalized = false, .stride = sizeof(VertexMesh), .offset = (void*)offsetof(VertexMesh, color)},
+		{.size = 2, .normalized = false, .stride = sizeof(VertexMesh), .offset = (void*)offsetof(VertexMesh, texCoord)}
 	};
 
 	for (int i = 0; i < m_subMeshes.size(); i++)

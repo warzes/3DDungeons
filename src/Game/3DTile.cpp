@@ -1,10 +1,10 @@
 #include "3DTile.h"
 //-----------------------------------------------------------------------------
 ShaderProgram shader;
-int uniformWorldMatrix;
-int uniformViewMatrix;
-int uniformProjectionMatrix;
-int uniformLight;
+Uniform uniformWorldMatrix;
+Uniform uniformViewMatrix;
+Uniform uniformProjectionMatrix;
+Uniform uniformLight;
 
 Texture2D defaultTexture;
 Model wallModel;
@@ -69,10 +69,10 @@ void main()
 	if( !shader.CreateFromMemories(vertexShaderText, fragmentShaderText) )
 		return false;
 
-	uniformWorldMatrix = shader.GetUniformLocation("uWorld");
-	uniformViewMatrix = shader.GetUniformLocation("uView");
-	uniformProjectionMatrix = shader.GetUniformLocation("uProjection");
-	uniformLight = shader.GetUniformLocation("uniformLight");
+	uniformWorldMatrix = shader["uWorld"];
+	uniformViewMatrix = shader["uView"];
+	uniformProjectionMatrix = shader["uProjection"];
+	uniformLight = shader["uniformLight"];
 
 
 	Texture2DInfo texInfo;
@@ -149,9 +149,8 @@ void Tile3DManager::Destroy()
 void Tile3DManager::BeginDraw(const Matrix4& proj, const Matrix4& view)
 {
 	shader.Bind();
-	shader.SetUniform(uniformViewMatrix, view);
-	shader.SetUniform(uniformProjectionMatrix, proj);
-
+	uniformViewMatrix = view;
+	uniformProjectionMatrix = proj;
 
 	shader.SetUniform(shader.GetUniformLocation("Light.Ambient"), 0.333333f);
 	shader.SetUniform(shader.GetUniformLocation("Light.Diffuse"), 0.666666f);
@@ -164,7 +163,7 @@ void Tile3DManager::BeginDraw(const Matrix4& proj, const Matrix4& view)
 void Tile3DManager::DrawWall(const Vector3& position)
 {
 	Matrix4 world = Matrix4::Translate(Matrix4::Identity, position);
-	shader.SetUniform(uniformWorldMatrix, world);
+	uniformWorldMatrix = world;
 	wallModel.Draw();
 }
 //-----------------------------------------------------------------------------
