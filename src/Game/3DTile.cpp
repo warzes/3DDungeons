@@ -8,8 +8,11 @@ Uniform uniformLight;
 
 Texture2D defaultTexture;
 Model wallModel;
-Model floorModel;
+Model floorModel[7];
 Model ceilModel;
+
+https://sketchfab.com/3d-models/low-poly-nature-pack-by-rgsdev-4b7e5b2130384655a7ccdd7e7b711836
+
 //-----------------------------------------------------------------------------
 bool Tile3DManager::Create()
 {
@@ -132,7 +135,11 @@ void main()
 
 	// floor
 	{
-
+		for( int i = 1; i < 8; i++ )
+		{
+			floorModel[i - 1].Create(("../data/mesh/tilesFloor/tile" + std::to_string(i) + ".obj").c_str());
+			floorModel[i - 1].SetMaterial({ .diffuseTexture = &defaultTexture });
+		}
 	}
 
 
@@ -154,10 +161,8 @@ void Tile3DManager::BeginDraw(const Matrix4& proj, const Matrix4& view)
 
 	shader.SetUniform(shader.GetUniformLocation("Light.Ambient"), 0.333333f);
 	shader.SetUniform(shader.GetUniformLocation("Light.Diffuse"), 0.666666f);
-	Vector3 LightDirection = Vector3(0.0f, 0.0f, 1.0f);
+	Vector3 LightDirection = Vector3(0.0f, 0.5f, -1.0f);
 	shader.SetUniform(shader.GetUniformLocation("Light.Direction"), LightDirection);
-
-
 }
 //-----------------------------------------------------------------------------
 void Tile3DManager::DrawWall(const Vector3& position)
@@ -169,7 +174,9 @@ void Tile3DManager::DrawWall(const Vector3& position)
 //-----------------------------------------------------------------------------
 void Tile3DManager::DrawFloor(const Vector3& position)
 {
-
+	Matrix4 world = Matrix4::Translate(Matrix4::Identity, position);
+	uniformWorldMatrix = world;
+	floorModel[3].Draw();
 }
 //-----------------------------------------------------------------------------
 void Tile3DManager::DrawCeil(const Vector3& position)

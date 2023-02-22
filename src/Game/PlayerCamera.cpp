@@ -42,16 +42,9 @@ float m_speedRotate = 200.0f;
 
 void setOneFloat(float& f)
 {
-	if (f > 0.0f)
-	{
-		if (f > 0.9f) f = 1.0f;
-		else f = 0.0f;
-	}
-	else
-	{
-		if (f < -0.9f) f = -1.0f;
-		else f = 0.0f;
-	}
+	if (f > 0.9f) f = 1.0f;
+	else if (f < -0.9f) f = -1.0f;
+	else f = 0.0f;
 }
 
 void setOneVector(Vector3& v)

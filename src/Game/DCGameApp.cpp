@@ -28,7 +28,7 @@ bool GameAppInit()
 	if( !Tile3DManager::Create() )
 		return false;
 
-	PlayerCamera::SetPosition({ 0.0f, 0.0f, -6.0f }, { 0.0f, 0.0f, 0.0f });
+	PlayerCamera::SetPosition({ 5.0f, 0.0f, 10.0f }, { 5.0f, 0.0f, -1.0f });
 	//SetMouseVisible(false);
 
 	return true;
@@ -53,12 +53,14 @@ void GameAppFrame()
 	{
 		for( size_t y = 0; y < 50; y++ )
 		{
+			Tile3DManager::DrawFloor({(float)x, -0.5f, (float)y});
+
 			for( size_t z = 0; z < 5; z++ )
 			{
 				Vector3 pos;
-				pos.x = x*2;
-				pos.y = z*2;
-				pos.z = y*2;
+				pos.x = x * 2;
+				pos.y = z;
+				pos.z = y * 2;
 				Tile3DManager::DrawWall(pos);
 			}
 		}
