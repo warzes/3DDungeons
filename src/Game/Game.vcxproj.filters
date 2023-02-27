@@ -27,6 +27,18 @@
     <ClCompile Include="PlayerCamera.cpp">
       <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>MicroEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsScene.cpp">
+      <Filter>MicroEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsBodyManager.cpp">
+      <Filter>MicroEngine\Physics\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>MicroEngine\Physics\Body</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppConfig.h" />
@@ -70,22 +82,40 @@
       <Filter>SimpleGame\DungeonCrawler</Filter>
     </ClInclude>
     <ClInclude Include="MicroCollisions.h">
-      <Filter>MicroEngine\math</Filter>
+      <Filter>MicroEngine\Math</Filter>
     </ClInclude>
     <ClInclude Include="MicroGeometry.h">
-      <Filter>MicroEngine\math</Filter>
+      <Filter>MicroEngine\Math</Filter>
     </ClInclude>
     <ClInclude Include="MicroMath.h">
-      <Filter>MicroEngine\math</Filter>
+      <Filter>MicroEngine\Math</Filter>
     </ClInclude>
     <ClInclude Include="TempPhysics.h">
-      <Filter>MicroEngine\math\TempPhysics</Filter>
+      <Filter>MicroEngine\Math\TempPhysics</Filter>
     </ClInclude>
     <ClInclude Include="3DTile.h">
       <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCamera.h">
       <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexedTriangle.h">
+      <Filter>MicroEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSettings.h">
+      <Filter>MicroEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.h">
+      <Filter>MicroEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsScene.h">
+      <Filter>MicroEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsBodyManager.h">
+      <Filter>MicroEngine\Physics\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>MicroEngine\Physics\Body</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -113,28 +143,43 @@
     <Filter Include="SimpleGame\DungeonCrawler">
       <UniqueIdentifier>{cff1a619-6ff6-480a-8ed2-a190d463427e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\math">
-      <UniqueIdentifier>{577f23e5-8709-4d3d-998a-019b63056c76}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MicroEngine\math\TempPhysics">
-      <UniqueIdentifier>{d248455f-b6dc-480c-9e3f-54682627e36f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SimpleGame\DungeonCrawler\Framework">
       <UniqueIdentifier>{78b84503-2c6d-4a1c-9676-f51e16fa60a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="SimpleGame\DungeonCrawler\Gameplay">
       <UniqueIdentifier>{2171e183-da56-454c-a489-865a8beb2bdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MicroEngine\Physics">
+      <UniqueIdentifier>{2b121dab-7023-49f6-9506-17d30092eecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\Math">
+      <UniqueIdentifier>{577f23e5-8709-4d3d-998a-019b63056c76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\Math\TempPhysics">
+      <UniqueIdentifier>{d248455f-b6dc-480c-9e3f-54682627e36f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\Physics\Body">
+      <UniqueIdentifier>{17216ad4-ef80-4b15-8657-3dc5386473b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\Physics\Collision">
+      <UniqueIdentifier>{570b1be6-cafa-443b-b615-b17b682dfe46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\Physics\Collision\BroadPhase">
+      <UniqueIdentifier>{7e249e14-776e-45f5-b60f-024250ded9b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MicroEngine\Physics\Collision\Shape">
+      <UniqueIdentifier>{1ff84f65-7a07-4899-a26c-83d22122784a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="MicroCollisions.inl">
-      <Filter>MicroEngine\math</Filter>
+      <Filter>MicroEngine\Math</Filter>
     </None>
     <None Include="MicroGeometry.inl">
-      <Filter>MicroEngine\math</Filter>
+      <Filter>MicroEngine\Math</Filter>
     </None>
     <None Include="MicroMath.inl">
-      <Filter>MicroEngine\math</Filter>
+      <Filter>MicroEngine\Math</Filter>
     </None>
   </ItemGroup>
 </Project>

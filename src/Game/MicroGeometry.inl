@@ -95,30 +95,61 @@ inline Intersection Rect::IsInside(const Vector2 & point) const
 }
 
 //=============================================================================
+// Triangle
+//=============================================================================
+inline Vector3 Triangle::GetCentroid() const
+{
+	return (v[0] + v[1] + v[2]) * (1.0f / 3.0f);
+}
+
+//=============================================================================
 // AABB
 //=============================================================================
 
-inline void AABB::Merge(const AABB& rhs)
-{
-	AddPoint(rhs.min);
-	AddPoint(rhs.max);
-}
-
 inline void AABB::AddPoint(const Vector3& point)
 {
-	min = MinCoords(point, min);
-	max = MaxCoords(point, max);
+	min = Min(min, point);
+	max = Max(max, point);
 }
 
-inline bool AABB::Overlaps(const AABB& aabb) const
+inline void AABB::AddAABB(const AABB& rhs)
 {
-	if( min.x > aabb.max.x ) return false;
-	if( min.y > aabb.max.y ) return false;
-	if( min.z > aabb.max.z ) return false;
-	if( aabb.min.x > max.x ) return false;
-	if( aabb.min.y > max.y ) return false;
-	if( aabb.min.z > max.z ) return false;
-	return true;
+	min = Min(min, rhs.min);
+	max = Max(max, rhs.max);
+}
+
+inline void AABB::AddTriangle(const Triangle& tri)
+{
+	AddPoint(tri[0]);
+	AddPoint(tri[1]);
+	AddPoint(tri[2]);
+}
+
+inline Vector3 AABB::GetCenter() const
+{
+	return 0.5f * (min + max);
+}
+
+inline Vector3 AABB::GetExtent() const
+{
+	return 0.5f * (max - min);
+}
+
+inline Vector3 AABB::GetSize() const
+{
+	return max - min;
+}
+
+inline float AABB::GetSurfaceArea() const
+{
+	Vector3 extent = max - min;
+	return 2.0f * (extent.x * extent.y + extent.x * extent.z + extent.y * extent.z);
+}
+
+inline float AABB::GetVolume() const
+{
+	Vector3 extent = max - min;
+	return extent.x * extent.y * extent.z;
 }
 
 inline bool AABB::Contains(const Vector3& point) const
@@ -132,34 +163,32 @@ inline bool AABB::Contains(const Vector3& point) const
 	return true;
 }
 
-inline void AABB::ToTransform(const Matrix4& matrix)
+inline bool AABB::Contains(const AABB& rhs) const
 {
-	Vector3 points[8];
-	points[0] = min;
-	points[7] = max;
-	points[1] = Vector3(points[0].x, points[0].y, points[7].z);
-	points[2] = Vector3(points[0].x, points[7].y, points[0].z);
-	points[3] = Vector3(points[0].x, points[7].y, points[7].z);
-	points[4] = Vector3(points[7].x, points[0].y, points[0].z);
-	points[5] = Vector3(points[7].x, points[0].y, points[7].z);
-	points[6] = Vector3(points[7].x, points[7].y, points[0].z);
+	// TODO: проверить
+	if( min.x > rhs.min.x ) return false;
+	if( min.y > rhs.min.y ) return false;
+	if( min.z > rhs.min.z ) return false;
+	if( rhs.min.x > max.x ) return false;
+	if( rhs.min.y > max.y ) return false;
+	if( rhs.min.z > max.z ) return false;
+	return true;
+}
 
-	for( int j = 0; j < 8; ++j )
-	{
-		points[j] = matrix.TransformPoint(points[j]);
-	}
+inline bool AABB::Overlaps(const AABB& aabb) const
+{
+	if( min.x > aabb.max.x ) return false;
+	if( min.y > aabb.max.y ) return false;
+	if( min.z > aabb.max.z ) return false;
+	if( aabb.min.x > max.x ) return false;
+	if( aabb.min.y > max.y ) return false;
+	if( aabb.min.z > max.z ) return false;
+	return true;
+}
 
-	Vector3 new_min = points[0];
-	Vector3 new_max = points[0];
-
-	for( int j = 0; j < 8; ++j )
-	{
-		new_min = MinCoords(points[j], new_min);
-		new_max = MaxCoords(points[j], new_max);
-	}
-
-	min = new_min;
-	max = new_max;
+inline AABB AABB::Intersection(const AABB& rhs) const
+{
+	return { Max(rhs.min, min), Min(rhs.max, max) };
 }
 
 inline void AABB::Translate(const Vector3& v)
@@ -168,67 +197,48 @@ inline void AABB::Translate(const Vector3& v)
 	max += v;
 }
 
-inline void AABB::GetCorners(const Transform& tr, Vector3* points) const
+inline AABB AABB::Transformed(const Matrix4& inMatrix) const
 {
-	Vector3 p(min.x, min.y, min.z);
-	points[0] = tr.ToTransform(p);
-	p = Vector3(min.x, min.y, max.z);
-	points[1] = tr.ToTransform(p);
-	p = Vector3(min.x, max.y, min.z);
-	points[2] = tr.ToTransform(p);
-	p = Vector3(min.x, max.y, max.z);
-	points[3] = tr.ToTransform(p);
-	p = Vector3(max.x, min.y, min.z);
-	points[4] = tr.ToTransform(p);
-	p = Vector3(max.x, min.y, max.z);
-	points[5] = tr.ToTransform(p);
-	p = Vector3(max.x, max.y, min.z);
-	points[6] = tr.ToTransform(p);
-	p = Vector3(max.x, max.y, max.z);
-	points[7] = tr.ToTransform(p);
+	// Start with the translation of the matrix
+	Vector3 newMin = inMatrix.GetTranslation();
+	Vector3 newMax = inMatrix.GetTranslation();
+
+	// Now find the extreme points by considering the product of the min and max with each column of inMatrix
+	for( int c = 0; c < 3; ++c )
+	{
+		Vector3 col = inMatrix[c];
+		Vector3 a = col * min[c];
+		Vector3 b = col * max[c];
+
+		newMin += Min(a, b);
+		newMax += Max(a, b);
+	}
+	// Return the new bounding box
+	return { newMin, newMax };
 }
 
-inline void AABB::GetCorners(const Matrix4& matrix, Vector3* points) const
+inline AABB AABB::Scaled(const Vector3& scale) const
 {
-	Vector3 p(min.x, min.y, min.z);
-	points[0] = matrix.TransformPoint(p);
-	p = Vector3(min.x, min.y, max.z);
-	points[1] = matrix.TransformPoint(p);
-	p = Vector3(min.x, max.y, min.z);
-	points[2] = matrix.TransformPoint(p);
-	p = Vector3(min.x, max.y, max.z);
-	points[3] = matrix.TransformPoint(p);
-	p = Vector3(max.x, min.y, min.z);
-	points[4] = matrix.TransformPoint(p);
-	p = Vector3(max.x, min.y, max.z);
-	points[5] = matrix.TransformPoint(p);
-	p = Vector3(max.x, max.y, min.z);
-	points[6] = matrix.TransformPoint(p);
-	p = Vector3(max.x, max.y, max.z);
-	points[7] = matrix.TransformPoint(p);
+	return AABB::FromTwoPoints(min * scale, max * scale);
 }
 
-inline Vector3 AABB::MinCoords(const Vector3& a, const Vector3& b)
+inline AABB AABB::FromTwoPoints(const Vector3& point1, const Vector3& point2)
 {
-	return Vector3(Min(a.x, b.x), Min(a.y, b.y), Min(a.z, b.z));
+	return AABB(Min(point1, point2), Max(point1, point2));
 }
 
-inline Vector3 AABB::MaxCoords(const Vector3& a, const Vector3& b)
+inline Vector3 GetClosestPoint(const AABB& aabb, const Vector3& inPoint)
 {
-	return Vector3(Max(a.x, b.x), Max(a.y, b.y), Max(a.z, b.z));
+	return Min(Max(inPoint, aabb.min), aabb.max);
 }
 
-inline void AABB::Shrink(float x)
+inline float GetSqDistanceTo(const AABB& aabb, const Vector3& inPoint)
 {
-	min += x;
-	max -= x;
+	return (GetClosestPoint(aabb, inPoint) - inPoint).GetLengthSquared();
 }
 
-inline AABB AABB::Intersection(const AABB& rhs) const
-{
-	return AABB(Max(rhs.min, min), Min(rhs.max, max));
-}
-
+inline bool operator==(const AABB& Left, const AABB& Right) noexcept { return Left.min == Right.min && Left.max == Right.max; }
+inline bool operator!=(const AABB& Left, const AABB& Right) noexcept { return Left.min != Right.min ||Left.max != Right.max; }
 
 //=============================================================================
 // Plane

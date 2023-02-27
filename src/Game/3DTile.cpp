@@ -11,8 +11,8 @@ Model wallModel;
 Model floorModel[7];
 Model ceilModel;
 
-https://sketchfab.com/3d-models/low-poly-nature-pack-by-rgsdev-4b7e5b2130384655a7ccdd7e7b711836
-https://github.com/voithos/quarkGL/tree/master/examples
+//https://sketchfab.com/3d-models/low-poly-nature-pack-by-rgsdev-4b7e5b2130384655a7ccdd7e7b711836
+//https://github.com/voithos/quarkGL/tree/master/examples
 //-----------------------------------------------------------------------------
 bool Tile3DManager::Create()
 {

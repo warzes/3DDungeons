@@ -11,6 +11,10 @@ Left handed
    0     1
 */
 
+#if defined(_MSC_VER)
+#	pragma(message("" __FILE__" TODO: добавить коментарий к функциям аналогично glm там где это так (перед этим проверить)"));
+#endif
+
 //=============================================================================
 // Header
 //=============================================================================
@@ -48,8 +52,8 @@ class Matrix4;
 
 inline bool Equals(float x, float y, float epsilon = EPSILON) noexcept; // Check whether two floating point values are equal within accuracy.
 inline constexpr bool  IsNaN(float value) noexcept; // Check whether a floating point value is NaN.
-inline constexpr float ConvertToRadians(float degrees) noexcept;
-inline constexpr float ConvertToDegrees(float radians) noexcept;
+inline constexpr float DegreesToRadians(float degrees) noexcept;
+inline constexpr float RadiansToDegrees(float radians) noexcept;
 inline constexpr int   Min(int a, int b) noexcept;
 inline constexpr float Min(float a, float b) noexcept;
 inline constexpr int   Max(int a, int b) noexcept;
@@ -249,25 +253,24 @@ public:
 };
 
 inline bool Equals(const Vector3& v1, const Vector3& v2, float epsilon = EPSILON) noexcept;
-
 inline float Distance(const Vector3& v1, const Vector3& v2);
 inline float DotProduct(const Vector3& v1, const Vector3& v2);
+
 inline Vector3 CrossProduct(const Vector3& v1, const Vector3& v2);
 inline Vector3 Reflect(const Vector3& v, const Vector3& normal);
 inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta);
 inline Vector3 Min(const Vector3& v1, const Vector3& v2);
 inline Vector3 Max(const Vector3& v1, const Vector3& v2);
+inline Vector3 Clamp(const Vector3& value, const Vector3& min, const Vector3& max);
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x);
-// Spherical interpolation between two vectors
-inline Vector3 SLerp(const Vector3& x, const Vector3& y, float a);
+inline Vector3 SLerp(const Vector3& x, const Vector3& y, float a); // Spherical interpolation between two vectors
 inline Vector3 Mix(const Vector3& x, const Vector3& y, float t);
 
 inline Vector3 Rotate(const Vector3& v, float angle, const Vector3& normal);
 inline Vector3 RotateX(const Vector3& v, float angle);
 inline Vector3 RotateY(const Vector3& v, float angle);
 inline Vector3 RotateZ(const Vector3& v, float angle);
-// Rotates a 3 components vector by a quaternion.
-inline Vector3 Rotate(const Quaternion& q, const Vector3& v);
+inline Vector3 Rotate(const Quaternion& q, const Vector3& v); // Rotates a 3 components vector by a quaternion.
 
 // Returns the absolute angle between two vectors.
 inline float Angle(const Vector3& x, const Vector3& y);
@@ -597,6 +600,8 @@ public:
 	float GetDeterminant() const;
 	Matrix4 Inverse() const;
 	Matrix4 Transpose() const;
+
+	Vector3 GetTranslation() const { return value[3]; }
 
 	Vector3 TransformPoint(const Vector3& pos) const;
 

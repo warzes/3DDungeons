@@ -13,8 +13,8 @@ inline bool Equals(float x, float y, float epsilon) noexcept
 // Check whether a floating point value is NaN.
 inline constexpr bool IsNaN(float value) noexcept { return value != value; }
 
-inline constexpr float ConvertToRadians(float degrees) noexcept { return degrees * DEG2RAD; }
-inline constexpr float ConvertToDegrees(float radians) noexcept { return radians * RAD2DEG; }
+inline constexpr float DegreesToRadians(float degrees) noexcept { return degrees * DEG2RAD; }
+inline constexpr float RadiansToDegrees(float radians) noexcept { return radians * RAD2DEG; }
 
 inline constexpr int   Min(int a, int b) noexcept { return a < b ? a : b; }
 inline constexpr float Min(float a, float b) noexcept { return a < b ? a : b; }
@@ -257,6 +257,7 @@ inline Vector3 Refract(const Vector3& i, const Vector3& normal, float eta)
 
 inline Vector3 Min(const Vector3& v1, const Vector3& v2) { return { Min(v1.x, v2.x), Min(v1.y, v2.y), Min(v1.z, v2.z) }; }
 inline Vector3 Max(const Vector3& v1, const Vector3& v2) { return { Max(v1.x, v2.x), Max(v1.y, v2.y), Max(v1.z, v2.z) }; }
+inline Vector3 Clamp(const Vector3& value, const Vector3& min, const Vector3& max) { return Max(Min(value, max), min); }
 inline Vector3 Lerp(const Vector3& a, const Vector3& b, float x) { return a + (b - a) * x; }
 
 inline Vector3 SLerp(const Vector3 & x, const Vector3 & y, float a)
@@ -355,7 +356,7 @@ inline Vector3 Bezier4(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
 }
 
 inline bool operator==(const Vector3& Left, const Vector3& Right) noexcept   { return Left.x == Right.x && Left.y == Right.y && Left.z == Right.z; }
-inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept   { return !(Left == Right); }
+inline bool operator!=(const Vector3& Left, const Vector3& Right) noexcept   { return Left.x != Right.x || Left.y != Right.y || Left.z != Right.z; }
 
 inline Vector3 operator-(const Vector3& In) noexcept                         { return { -In.x, -In.y, -In.z }; }
 inline Vector3 operator-(float Left, const Vector3& Right) noexcept          { return {   Left - Right.x,   Left - Right.y,   Left - Right.z }; }

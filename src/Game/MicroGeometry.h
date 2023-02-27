@@ -62,6 +62,29 @@ public:
 };
 
 //=============================================================================
+// Triangle
+//=============================================================================
+class Triangle
+{
+public:
+	Triangle() = default;
+	Triangle(Triangle&&) = default;
+	Triangle(const Triangle&) = default;
+	Triangle(const Vector3& v1, const Vector3& v2, const Vector3& v3) : v{ v1, v2, v3 } {}
+
+	Triangle& operator=(Triangle&&) = default;
+	Triangle& operator=(const Triangle&) = default;
+
+	constexpr Vector3& operator[](size_t i) noexcept { return v[i]; }
+	constexpr const Vector3& operator[](size_t i) const noexcept { return v[i]; }
+
+	Vector3 GetCentroid() const; // Get center of triangle
+
+	// Vertices
+	Vector3 v[3];
+};
+
+//=============================================================================
 // Sphere
 //=============================================================================
 class Sphere
@@ -81,25 +104,45 @@ class AABB
 {
 public:
 	AABB() = default;
-	AABB(const Vector3& _min, const Vector3& _max) : min(_min), max(_max) {}
+	AABB(AABB&&) = default;
+	AABB(const AABB&) = default;
+	AABB(const Vector3& inMin, const Vector3& inMax) : min(inMin), max(inMax) {}
+	AABB(const Vector3& inCenter, float inRadius) : min(inCenter - inRadius), max(inCenter + inRadius) {}
 
-	void Merge(const AABB& rhs);
-	void AddPoint(const Vector3& point);
-	bool Overlaps(const AABB& aabb) const;
+	AABB& operator=(AABB&&) = default;
+	AABB& operator=(const AABB&) = default;
+
+	void AddPoint(const Vector3& point); // Add point in bounding box
+	void AddAABB(const AABB& rhs); // Add bounding box in bounding box
+	void AddTriangle(const Triangle& tri); // Encapsulate triangle in bounding box
+
+	Vector3 GetCenter() const;
+	Vector3 GetExtent() const; // Get extent of bounding box (half of the size)
+	Vector3 GetSize() const;
+	float GetSurfaceArea() const; // Get surface area of bounding box
+	float GetVolume() const;
+
 	bool Contains(const Vector3& point) const;
-	void ToTransform(const Matrix4& matrix);
+	bool Contains(const AABB& rhs) const;
+	bool Overlaps(const AABB& aabb) const; // Check if this box overlaps with another box
+
+	AABB Intersection(const AABB& rhs) const; // Intersect this bounding box with inOther, returns the intersection
+
 	void Translate(const Vector3& v);
-	void GetCorners(const Transform& tr, Vector3* points) const;
-	void GetCorners(const Matrix4& matrix, Vector3* points) const;
-	static Vector3 MinCoords(const Vector3& a, const Vector3& b);
-	static Vector3 MaxCoords(const Vector3& a, const Vector3& b);
-	void Shrink(float x);
-	AABB Intersection(const AABB& rhs) const;
-	AABB operator*(float scale) { return { min * scale, max * scale }; }
+	AABB Transformed(const Matrix4& matrix) const;
+	AABB Scaled(const Vector3& scale) const;// Scale this bounding box, can handle non-uniform and negative scaling
+
+	static AABB FromTwoPoints(const Vector3& point1, const Vector3& point2); // Create box from 2 points
 
 	Vector3 min;
 	Vector3 max;
 };
+
+inline Vector3 GetClosestPoint(const AABB& aabb, const Vector3& inPoint); // Get the closest point on or in this box to inPoint
+inline float GetSqDistanceTo(const AABB& aabb, const Vector3& inPoint); // Get the squared distance between inPoint and this box (will be 0 if in Point is inside the box)
+
+inline bool operator==(const AABB& Left, const AABB& Right) noexcept;
+inline bool operator!=(const AABB& Left, const AABB& Right) noexcept;
 
 //=============================================================================
 // Frustum
