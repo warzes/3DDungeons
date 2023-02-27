@@ -27,6 +27,9 @@
 #	include <windows.h>
 #endif // _WIN32
 
+#if defined(__ANDROID__)
+#endif // __ANDROID__
+
 #if defined(__linux__)
 #endif // __linux__
 

@@ -27,17 +27,29 @@
     <ClCompile Include="PlayerCamera.cpp">
       <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsSystem.cpp">
-      <Filter>MicroEngine\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsScene.cpp">
-      <Filter>MicroEngine\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="PhysicsBodyManager.cpp">
-      <Filter>MicroEngine\Physics\Body</Filter>
+      <Filter>PhysicsEngine\Physics\Body</Filter>
     </ClCompile>
     <ClCompile Include="RigidBody.cpp">
-      <Filter>MicroEngine\Physics\Body</Filter>
+      <Filter>PhysicsEngine\Physics\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsScene.cpp">
+      <Filter>PhysicsEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>PhysicsEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="temp.cpp">
+      <Filter>PhysicsEngine\Temp</Filter>
+    </ClCompile>
+    <ClCompile Include="TickCounter.cpp">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="StringTools.cpp">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -99,23 +111,47 @@
     <ClInclude Include="PlayerCamera.h">
       <Filter>SimpleGame\DungeonCrawler\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="IndexedTriangle.h">
-      <Filter>MicroEngine\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsSettings.h">
-      <Filter>MicroEngine\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsSystem.h">
-      <Filter>MicroEngine\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsScene.h">
-      <Filter>MicroEngine\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="PhysicsBodyManager.h">
-      <Filter>MicroEngine\Physics\Body</Filter>
+      <Filter>PhysicsEngine\Physics\Body</Filter>
     </ClInclude>
     <ClInclude Include="RigidBody.h">
-      <Filter>MicroEngine\Physics\Body</Filter>
+      <Filter>PhysicsEngine\Physics\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexedTriangle.h">
+      <Filter>PhysicsEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsScene.h">
+      <Filter>PhysicsEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSettings.h">
+      <Filter>PhysicsEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.h">
+      <Filter>PhysicsEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="TempCore.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TickCounter.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Reference.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Atomics.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Mutex.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="HashCombine.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="StringTools.h">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -149,26 +185,35 @@
     <Filter Include="SimpleGame\DungeonCrawler\Gameplay">
       <UniqueIdentifier>{2171e183-da56-454c-a489-865a8beb2bdb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\Physics">
-      <UniqueIdentifier>{2b121dab-7023-49f6-9506-17d30092eecd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MicroEngine\Math">
       <UniqueIdentifier>{577f23e5-8709-4d3d-998a-019b63056c76}</UniqueIdentifier>
     </Filter>
     <Filter Include="MicroEngine\Math\TempPhysics">
       <UniqueIdentifier>{d248455f-b6dc-480c-9e3f-54682627e36f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\Physics\Body">
+    <Filter Include="PhysicsEngine">
+      <UniqueIdentifier>{2b121dab-7023-49f6-9506-17d30092eecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysicsEngine\Temp">
+      <UniqueIdentifier>{6095d36e-35e8-4833-8760-219ac1a162e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysicsEngine\Physics">
+      <UniqueIdentifier>{bbfd699c-12d1-4691-8365-dc458108a7a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysicsEngine\Physics\Body">
       <UniqueIdentifier>{17216ad4-ef80-4b15-8657-3dc5386473b7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\Physics\Collision">
+    <Filter Include="PhysicsEngine\Physics\Collision">
       <UniqueIdentifier>{570b1be6-cafa-443b-b615-b17b682dfe46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\Physics\Collision\BroadPhase">
+    <Filter Include="PhysicsEngine\Physics\Collision\BroadPhase">
       <UniqueIdentifier>{7e249e14-776e-45f5-b60f-024250ded9b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MicroEngine\Physics\Collision\Shape">
+    <Filter Include="PhysicsEngine\Physics\Collision\Shape">
       <UniqueIdentifier>{1ff84f65-7a07-4899-a26c-83d22122784a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysicsEngine\Temp\Core">
+      <UniqueIdentifier>{36e250c5-7a5b-40ec-b688-53dd98491fcd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +225,9 @@
     </None>
     <None Include="MicroMath.inl">
       <Filter>MicroEngine\Math</Filter>
+    </None>
+    <None Include="Profiler.inl">
+      <Filter>PhysicsEngine\Temp\Core</Filter>
     </None>
   </ItemGroup>
 </Project>

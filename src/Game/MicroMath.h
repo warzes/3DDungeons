@@ -68,6 +68,24 @@ inline constexpr float Mix(float x, float y, float a) noexcept;
 class Color
 {
 public:
+	static const Color Black;
+	static const Color DarkRed;
+	static const Color Red;
+	static const Color DarkGreen;
+	static const Color Green;
+	static const Color DarkBlue;
+	static const Color Blue;
+	static const Color Yellow;
+	static const Color Purple;
+	static const Color Cyan;
+	static const Color Orange;
+	static const Color DarkOrange;
+	static const Color Grey;
+	static const Color LightGrey;
+	static const Color White;
+
+	static const Vector3 Zero;
+
 	constexpr Color() = default;
 	constexpr Color(Color&&) = default;
 	constexpr Color(const Color&) = default;

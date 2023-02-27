@@ -42,6 +42,23 @@ inline constexpr float Mix(float x, float y, float a) noexcept
 //=============================================================================
 // Color Impl
 //=============================================================================
+inline const Color Color::Black(0, 0, 0);
+inline const Color Color::DarkRed(128, 0, 0);
+inline const Color Color::Red(255, 0, 0);
+inline const Color Color::DarkGreen(0, 128, 0);
+inline const Color Color::Green(0, 255, 0);
+inline const Color Color::DarkBlue(0, 0, 128);
+inline const Color Color::Blue(0, 0, 255);
+inline const Color Color::Yellow(255, 255, 0);
+inline const Color Color::Purple(255, 0, 255);
+inline const Color Color::Cyan(0, 255, 255);
+inline const Color Color::Orange(255, 128, 0);
+inline const Color Color::DarkOrange(128, 64, 0);
+inline const Color Color::Grey(128, 128, 128);
+inline const Color Color::LightGrey(192, 192, 192);
+inline const Color Color::White(255, 255, 255);
+
+
 inline constexpr Color::Color(unsigned uintRGBA)
 {
 	a = (unsigned char)(uintRGBA >> 24);
