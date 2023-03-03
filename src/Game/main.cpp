@@ -1,6 +1,13 @@
 #include "MicroEngine.h"
 #include "AppConfig.h"
 
+//сделать демки из https ://github.com/floooh/sokol
+//https://mrnr15.itch.io/dungeon-dare
+
+#if defined(_MSC_VER)
+#	pragma comment( lib, "PhysicEngine.lib" )
+#endif
+
 //повторить вот это 
 //https://gpvoid.itch.io/rogue3d - механика боя
 //https://orbissan.itch.io/pixel-roguelike - продолжение для предыдущего - стиль

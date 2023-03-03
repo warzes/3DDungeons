@@ -4,14 +4,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game\Game.vcxproj", "{27713DC0-00BF-465F-861A-FB02D02B539F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509} = {63BD99F0-C8C0-41E3-B27C-B837310A7509}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{088018CB-1A93-45FE-9858-D1E2977390ED}"
 	ProjectSection(SolutionItems) = preProject
-		..\README.md = ..\README.md
 		doc.md = doc.md
+		..\README.md = ..\README.md
 		ref.md = ref.md
 		TODO.md = TODO.md
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysicEngine", "PhysicEngine\PhysicEngine.vcxproj", "{63BD99F0-C8C0-41E3-B27C-B837310A7509}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +34,14 @@ Global
 		{27713DC0-00BF-465F-861A-FB02D02B539F}.Release|x64.Build.0 = Release|x64
 		{27713DC0-00BF-465F-861A-FB02D02B539F}.Release|x86.ActiveCfg = Release|Win32
 		{27713DC0-00BF-465F-861A-FB02D02B539F}.Release|x86.Build.0 = Release|Win32
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Debug|x64.ActiveCfg = Debug|x64
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Debug|x64.Build.0 = Debug|x64
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Debug|x86.ActiveCfg = Debug|Win32
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Debug|x86.Build.0 = Debug|Win32
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Release|x64.ActiveCfg = Release|x64
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Release|x64.Build.0 = Release|x64
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Release|x86.ActiveCfg = Release|Win32
+		{63BD99F0-C8C0-41E3-B27C-B837310A7509}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
