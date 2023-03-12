@@ -11,6 +11,8 @@ Model wallModel;
 Model floorModel[7];
 Model ceilModel;
 
+// рисовать кубами, добавлять колонны - как тут https://zisongbr.itch.io/dungeon-low-poly-tileable
+
 //https://sketchfab.com/3d-models/low-poly-nature-pack-by-rgsdev-4b7e5b2130384655a7ccdd7e7b711836
 //https://github.com/voithos/quarkGL/tree/master/examples
 //-----------------------------------------------------------------------------
@@ -75,7 +77,7 @@ void main()
 	uniformWorldMatrix = shader["uWorld"];
 	uniformViewMatrix = shader["uView"];
 	uniformProjectionMatrix = shader["uProjection"];
-	uniformLight = shader["uniformLight"];
+	uniformLight = shader["Light"];
 
 
 	Texture2DInfo texInfo;

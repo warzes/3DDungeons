@@ -13,6 +13,7 @@
 //https://orbissan.itch.io/pixel-roguelike - продолжение для предыдущего - стиль
 //https://gpvoid.itch.io/dungeon-crawler - геймплей
 //https://wirelessjava.itch.io/amulet-of-destiny
+// https://genaralskar.itch.io/dungeon-crawler - анимация оружия
 //вот такой еще стиль рендера делать 
 //		- https://www.youtube.com/watch?v=JgfACGvWiM4
 //		- https://www.youtube.com/watch?v=Eb9C6_43K1Y

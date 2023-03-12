@@ -125,6 +125,9 @@
     <Filter Include="MicroEngine\Math\TempPhysics">
       <UniqueIdentifier>{d248455f-b6dc-480c-9e3f-54682627e36f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MicroEngine\Advance">
+      <UniqueIdentifier>{38ac96bc-d974-430d-a6ca-b14b53547823}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="MicroCollisions.inl">

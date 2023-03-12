@@ -2,6 +2,10 @@
 #include "3DTile.h"
 #include "PlayerCamera.h"
 
+// еще стиль (особенно освещение) https://deepnight.itch.io/dungeon-crawler
+// эта игра продается при своем виде  - https://voxelvoid.itch.io/dark-lords-maze
+// 
+// 
 //https://www.youtube.com/watch?v=Vr-Fsd6M5Tk
 //https://www.youtube.com/watch?v=VjuyfBaryu8&t=3s
 
